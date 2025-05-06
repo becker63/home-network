@@ -15,7 +15,7 @@ NODES = [
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent
 CONFIG_DIR = (PROJECT_ROOT / "talosctl" / "bootstrap_config").resolve()
-
+KUBECONFIG_PATH = (PROJECT_ROOT / "kubeconfig.yaml").resolve()
 
 @task
 def generate(c):
@@ -62,17 +62,59 @@ def generate(c):
 
 
 @task
-def bootstrap(c, node_ip="192.168.1.101"):
+def apply_config(c, node_ip):
     """
-    Bootstrap the Talos cluster on the first control plane node
+    Apply Talos machine config to the given node.
     """
-    print(f"🚀 Bootstrapping cluster on {node_ip}...")
-    result = c.run(
-        f"talosctl --talosconfig {CONFIG_DIR}/talosconfig bootstrap --nodes {node_ip}",
-        echo=True,
-        warn=True
+    print(f"📦 Applying config to {node_ip}")
+    c.run(
+        f"talosctl apply-config "
+        f"--talosconfig {CONFIG_DIR/'talosconfig'} "
+        f"--nodes {node_ip} "
+        f"--endpoints {node_ip} "
+        f"--file {CONFIG_DIR/f'{resolve_hostname(node_ip)}.yaml'}",
+        echo=True
     )
-    if result.failed:
-        print("❌ Bootstrap failed.")
-    else:
-        print("✅ Bootstrap successful.")
+
+
+@task
+def bootstrap_cluster(c):
+    """
+    Bootstrap the Talos cluster from the first control plane node.
+    Skips if kubeconfig already exists.
+    """
+    node_ip = get_bootstrap_node_ip()
+
+    if KUBECONFIG_PATH.exists():
+        print("⚠️  Cluster already bootstrapped. Skipping bootstrap.")
+        return
+
+    print(f"🚀 Bootstrapping from {node_ip}")
+    c.run(
+        f"talosctl bootstrap "
+        f"--talosconfig {CONFIG_DIR/'talosconfig'} "
+        f"--nodes {node_ip} "
+        f"--endpoints {node_ip}",
+        echo=True
+    )
+
+    print("📦 Fetching kubeconfig")
+    c.run(
+        f"talosctl kubeconfig "
+        f"--talosconfig {CONFIG_DIR/'talosconfig'} "
+        f"--nodes {node_ip} "
+        f"--endpoints {node_ip} "
+        f"{KUBECONFIG_PATH} --force",
+        echo=True
+    )
+
+
+# Helpers
+def resolve_hostname(ip):
+    for node in NODES:
+        if node["ip"] == ip:
+            return node["hostname"]
+    return "unknown"
+
+def get_bootstrap_node_ip():
+    return NODES[0]["ip"]
