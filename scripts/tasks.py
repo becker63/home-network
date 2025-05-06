@@ -62,25 +62,6 @@ def generate(c):
 
         print(f"✅ Wrote config: {output_path}")
 
-
-@task
-def apply_config(c, node_ip):
-    """
-    Apply Talos machine config to the given node (insecure mode for first contact).
-    """
-    print(f"📦 Applying config to {node_ip}")
-    hostname = resolve_hostname(node_ip)
-    config_file = CONFIG_DIR / f"{hostname}.yaml"
-
-    c.run(
-        f"talosctl apply-config "
-        f"--insecure "
-        f"--nodes {node_ip} "
-        f"--file {config_file}",
-        echo=True
-    )
-
-
 @task
 def bootstrap_cluster(c):
     """
@@ -113,23 +94,40 @@ def bootstrap_cluster(c):
     )
 
 @task
+def apply_config(c, node_ip):
+    """
+    Apply Talos machine config to the given node (insecure mode for first contact).
+    """
+    print(f"📦 Applying config to {node_ip}")
+    hostname = resolve_hostname(node_ip)
+    config_file = CONFIG_DIR / f"{hostname}.yaml"
+
+    c.run(
+        f"talosctl apply-config "
+        f"--insecure "
+        f"--nodes {node_ip} "
+        f"--file {config_file}",
+        echo=True
+    )
+
+# Helpers
+
+@task
 def health_check(c):
     """
     Check Talos and Kubernetes health across all nodes using talosctl health.
     """
-    for node in NODES:
-        ip = node["ip"]
-        print(f"🔍 Checking health of {node['hostname']} ({ip})...")
-        c.run(
-            f"talosctl health "
-            f"--talosconfig {TALOSCONFIG_PATH} "
-            f"--nodes {ip} "
-            f"--endpoints {ip}",
-            warn=True,
-            echo=True
+    ip = get_bootstrap_node_ip()
+    print(f"🔍 Checking health of cluster.")
+    c.run(
+        f"talosctl health "
+        f"--talosconfig {TALOSCONFIG_PATH} "
+        f"--nodes {ip} "
+        f"--endpoints {ip}",
+        warn=True,
+        echo=True
         )
 
-# Helpers
 def resolve_hostname(ip):
     for node in NODES:
         if node["ip"] == ip:
