@@ -1,0 +1,27 @@
+# Terraform state and cache
+*.tfstate
+*.tfstate.backup
+.terraform/
+
+# Ignore secrets, even if decrypted
+*.tfvars.json
+!*.tfvars.json.enc
+
+# Ignore kubeconfig or Talosconfig if sensitive
+kubeconfig.yaml
+talosctl/bootstrap_config/talosconfig
+
+# Python & editor clutter
+__pycache__/
+*.pyc
+.env
+.venv/
+*.log
+
+# SOPS Age private keys (never commit!)
+**/keys.txt
+
+# OS / IDE files
+.DS_Store
+.idea/
+.vscode/

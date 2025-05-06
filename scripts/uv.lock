@@ -34,10 +34,24 @@ source = { virtual = "." }
 dependencies = [
     { name = "invoke" },
     { name = "pyyaml" },
+    { name = "sopsy" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "invoke", specifier = ">=2.2.0" },
     { name = "pyyaml", specifier = ">=6.0.2" },
+    { name = "sopsy", specifier = ">=1.1.0" },
+]
+
+[[package]]
+name = "sopsy"
+version = "1.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyyaml" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/14/f9/d52a5092f9e32bd7749d10174c9c2d408e20da28f407775dee088e0b1a25/sopsy-1.1.0.tar.gz", hash = "sha256:5b25c831c96a5248de7ebec6180879c8d5cd3894ab8b1ad12409e6180567e82a", size = 78194 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f4/03/bb47d54941bb08ecc45e0e311c4089211fe5bfd169f6200d008cdffe7fcc/sopsy-1.1.0-py3-none-any.whl", hash = "sha256:13158da272f43c1394f370887a56d822d3fe17cd175421782e8e3285a5107fdf", size = 6988 },
 ]

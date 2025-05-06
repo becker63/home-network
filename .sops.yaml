@@ -1,0 +1,3 @@
+creation_rules:
+  - path_regex: \.tfvars\.json$
+    age: age14g2g95nh43vgslta46gxp9mm7f0s9unluygqy52uccwscvgcqvps86xmqy
