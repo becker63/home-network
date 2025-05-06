@@ -7,24 +7,29 @@ from pathlib import Path
 
 os.environ["SOPS_AGE_KEY_FILE"] = str(Path.home() / ".config/sops/age/keys.txt")
 
+
+def is_sops_encrypted(content: str) -> bool:
+    return (
+        "sops:" in content or     # YAML
+        '"sops"' in content or    # JSON
+        content.strip().startswith("ENC[")  # inline format (e.g. .env files)
+    )
+
+
 @task
 def encrypt_all(c):
     """
-    Encrypt all terraform.auto.tfvars.json files under terraform/**/
-    if they are not already encrypted.
+    Encrypt all terraform.auto.tfvars.json files and kubeconfig.yaml if not already encrypted.
     """
-    base = PROJECT_ROOT / "terraform"
-    print(f"📁 Searching in: {base.resolve()}")
-    tfvar_files = list(base.rglob("terraform.auto.tfvars.json"))
-    print(f"📄 All found tfvars files: {tfvar_files}")
+    tfvar_files = list((PROJECT_ROOT / "terraform").rglob("terraform.auto.tfvars.json"))
+    kubeconfig = PROJECT_ROOT / "kubeconfig.yaml"
+    all_files = tfvar_files + ([kubeconfig] if kubeconfig.exists() else [])
 
-    if not tfvar_files:
-        print("⚠️  No tfvars files found to encrypt.")
-        return
+    print(f"📁 Encrypting files: {all_files}")
 
-    for file_path in tfvar_files:
+    for file_path in all_files:
         content = file_path.read_text()
-        if '"sops"' in content or content.strip().startswith('{') and '"sops":' in content:
+        if is_sops_encrypted(content):
             print(f"⏭️  Skipping already encrypted file: {file_path}")
             continue
 
@@ -36,29 +41,29 @@ def encrypt_all(c):
 @task
 def decrypt_all(c):
     """
-    Decrypt all terraform.auto.tfvars.json files and overwrite with valid JSON.
+    Decrypt all terraform.auto.tfvars.json files and kubeconfig.yaml and overwrite with valid JSON or YAML.
     """
-    base = PROJECT_ROOT / "terraform"
-    tfvars_files = list(base.rglob("terraform.auto.tfvars.json"))
+    tfvar_files = list((PROJECT_ROOT / "terraform").rglob("terraform.auto.tfvars.json"))
+    kubeconfig = PROJECT_ROOT / "kubeconfig.yaml"
+    all_files = tfvar_files + ([kubeconfig] if kubeconfig.exists() else [])
 
-    if not tfvars_files:
-        print("⚠️  No tfvars files found.")
+    if not all_files:
+        print("⚠️  No files to decrypt.")
         return
 
-    for file_path in tfvars_files:
+    for file_path in all_files:
         print(f"🔓 Decrypting and writing: {file_path}")
         sops = Sops(file_path)
         decrypted = sops.decrypt()
 
-        # Normalize all output to a JSON-compatible dict
-        if isinstance(decrypted, str):
-            data = json.loads(decrypted)
+        # Normalize all output to string before writing
+        if isinstance(decrypted, dict):
+            content = json.dumps(decrypted, indent=2)
         elif isinstance(decrypted, bytes):
-            data = json.loads(decrypted.decode())
-        elif isinstance(decrypted, dict):
-            data = decrypted
+            content = decrypted.decode()
+        elif isinstance(decrypted, str):
+            content = decrypted
         else:
             raise TypeError(f"Unexpected decrypt output type: {type(decrypted)}")
 
-        # Overwrite with formatted JSON
-        file_path.write_text(json.dumps(data, indent=2))
+        file_path.write_text(content)
