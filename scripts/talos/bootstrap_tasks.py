@@ -10,13 +10,8 @@ from config import (
 def bootstrap_cluster(c):
     """
     Bootstrap the Talos cluster from the first control plane node.
-    Skips if kubeconfig already exists.
     """
     node_ip = get_bootstrap_node_ip()
-
-    if KUBECONFIG_PATH.exists():
-        print("⚠️  kubeconfig already exists at root. Skipping bootstrap.")
-        return
 
     print(f"🚀 Bootstrapping from {node_ip}")
     c.run(
@@ -27,7 +22,19 @@ def bootstrap_cluster(c):
         echo=True
     )
 
-    print("📦 Fetching kubeconfig")
+@task
+def fetch_kubeconfig(c, force=False):
+    """
+    Fetch kubeconfig from Talos cluster.
+    Skips if file already exists unless --force is passed.
+    """
+    node_ip = get_bootstrap_node_ip()
+
+    if KUBECONFIG_PATH.exists() and not force:
+        print(f"⚠️  kubeconfig already exists at {KUBECONFIG_PATH}. Use --force to overwrite.")
+        return
+
+    print(f"📦 Fetching kubeconfig from {node_ip}")
     c.run(
         f"talosctl kubeconfig "
         f"--talosconfig {TALOSCONFIG_PATH} "
@@ -61,7 +68,6 @@ def resolve_hostname(ip):
         if node["ip"] == ip:
             return node["hostname"]
     return "unknown"
-
 
 def get_bootstrap_node_ip():
     return NODES[0]["ip"]
