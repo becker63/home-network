@@ -66,7 +66,7 @@ def generate(c):
 @task
 def apply_config(c, node_ip):
     """
-    Apply Talos machine config to the given node.
+    Apply Talos machine config to the given node (insecure mode for first contact).
     """
     print(f"📦 Applying config to {node_ip}")
     hostname = resolve_hostname(node_ip)
@@ -74,9 +74,8 @@ def apply_config(c, node_ip):
 
     c.run(
         f"talosctl apply-config "
-        f"--talosconfig {TALOSCONFIG_PATH} "
+        f"--insecure "
         f"--nodes {node_ip} "
-        f"--endpoints {node_ip} "
         f"--file {config_file}",
         echo=True
     )
