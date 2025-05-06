@@ -112,6 +112,22 @@ def bootstrap_cluster(c):
         echo=True
     )
 
+@task
+def health_check(c):
+    """
+    Check Talos and Kubernetes health across all nodes using talosctl health.
+    """
+    for node in NODES:
+        ip = node["ip"]
+        print(f"🔍 Checking health of {node['hostname']} ({ip})...")
+        c.run(
+            f"talosctl health "
+            f"--talosconfig {TALOSCONFIG_PATH} "
+            f"--nodes {ip} "
+            f"--endpoints {ip}",
+            warn=True,
+            echo=True
+        )
 
 # Helpers
 def resolve_hostname(ip):
