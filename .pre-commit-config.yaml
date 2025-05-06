@@ -1,0 +1,8 @@
+repos:
+  - repo: local
+    hooks:
+      - id: encrypt-vars
+        name: Encrypt tfvars and kubeconfig
+        entry: just invoke sopsy.encrypt-all
+        language: system
+        pass_filenames: false

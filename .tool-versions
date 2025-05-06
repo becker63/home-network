@@ -3,3 +3,4 @@ terraform 1.11.4
 just 1.40.0
 direnv 2.36.0
 talosctl 1.10.0
+pre-commit 4.2.0
