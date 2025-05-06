@@ -69,7 +69,7 @@ def apply_config(c, node_ip):
     print(f"📦 Applying config to {node_ip}")
     c.run(
         f"talosctl apply-config "
-        f"--talosconfig {CONFIG_DIR/'talosconfig'} "
+        f"--talosconfig {KUBECONFIG_PATH} "
         f"--nodes {node_ip} "
         f"--endpoints {node_ip} "
         f"--file {CONFIG_DIR/f'{resolve_hostname(node_ip)}.yaml'}",
@@ -92,7 +92,7 @@ def bootstrap_cluster(c):
     print(f"🚀 Bootstrapping from {node_ip}")
     c.run(
         f"talosctl bootstrap "
-        f"--talosconfig {CONFIG_DIR/'talosconfig'} "
+        f"--talosconfig {KUBECONFIG_PATH} "
         f"--nodes {node_ip} "
         f"--endpoints {node_ip}",
         echo=True
@@ -101,7 +101,7 @@ def bootstrap_cluster(c):
     print("📦 Fetching kubeconfig")
     c.run(
         f"talosctl kubeconfig "
-        f"--talosconfig {CONFIG_DIR/'talosconfig'} "
+        f"--talosconfig {KUBECONFIG_PATH} "
         f"--nodes {node_ip} "
         f"--endpoints {node_ip} "
         f"{KUBECONFIG_PATH} --force",
