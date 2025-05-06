@@ -4,7 +4,6 @@ import json
 from config import PROJECT_ROOT
 import os
 from pathlib import Path
-from typing import cast
 
 os.environ["SOPS_AGE_KEY_FILE"] = str(Path.home() / ".config/sops/age/keys.txt")
 
