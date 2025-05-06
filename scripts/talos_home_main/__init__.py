@@ -1,7 +1,7 @@
 from invoke.collection import Collection
-import talos.bootstrap_tasks as bootstrap
-import talos.generate as generate
-import talos.extra as extra
+import talos_home_main.bootstrap_tasks as bootstrap
+import talos_home_main.generate as generate
+import talos_home_main.extra as extra
 
 ns = Collection()
 ns.add_collection(Collection.from_module(bootstrap))

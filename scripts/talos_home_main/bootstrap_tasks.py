@@ -3,7 +3,7 @@ from config import (
     NODES,
     CONFIG_DIR,
     TALOSCONFIG_PATH,
-    KUBECONFIG_PATH,
+    TALOS_HOME_MAIN_KUBECONFIG_PATH,
 )
 
 @task
@@ -30,8 +30,8 @@ def fetch_kubeconfig(c, force=False):
     """
     node_ip = get_bootstrap_node_ip()
 
-    if KUBECONFIG_PATH.exists() and not force:
-        print(f"⚠️  kubeconfig already exists at {KUBECONFIG_PATH}. Use --force to overwrite.")
+    if TALOS_HOME_MAIN_KUBECONFIG_PATH.exists() and not force:
+        print(f"⚠️  kubeconfig already exists at {TALOS_HOME_MAIN_KUBECONFIG_PATH}. Use --force to overwrite.")
         return
 
     print(f"📦 Fetching kubeconfig from {node_ip}")
@@ -40,7 +40,7 @@ def fetch_kubeconfig(c, force=False):
         f"--talosconfig {TALOSCONFIG_PATH} "
         f"--nodes {node_ip} "
         f"--endpoints {node_ip} "
-        f"{KUBECONFIG_PATH} --force",
+        f"{TALOS_HOME_MAIN_KUBECONFIG_PATH} --force",
         echo=True
     )
 

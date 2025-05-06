@@ -1,7 +1,7 @@
 from sopsy import Sops
 from invoke.tasks import task
 import json
-from config import PROJECT_ROOT
+from config import PROJECT_ROOT, TALOS_HOME_MAIN_KUBECONFIG_PATH
 import os
 from pathlib import Path
 
@@ -22,7 +22,7 @@ def encrypt_all(c):
     Encrypt all terraform.auto.tfvars.json files and kubeconfig.yaml if not already encrypted.
     """
     tfvar_files = list((PROJECT_ROOT / "terraform").rglob("terraform.auto.tfvars.json"))
-    kubeconfig = PROJECT_ROOT / "kubeconfig.yaml"
+    kubeconfig = TALOS_HOME_MAIN_KUBECONFIG_PATH
     all_files = tfvar_files + ([kubeconfig] if kubeconfig.exists() else [])
 
     print(f"📁 Encrypting files: {all_files}")
@@ -44,7 +44,7 @@ def decrypt_all(c):
     Decrypt all terraform.auto.tfvars.json files and kubeconfig.yaml and overwrite with valid JSON or YAML.
     """
     tfvar_files = list((PROJECT_ROOT / "terraform").rglob("terraform.auto.tfvars.json"))
-    kubeconfig = PROJECT_ROOT / "kubeconfig.yaml"
+    kubeconfig = TALOS_HOME_MAIN_KUBECONFIG_PATH
     all_files = tfvar_files + ([kubeconfig] if kubeconfig.exists() else [])
 
     if not all_files:

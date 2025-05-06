@@ -7,7 +7,7 @@ PROJECT_ROOT = SCRIPT_DIR.parent.resolve()
 # Talos-specific paths
 CONFIG_DIR = PROJECT_ROOT / "talosctl" / "bootstrap_config"
 TALOSCONFIG_PATH = CONFIG_DIR / "talosconfig"
-KUBECONFIG_PATH = PROJECT_ROOT / "kubeconfig.yaml"
+TALOS_HOME_MAIN_KUBECONFIG_PATH = PROJECT_ROOT / "kubeconfigs" / "home-main.yaml"
 
 # Cluster settings
 CLUSTER_NAME = "home-lab"

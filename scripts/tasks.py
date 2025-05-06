@@ -1,5 +1,5 @@
 from invoke.collection import Collection
-from talos import ns as bootstrap_ns
+from talos_home_main import ns as bootstrap_ns
 from sopsy_tasks import sopsy_tasks
 
 ns = Collection()
