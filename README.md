@@ -155,15 +155,3 @@ Defines all homelab services and workloads.
 
 ---
 
-## 📁 Repo Overview
-
-```text
-phases/
-├── phase0-bootstrap/   # OCI VM provisioning, frps, keepalived, DNS, Talos machine configs
-├── phase1-core/        # Ceph, PostgreSQL, Traefik, frpc
-├── phase2-platform/    # Atlantis, cert management, GitHub runner
-├── phase3-apps/        # Workloads: services, VMs, dashboards
-
-scripts/                # Talosctl and SOPS automation (invoke tasks)
-sops/                   # Encrypted secrets for use across phases
-talosctl/               # Static machine configs for Talos cluster
