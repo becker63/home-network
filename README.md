@@ -4,6 +4,37 @@ This project manages a fully declarative, GitOps-driven home lab infrastructure 
 
 ---
 
+## 🧱 Hardware Overview
+
+This project is designed to run on the following physical and cloud infrastructure:
+
+### 🖥️ On-Prem Hardware
+
+- **3× ThinkCentre Mini PCs**
+  - Run Talos Linux
+  - Form a high-availability Kubernetes control plane
+  - Host critical stateful services (Ceph, Postgres, Atlantis, etc.)
+  - Networked behind a home router
+  - Intended to be resilient and fault-tolerant
+
+- **1× Proxmox Bare-Metal Node**
+  - Runs dynamic workloads as VMs or LXCs
+  - Used for less critical, stateful, or experimental services
+  - Terraform-managed (via Atlantis in Phase 3)
+
+- **OpenWRT Router**
+  - Manages internal networking
+  - Not Terraform-managed, but assumed for DNS/DHCP configuration
+
+### ☁️ Cloud Resources
+
+- **2× Oracle Cloud (OCI) Always Free VMs**
+  - Publicly reachable, external ingress layer
+  - Run `frps` and `keepalived` for reverse tunneling and failover
+  - Used to expose internal services like Atlantis and Ceph
+
+---
+
 ## 📦 Project Structure by Phase
 
 ### 📍 Phase 0: Bootstrap
