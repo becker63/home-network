@@ -6,31 +6,39 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils, ... }:
+  outputs = { nixpkgs, flake-utils, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = import nixpkgs { inherit system; };
-        inherit (pkgs) mkShell nixd;
+        pkgs = import nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+        };
       in {
-        devShells.default = mkShell {
-          packages = [
+        devShells.default = pkgs.mkShell {
+          packages = with pkgs; [
+            # Editor tools
+            nixfmt
+            nil
             nixd
-            python313
-            terraform_1_11
-            just
             direnv
-            talosctl
+
+            # Needed pkgs
+            terraform
+            just
             pre-commit
+            talosctl
+
+            # Python
+            python313
             uv
           ];
-
+          # Some magic to run zsh in our devshell
           shellHook = ''
-              if [ -z "$IN_NIX_SHELL_ZSH" ]; then
-                export IN_NIX_SHELL_ZSH=1
-                exec zsh
-              fi
-            '';
+            if [ -z "$IN_NIX_SHELL_ZSH" ]; then
+              export IN_NIX_SHELL_ZSH=1
+              exec zsh
+            fi
+          '';
         };
-      }
-    );
+      });
 }
