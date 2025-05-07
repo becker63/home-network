@@ -28,4 +28,4 @@ __pycache__/
 
 .ropeproject/
 .envrc.cache
-.direnv
+.direnv/
