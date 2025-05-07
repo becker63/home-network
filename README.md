@@ -8,12 +8,25 @@ This project manages a fully declarative, GitOps-driven home lab infrastructure 
 
 ### 📍 Phase 0: Bootstrap
 
-Brings up minimal infrastructure to enable higher-level provisioning. This includes:
+Brings up the minimal infrastructure required to support later provisioning remotely. This includes:
 
 - **OCI VMs (x2)**
   - Provisioned using Terraform (Always Free tier)
-  - No software is installed yet; treated as raw VM resources
-  - Will host ingress services in Phase 1
+  - Hosts ingress services (FRP server + keepalived)
+  - Public-facing tunnel endpoint for home cluster access
+
+- **FRP Server (`frps`)**
+  - Installed on both OCI VMs
+  - Accepts tunnels from internal `frpc` clients in the home cluster
+  - Enables external access to Ceph (S3) for remote Terraform state
+
+- **Keepalived**
+  - Provides a floating public IP across the OCI VMs
+  - Ensures high-availability access to the `frps` service
+
+- **Public DNS**
+  - Points your domain (e.g., `gitops.example.com`) to the OCI floating IP
+  - Enables external access to services tunneled through FRP
 
 - **Talos Machine Configs**
   - Static configs for the 3-node Kubernetes control plane (ThinkCentre mini PCs)
@@ -24,38 +37,21 @@ Brings up minimal infrastructure to enable higher-level provisioning. This inclu
   - Initially bootstrapped manually or via future NetBoot automation
 
 - **Initial Local Terraform State**
-  - Used to bootstrap Ceph and the K8s cluster
-  - Will be migrated to remote Ceph S3 once available
+  - Used to provision OCI VMs and Talos configs
+  - Will later migrate to Ceph (S3) once that backend is stood up in Phase 1
 
 ---
 
 ### 📍 Phase 1: Core Infrastructure
 
-Installs foundational services across cloud and on-prem environments to support GitOps, remote access, and stateful workloads.
-
-#### ☁️🌍 OCI Ingress Layer (OCI VMs + Public DNS)
-
-Creates a highly available reverse proxy setup that exposes internal services to the internet.
-
-- **FRP Server (`frps`)**
-  - Runs on both OCI VMs
-  - Accepts tunnels from internal `frpc` clients
-  - Forwards traffic to internal services like Atlantis and Traefik
-
-- **Keepalived**
-  - Provides high availability via floating public IP
-  - Ensures a single stable IP address across both OCI VMs
-
-- **Public DNS**
-  - Maps domain names (e.g., `gitops.example.com`) to the OCI floating IP
-  - Enables stable, public access to the home network through FRP
+Installs foundational services inside the Kubernetes cluster to support GitOps, persistent infrastructure, and cluster ingress.
 
 #### 🏠 Home Kubernetes Cluster (Talos Nodes)
 
 - **FRP Client (`frpc`)**
   - Runs as a static pod or DaemonSet
-  - Maintains outbound tunnel to OCI `frps`
-  - Forwards ingress traffic from the public internet into the cluster
+  - Maintains an outbound tunnel to OCI `frps`
+  - Forwards ingress traffic from the internet into the cluster
 
 - **Ceph (S3 Gateway Mode)**
   - MinIO-compatible object storage deployed across the Talos control plane
@@ -134,8 +130,8 @@ Defines all homelab services and workloads.
 
 ```text
 phases/
-├── phase0-bootstrap/   # OCI VM provisioning, Talos machine configs
-├── phase1-core/        # FRP (OCI/home), Ceph, PostgreSQL, Traefik, DNS
+├── phase0-bootstrap/   # OCI VM provisioning, frps, keepalived, DNS, Talos machine configs
+├── phase1-core/        # Ceph, PostgreSQL, Traefik, frpc
 ├── phase2-platform/    # Atlantis, cert management, GitHub runner
 ├── phase3-apps/        # Workloads: services, VMs, dashboards
 
