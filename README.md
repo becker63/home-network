@@ -23,8 +23,6 @@ This project is designed to run on the following physical and cloud infrastructu
   - Terraform-managed (via Atlantis in Phase 3)
 
 - **OpenWRT Router**
-  - Manages internal networking
-  - Not Terraform-managed, but assumed for DNS/DHCP configuration
 
 ### ☁️ Cloud Resources
 
