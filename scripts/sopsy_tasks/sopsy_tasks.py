@@ -3,7 +3,7 @@ from invoke.tasks import task
 import json
 import os
 from pathlib import Path
-from config import PROJECT_ROOT, KUBECONFIG_PATH, PHASES_DIR
+from config import PROJECT_ROOT, PHASES_DIR
 
 SOPS_AGE_KEY_FILE = Path.home() / ".config/sops/age/keys.txt"
 KUBECONFIG_DIR = PROJECT_ROOT / "kubeconfigs"
