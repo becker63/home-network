@@ -11,6 +11,7 @@ def find_project_root(start: Path, marker_file: str = "Justfile") -> Path:
 # Core paths
 PROJECT_ROOT = find_project_root(Path(__file__).resolve())
 PHASES_DIR = PROJECT_ROOT / "phases"
+KUBECONFIG_DIR = PROJECT_ROOT / "kubeconfigs"
 
 # Cluster settings
 CLUSTER_NAME = "home-lab"

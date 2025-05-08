@@ -1,10 +1,14 @@
 from invoke.tasks import task
-from config import (
+from root_config import (
     NODES,
-    CONFIG_DIR,
-    TALOSCONFIG_PATH,
-    TALOS_HOME_MAIN_KUBECONFIG_PATH,
+    KUBECONFIG_DIR,
 )
+from pathlib import Path
+
+PHASE_ROOT = Path(__file__).resolve().parent.parent
+CONFIG_DIR = PHASE_ROOT / "talosctl" / "bootstrap_config"
+TALOSCONFIG_PATH = CONFIG_DIR / "talosconfig"
+KUBECONFIG_PATH = KUBECONFIG_DIR / "home_kubeconfig.yaml"
 
 @task
 def bootstrap_cluster(c):
@@ -26,13 +30,8 @@ def bootstrap_cluster(c):
 def fetch_kubeconfig(c, force=False):
     """
     Fetch kubeconfig from Talos cluster.
-    Skips if file already exists unless --force is passed.
     """
     node_ip = get_bootstrap_node_ip()
-
-    if TALOS_HOME_MAIN_KUBECONFIG_PATH.exists() and not force:
-        print(f"⚠️  kubeconfig already exists at {TALOS_HOME_MAIN_KUBECONFIG_PATH}. Use --force to overwrite.")
-        return
 
     print(f"📦 Fetching kubeconfig from {node_ip}")
     c.run(
@@ -40,7 +39,7 @@ def fetch_kubeconfig(c, force=False):
         f"--talosconfig {TALOSCONFIG_PATH} "
         f"--nodes {node_ip} "
         f"--endpoints {node_ip} "
-        f"{TALOS_HOME_MAIN_KUBECONFIG_PATH} --force",
+        f"{KUBECONFIG_PATH} --force",
         echo=True
     )
 

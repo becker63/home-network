@@ -3,10 +3,9 @@ from invoke.tasks import task
 import json
 import os
 from pathlib import Path
-from config import PROJECT_ROOT, PHASES_DIR
+from root_config import PHASES_DIR, KUBECONFIG_DIR
 
 SOPS_AGE_KEY_FILE = Path.home() / ".config/sops/age/keys.txt"
-KUBECONFIG_DIR = PROJECT_ROOT / "kubeconfigs"
 TFVARS_GLOB = "terraform.auto.tfvars.json"
 KUBECONFIG_GLOB = "*.yaml"
 
