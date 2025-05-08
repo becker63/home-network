@@ -1,10 +1,20 @@
-{ pkgs, lib, ... }:
-
-let
-  hostname = builtins.getEnv "FRP_HOSTNAME";
-  isMaster = lib.strings.hasInfix "1" hostname; # e.g., frp-node-1 is master
-in
 {
-  networking.hostName = lib.mkDefault hostname;
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
+{
+  networking.hostName = lib.mkDefault "frp-node";
+  services.openssh.enable = true;
+
+  users.users.root.openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3Nz... yourkey" ];
+
+  environment.systemPackages = with pkgs; [
+    frp
+    keepalived
+  ];
+
+  system.stateVersion = "24.05";
 }

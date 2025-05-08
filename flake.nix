@@ -14,19 +14,6 @@
           inherit system;
           config.allowUnfree = true;
         };
-
-        # Define the QCOW2 image package
-        qcowImagePkg = nixos-generators.nixosGenerate {
-          system = "x86_64-linux"; # Build platform
-          format = "qcow";
-          modules = [
-            {
-              nixpkgs.buildPlatform = "x86_64-linux";
-              nixpkgs.hostPlatform = "aarch64-linux"; # Target platform
-            }
-            ./phases/one_bootstrap/nix_configs/cloud_frp/configuration.nix
-          ];
-        };
       in
       {
         devShells.default = pkgs.mkShell {
@@ -53,10 +40,6 @@
               exec zsh
             fi
           '';
-        };
-
-        packages = {
-          qcowImage = qcowImagePkg;
         };
       });
 }
