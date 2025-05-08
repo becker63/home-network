@@ -2,9 +2,9 @@ default:
     @echo ""
     @just list
 
-# Install all tools listed in .tool-versions
+# Start the dev shell with needed tools
 install-tools:
-    asdf install
+    nix develop
 
 [working-directory: 'scripts']
 list:

@@ -1,11 +1,10 @@
 from invoke.tasks import task
-import subprocess
 from pathlib import Path
 
 # Paths
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-CONFIG_PATH = PROJECT_ROOT / "nix_configs" / "cloud_frp" / "configuration.nix"
-OUTPUT_IMAGE = PROJECT_ROOT / "nix_configs" / "terraform" / "nixos-frp.qcow2"
+PHASE_ROOT = Path(__file__).resolve().parents[2]
+CONFIG_PATH = PHASE_ROOT / "nix_configs" / "cloud_frp" / "configuration.nix"
+OUTPUT_IMAGE = PHASE_ROOT / "terraform" / "nixos-frp.qcow2"
 
 @task
 def build_qcow_image(c):
@@ -15,8 +14,9 @@ def build_qcow_image(c):
     print("🚀 Generating NixOS QCOW2 image...")
 
     cmd = (
-        f"nix run github:nix-community/nixos-generators -- "
-        f"-f qcow2 -c {CONFIG_PATH} -o {OUTPUT_IMAGE}"
+        f"NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 "
+        f"nix build --impure --extra-platforms x86_64-linux "
+        f".#qcowImage"
     )
 
     c.run(cmd, echo=True)

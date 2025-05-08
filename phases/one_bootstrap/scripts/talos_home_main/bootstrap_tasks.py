@@ -1,5 +1,5 @@
 from invoke.tasks import task
-from root_config import (
+from scripts.root_config import (
     NODES,
     KUBECONFIG_DIR,
 )

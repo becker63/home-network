@@ -1,6 +1,6 @@
 {
   "venvPath": "./scripts",
   "venv": ".venv",
-  "include": ["scripts"],
-  "extraPaths": ["phases/0-bootstrap/scripts/talos_home_main", "scripts"]
+  "include": ["scripts", "phases"],
+  "extraPaths": []
 }
