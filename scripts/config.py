@@ -1,13 +1,21 @@
 from pathlib import Path
 
+def find_project_root(start: Path, marker_file: str = "Justfile") -> Path:
+    current = start
+    while current != current.parent:
+        if (current / marker_file).exists():
+            return current
+        current = current.parent
+    raise RuntimeError("Project root not found.")
+
 # Core paths
-SCRIPT_DIR = Path(__file__).resolve().parent
-PROJECT_ROOT = SCRIPT_DIR.parent.resolve()
+PROJECT_ROOT = find_project_root(Path(__file__).resolve())
+PHASES_DIR = PROJECT_ROOT / "phases"
 
 # Talos-specific paths
 CONFIG_DIR = PROJECT_ROOT / "talosctl" / "bootstrap_config"
 TALOSCONFIG_PATH = CONFIG_DIR / "talosconfig"
-TALOS_HOME_MAIN_KUBECONFIG_PATH = PROJECT_ROOT / "kubeconfigs" / "home-main.yaml"
+KUBECONFIG_PATH = PROJECT_ROOT / "kubeconfigs"
 
 # Cluster settings
 CLUSTER_NAME = "home-lab"
