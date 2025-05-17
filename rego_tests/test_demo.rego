@@ -1,4 +1,4 @@
-package main
+package rego_tests
 
 import data.lib.kubernetes
 
