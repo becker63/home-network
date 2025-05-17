@@ -183,3 +183,6 @@ config/git-crypt.key
 !jest.config.js
 node_modules
 dist/
+
+# Ignore generated Kubernetes API imports
+imports/
