@@ -1,3 +1,4 @@
+// scripts/synth.ts
 import { App } from "cdk8s";
 import { DemoTestChart } from "./charts/test_demo";
 

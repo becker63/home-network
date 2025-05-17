@@ -49,6 +49,7 @@
             bun
             talosctl
             git-crypt
+            conftest
 
             # Things I like
             zoxide

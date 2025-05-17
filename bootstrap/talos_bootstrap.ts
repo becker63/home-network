@@ -1,13 +1,9 @@
-// tasks.ts
 // TODO: Move to omni with net boot
-import { $ } from "zx";
+import { execa } from "execa";
 import * as fs from "fs";
 import * as path from "path";
-import yaml from "js-yaml";
-import { fileURLToPath } from "url";
+import * as yaml from "js-yaml";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 // ---- Placeholder Config Constants ----
 
 const CONFIG_DIR = path.resolve(__dirname, "./talosctl/bootstrap_config");
@@ -37,32 +33,32 @@ function resolveHostname(ip: string): string {
   return node ? node.hostname : "unknown";
 }
 
-// ---- ZX Tasks ----
+// ---- execa-based Tasks ----
 
 export async function bootstrapCluster() {
   const nodeIp = getBootstrapNodeIP();
   console.log(`🚀 Bootstrapping from ${nodeIp}`);
-  await $`talosctl bootstrap --talosconfig ${TALOSCONFIG_PATH} --nodes ${nodeIp} --endpoints ${nodeIp}`;
+  await execa`talosctl bootstrap --talosconfig ${TALOSCONFIG_PATH} --nodes ${nodeIp} --endpoints ${nodeIp}`;
 }
 
 export async function fetchKubeconfig(force = false) {
   const nodeIp = getBootstrapNodeIP();
   console.log(`📦 Fetching kubeconfig from ${nodeIp}`);
   const forceFlag = force ? "--force" : "";
-  await $`talosctl kubeconfig --talosconfig ${TALOSCONFIG_PATH} --nodes ${nodeIp} --endpoints ${nodeIp} ${forceFlag} ${KUBECONFIG_PATH}`;
+  await execa`talosctl kubeconfig --talosconfig ${TALOSCONFIG_PATH} --nodes ${nodeIp} --endpoints ${nodeIp} ${forceFlag} ${KUBECONFIG_PATH}`;
 }
 
 export async function applyConfig(nodeIp: string) {
   const hostname = resolveHostname(nodeIp);
   const configFile = path.join(CONFIG_DIR, `${hostname}.yaml`);
   console.log(`📦 Applying config to ${nodeIp}`);
-  await $`talosctl apply-config --insecure --nodes ${nodeIp} --file ${configFile}`;
+  await execa`talosctl apply-config --insecure --nodes ${nodeIp} --file ${configFile}`;
 }
 
 export async function healthCheck() {
   const ip = getBootstrapNodeIP();
   console.log("🔍 Checking health of cluster.");
-  await $`talosctl health --talosconfig ${TALOSCONFIG_PATH} --nodes ${ip} --endpoints ${ip}`;
+  await execa`talosctl health --talosconfig ${TALOSCONFIG_PATH} --nodes ${ip} --endpoints ${ip}`;
 }
 
 export async function generateConfig() {
@@ -70,7 +66,9 @@ export async function generateConfig() {
   fs.mkdirSync(CONFIG_DIR, { recursive: true });
 
   const result =
-    await $`talosctl gen config ${CLUSTER_NAME} ${K8S_ENDPOINT} --output-dir ${CONFIG_DIR} --force`.nothrow();
+    await execa`talosctl gen config ${CLUSTER_NAME} ${K8S_ENDPOINT} --output-dir ${CONFIG_DIR} --force`.catch(
+      (err) => err,
+    );
 
   if (result.exitCode !== 0) {
     console.error("❌ talosctl gen config failed.");

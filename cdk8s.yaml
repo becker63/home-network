@@ -1,4 +1,5 @@
 language: typescript
 app: npx ts-node main.ts
+output: synth-yaml
 imports:
   - k8s
