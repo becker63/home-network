@@ -1,6 +1,9 @@
 # TODO:
 
 ### 0. learn more about crossplane
+  * will procedural steps be reconciled?
+  * how would wrapping the argocd nix image build steps in a composition reconcile?
+  * how do we trigger the argocd image composition when digitalocean needs reconciliation 
 
 ### 1. Add each phases responsibility and process in here.
   * What will argocd do? what phase does it mostly sit in?
