@@ -6,7 +6,6 @@ This is the order in which each CDK8s chart should be instantiated to ensure dep
 2. **CrossplaneCore** – Sets up the `crossplane-system` namespace.
 3. **DOProvider** – Configures the DigitalOcean provider for Crossplane.
 4. **ArgoWorkflowBuilder** – (Optional for testing, nixos build tests will be performed elseware, we also shouldnt mock aws apis like s3 or digitalocean) Defines the Argo Workflow to build, upload, and register the NixOS image.
-5. **NixOSImageSecret** – writes the image slug into a `Secret`.
 6. **ImageReader** – Uses `provider-kubernetes` to extract the image slug from the Secret and write a connection secret.
 7. **FinalDroplet** – Provisions the DigitalOcean Droplet using the image slug from the connection secret.
 
@@ -283,35 +282,6 @@ export class ArgoWorkflowBuilder extends Chart {
 }
 ```
 
-## NixOS Write Image Secret Chart
-
-```typescript
-// charts/sut/writeimagesecret.ts
-import { Chart } from 'cdk8s';
-import { Construct } from 'constructs';
-import * as k8s from '../imports/k8s';
-
-export class NixOSImageSecret extends Chart {
-  constructor(scope: Construct, id: string) {
-    super(scope, id);
-
-    new k8s.KubeManifest(this, 'ImageSecret', {
-      manifest: {
-        apiVersion: 'v1',
-        kind: 'Secret',
-        metadata: {
-          name: 'nixos-image',
-          namespace: 'default'
-        },
-        stringData: {
-          image: 'nixos-latest'
-        }
-      }
-    });
-  }
-}
-```
-
 ## Image Reader Chart
 
 ```typescript
@@ -384,27 +354,77 @@ export class FinalDroplet extends Chart {
 }
 ```
 
+### The workflow trigger that crossplane runs
+``` ts
+// charts/sut/workflow-trigger.ts
+import { Chart } from 'cdk8s';
+import { Construct } from 'constructs';
+import * as k8s from '../imports/k8s';
+
+export class ArgoWorkflowTrigger extends Chart {
+  constructor(scope: Construct, id: string) {
+    super(scope, id);
+
+    new k8s.KubeManifest(this, 'RunWorkflowInstance', {
+      manifest: {
+        apiVersion: 'kubernetes.crossplane.io/v1alpha1',
+        kind: 'Object',
+        metadata: { name: 'run-image-builder' },
+        spec: {
+          deletionPolicy: 'Delete', // <-- add this
+          forProvider: {
+            manifest: {
+              apiVersion: 'argoproj.io/v1alpha1',
+              kind: 'Workflow',
+              metadata: {
+                generateName: 'image-build-',
+                namespace: 'default'
+              },
+              spec: {
+                workflowTemplateRef: {
+                  name: 'nixos-image-builder'
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}
+```
+
 ## Main Application Entry Point
 
-```typescript
+``` ts
 // charts/sut/index.ts
 import { App } from 'cdk8s';
 import { ArgoCDCore } from './argocd';
 import { CrossplaneCore } from './crossplane';
 import { DOProvider } from './provider';
 import { ArgoWorkflowBuilder } from './imagebuilder';
-import { NixOSImageSecret } from './writeimagesecret';
+import { NixOSImageSecret } from './writeimagesecret'; // Optional: for test/dev only
 import { ImageReader } from './readsecret';
 import { FinalDroplet } from './droplet';
+import * as k8s from '../imports/k8s';
 
 const app = new App();
 
+// 1. Core infrastructure setup
 new ArgoCDCore(app, 'argocd');
 new CrossplaneCore(app, 'crossplane');
 new DOProvider(app, 'provider');
+
+// 2. Define Argo Workflow template
 new ArgoWorkflowBuilder(app, 'workflow');
-new NixOSImageSecret(app, 'image-secret');
+
+// 3. Submit a *run* of the workflow using provider-kubernetes
+new ArgoWorkflowTrigger(app, 'workflowtrigger')
+
+// 4. Read the secret created by the workflow
 new ImageReader(app, 'image-reader');
+
+// 5. Create the droplet using the image slug from the connection secret
 new FinalDroplet(app, 'droplet');
 
 app.synth();
