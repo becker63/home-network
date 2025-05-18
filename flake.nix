@@ -23,8 +23,6 @@
           config.allowUnfree = true;
         };
 
-        isX86_64Linux = system == "x86_64-linux";
-
         baseModules = [
           (
             { ... }:
@@ -34,6 +32,15 @@
             }
           )
         ];
+
+        qcowPackages = import ./flake_modules/frp_qcow.nix {
+          inherit
+            pkgs
+            system
+            nixos-generators
+            baseModules
+            ;
+        };
       in
       {
         # Developer shell (works on all systems)
@@ -88,30 +95,7 @@
           '';
         };
 
-        # Only expose qcow2 image build outputs for x86_64-linux
-        packages =
-          if isX86_64Linux then
-            {
-              master-qcow = nixos-generators.nixosGenerate {
-                inherit system;
-                format = "qcow";
-                modules = baseModules ++ [
-                  ./phases/0_bootstrap/frp_nix_config/configuration.nix
-                  ./phases/0_bootstrap/frp_nix_config/master.nix
-                ];
-              };
-
-              slave-qcow = nixos-generators.nixosGenerate {
-                inherit system;
-                format = "qcow";
-                modules = baseModules ++ [
-                  ./phases/0_bootstrap/frp_nix_config/configuration.nix
-                  ./phases/0_bootstrap/frp_nix_config/slave.nix
-                ];
-              };
-            }
-          else
-            { };
+        packages = qcowPackages;
       }
     );
 }
