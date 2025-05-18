@@ -1,14 +1,21 @@
 # TODO:
 
-### Add each phases responsibility and process in here.
+### 0. learn more about crossplane
+
+### 1. Add each phases responsibility and process in here.
   * What will argocd do? what phase does it mostly sit in?
   * What does the bootstrap phase do?
 
-### Fix the git-crypt encryption from previous revision
+### 2. Fix the git-crypt encryption from previous revision
   * check config folder
   * you commited your key, regen and gitignore it
+  * make sure secrets.json is being encrypted again
+  * test if we can read secrrets.json + constants
 
-### Fix talosctl bootstrap code
+### 3. Write the rest of the phases
+  * use testing strat below for each step
+
+### 4. Fix talosctl bootstrap code
   * move our kubeconfig over
   * make sure a healthcheck succeeds
   * fully automate with omni/netboot docker container in future
