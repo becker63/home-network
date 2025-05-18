@@ -1,3 +1,25 @@
+# Testing Strategy Summary (with Crossplane Composition + Nix VM Testing)
+
+| Concern                                                              | Test? | Tool / Approach                                                                                   |
+|----------------------------------------------------------------------|-------|----------------------------------------------------------------------------------------------------|
+| ✅ Does my **Crossplane Composition render the correct resources**?  | Yes   | [KUTTL](https://kuttl.dev/) — assert that the right child resources are created                   |
+| ✅ Does **data wiring** (e.g., image slug from secret → Droplet) work?| Yes   | KUTTL or `kubectl get -o yaml` — verify fields are correctly populated                            |
+| ✅ Does the **image build work and boot a working system**?          | Yes   | Use [Nix VM integration tests](https://nix.dev/tutorials/nixos/integration-testing-using-virtual-machines.html) to run and validate the image before publishing |
+| 🚫 Do **doctl** / `aws` upload steps work                            | Skip  | Assume correctness — optionally verify once manually or via logs                                  |
+| 🚫 Does DigitalOcean **Droplet provisioning** work at the API level  | Skip  | Assume DO’s API is reliable — test only for integration at the Kubernetes level                   |
+| 🚫 Do **CDK8s chart internals** need testing                         | Skip  | Treat CDK8s output as plain YAML — test via Kubernetes behavior instead                           |
+
+---
+
+### 🧪 Where to focus:
+
+- ✅ **KUTTL**: Prove your Composition renders and wires correctly
+- ✅ **Nix VM Test**: Ensure your NixOS system boots and behaves as expected before the image ever reaches DigitalOcean
+
+You now have a clean split between:
+- **Declarative testing**: via Kubernetes and KUTTL
+- **Procedural system validation**: via Nix VM integration tests
+
 # KUTTL + CDK8s Notes
 
 ## Goal
