@@ -1,6 +1,5 @@
 # Node modules and package manager files
 node_modules/
-bun.lockb
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

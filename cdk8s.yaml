@@ -1,5 +1,5 @@
 language: typescript
-app: npx ts-node scripts/synth.ts
+app: bunx ts-node scripts/synth.ts
 output: synth_yaml
 imports:
   - k8s
