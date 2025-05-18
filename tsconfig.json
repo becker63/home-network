@@ -3,10 +3,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "alwaysStrict": true,
-    "declaration": true,
     "experimentalDecorators": true,
-    "inlineSourceMap": true,
-    "inlineSources": true,
     "lib": ["es2022", "dom", "dom.iterable"],
     "module": "CommonJS",
     "moduleResolution": "node",
@@ -19,13 +16,10 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "resolveJsonModule": true,
-    "strict": true,
-    "strictNullChecks": true,
-    "strictPropertyInitialization": true,
     "stripInternal": true,
     "target": "ES2017",
     "outDir": "dist"
   },
-  "include": ["**/*.ts"],
+  "include": ["charts", "config", "bootstrap", "scripts"],
   "exclude": ["node_modules"]
 }
