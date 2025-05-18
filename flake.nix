@@ -78,6 +78,8 @@
 
             echo "🌱 KUBECONFIG: $KUBECONFIG"
             echo "👉 Current context: $(kubectl config current-context)"
+            echo "Bun installing for you"
+            bun install
 
             if [ -z "$IN_NIX_SHELL_ZSH" ]; then
               export IN_NIX_SHELL_ZSH=1
