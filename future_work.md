@@ -5,8 +5,8 @@ This is the order in which each CDK8s chart should be instantiated to ensure dep
 1. **ArgoCDCore** – Sets up the `argocd` namespace and minimal ArgoCD deployment.
 2. **CrossplaneCore** – Sets up the `crossplane-system` namespace.
 3. **DOProvider** – Configures the DigitalOcean provider for Crossplane.
-4. **ArgoWorkflowBuilder** – (Optional for testing, nixos build tests will be performed elseware) Defines the Argo Workflow to build, upload, and register the NixOS image.
-5. **NixOSImageSecret** – (Optional for testing) writes the image slug into a `Secret`.
+4. **ArgoWorkflowBuilder** – (Optional for testing, nixos build tests will be performed elseware, we also shouldnt mock aws apis like s3 or digitalocean) Defines the Argo Workflow to build, upload, and register the NixOS image.
+5. **NixOSImageSecret** – writes the image slug into a `Secret`.
 6. **ImageReader** – Uses `provider-kubernetes` to extract the image slug from the Secret and write a connection secret.
 7. **FinalDroplet** – Provisions the DigitalOcean Droplet using the image slug from the connection secret.
 
