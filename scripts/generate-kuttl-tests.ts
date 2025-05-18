@@ -1,4 +1,6 @@
 // TODO refactor ai slop
+// prevent it from generating a hash per chat eg: nginxchart-c87fe4d0.k8s
+// Alternatively learn how this hash is generated, we need to make sure running synth twice creates the same charts
 import fs from "fs";
 import path from "path";
 import * as yaml from "js-yaml";
