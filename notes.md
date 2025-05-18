@@ -6,6 +6,7 @@
 
 ### Fix the git-crypt encryption from previous revision
   * check config folder
+  * you commited your key, regen and gitignore it
 
 ### Fix talosctl bootstrap code
   * move our kubeconfig over
