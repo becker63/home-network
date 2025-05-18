@@ -4,23 +4,25 @@ _default: _help
 _help:
   @just --list
 
-_synth_yaml_validate:
-  kubeconform synth_yaml/
+# 0. Compile ts
+compile:
+  rm -rf dist && bunx tsc --build
 
-# Run tests
-test: _synth_yaml_validate
-
-# Import Kubernetes definitions
-import_cdk8s:
-  cdk8s import
-
-# Compile and synth
-build: compile synth
-
-# Generate Kubernetes YAML
+# 1. Generate Kubernetes YAML
 synth:
   bunx cdk8s synth
 
-# Compile ts
-compile:
-  bunx tsc --build
+# 2. Generate KUTTL files
+generate:
+  bun run generate-kuttl-tests.ts
+
+# 3. run unit tests on charts (must fill in asserts first)
+test:
+  kubectl kuttl test ./kuttl_tests
+
+# 0–3. Full build & test cycle
+all:
+  just compile
+  just synth
+  just generate
+  just test

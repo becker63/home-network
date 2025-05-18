@@ -1,3 +1,4 @@
+// TODO refactor ai slop
 import fs from "fs";
 import path from "path";
 import * as yaml from "js-yaml";
@@ -21,7 +22,6 @@ for (const file of files) {
   const contents = fs.readFileSync(fullPath, "utf8");
   const docs = yaml.loadAll(contents) as K8sManifest[];
 
-  // Use the filename (without .yaml) to create a test suite name
   const testName = path.basename(file, ".yaml");
   const testDir = path.join(TESTS_PATH, testName);
   fs.mkdirSync(testDir, { recursive: true });
@@ -32,7 +32,9 @@ for (const file of files) {
     kind: "TestStep",
     apply: [path.relative(testDir, fullPath)],
   };
-  fs.writeFileSync(applyPath, yaml.dump(applyStep));
+  if (!fs.existsSync(applyPath)) {
+    fs.writeFileSync(applyPath, yaml.dump(applyStep));
+  }
 
   const assertions: K8sManifest[] = docs
     .filter((doc) => doc?.kind && doc?.metadata?.name)
@@ -46,9 +48,11 @@ for (const file of files) {
 
   if (assertions.length > 0) {
     const assertPath = path.join(testDir, "01-assert.yaml");
-    fs.writeFileSync(
-      assertPath,
-      assertions.map((doc) => yaml.dump(doc)).join("---\n"),
-    );
+    if (!fs.existsSync(assertPath)) {
+      fs.writeFileSync(
+        assertPath,
+        assertions.map((doc) => yaml.dump(doc)).join("---\n"),
+      );
+    }
   }
 }
