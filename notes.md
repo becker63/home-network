@@ -1,5 +1,7 @@
 # TODO:
 
+### add a tool to look for TODO: comments in source and aggregate them
+
 ### 0. learn more about crossplane
   * will procedural steps be reconciled?
   * how would wrapping the argocd nix image build steps in a composition reconcile?
