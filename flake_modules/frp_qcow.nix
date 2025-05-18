@@ -1,8 +1,8 @@
 {
-  pkgs,
   system,
   nixos-generators,
-  baseModules,
+  buildOnX86_64Linux,
+  ...
 }:
 
 let
@@ -13,7 +13,7 @@ if isX86_64Linux then
     master-qcow = nixos-generators.nixosGenerate {
       inherit system;
       format = "qcow";
-      modules = baseModules ++ [
+      modules = buildOnX86_64Linux ++ [
         ./frp_nix_config/configuration.nix
         ./frp_nix_config/master.nix
       ];
@@ -22,7 +22,7 @@ if isX86_64Linux then
     slave-qcow = nixos-generators.nixosGenerate {
       inherit system;
       format = "qcow";
-      modules = baseModules ++ [
+      modules = buildOnX86_64Linux ++ [
         ./frp_nix_config/configuration.nix
         ./frp_nix_config/slave.nix
       ];

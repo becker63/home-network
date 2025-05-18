@@ -9,7 +9,6 @@
 
   outputs =
     {
-      self,
       nixpkgs,
       flake-utils,
       nixos-generators,
@@ -23,7 +22,7 @@
           config.allowUnfree = true;
         };
 
-        baseModules = [
+        buildOnX86_64Linux = [
           (
             { ... }:
             {
@@ -38,7 +37,7 @@
             pkgs
             system
             nixos-generators
-            baseModules
+            buildOnX86_64Linux
             ;
         };
       in
