@@ -1,8 +1,11 @@
 # TODO:
 
-Add each phases responsibility and process in here.
+### Add each phases responsibility and process in here.
   * What will argocd do? what phase does it mostly sit in?
   * What does the bootstrap phase do?
+
+### Fix the git-crypt encryption from previous revision
+  * check config folder
 
 # Testing Strategy Summary (with Crossplane Composition + Nix VM Testing)
 
