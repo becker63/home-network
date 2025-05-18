@@ -1,6 +1,8 @@
 # TODO:
 
-### add a tool to look for TODO: comments in source and aggregate them
+### extras 
+  * add a tool to look for TODO: comments in source and aggregate them
+  * typed helper to generate labels, lable name = deployment_varirableName.tostring
 
 ### 0. learn more about crossplane
   * will procedural steps be reconciled?
