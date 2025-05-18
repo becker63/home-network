@@ -7,6 +7,11 @@
 ### Fix the git-crypt encryption from previous revision
   * check config folder
 
+### Fix talosctl bootstrap code
+  * move our kubeconfig over
+  * make sure a healthcheck succeeds
+  * fully automate with omni/netboot docker container in future
+
 # Testing Strategy Summary (with Crossplane Composition + Nix VM Testing)
 
 | Concern                                                              | Test? | Tool / Approach                                                                                   |
