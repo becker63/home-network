@@ -1,3 +1,9 @@
+# TODO:
+
+Add each layers responsibility and process in here.
+  * What will argocd do? what layer does it mostly sit in?
+  * What does the bootstrap phase do?
+
 # Testing Strategy Summary (with Crossplane Composition + Nix VM Testing)
 
 | Concern                                                              | Test? | Tool / Approach                                                                                   |
