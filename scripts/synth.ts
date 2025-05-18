@@ -1,18 +1,19 @@
+// scripts/synth.ts
 import { App } from "cdk8s";
 import * as path from "path";
 import * as fs from "fs";
 
 const app = new App();
 
-// Read all .ts files in the charts directory (excluding test files or .d.ts)
-const chartsDir = path.join(__dirname, "charts");
+// Resolve charts directory relative to the project root
+const chartsDir = path.join(process.cwd(), "charts");
+
 const chartFiles = fs
   .readdirSync(chartsDir)
   .filter((file) => file.endsWith(".ts") && !file.endsWith(".d.ts"));
 
-// Import each chart module dynamically
 for (const file of chartFiles) {
-  const modulePath = `./charts/${path.basename(file, ".ts")}`;
+  const modulePath = path.join(chartsDir, path.basename(file, ".ts"));
   const mod = require(modulePath);
 
   for (const exportName of Object.keys(mod)) {

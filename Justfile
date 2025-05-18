@@ -14,7 +14,7 @@ synth:
 
 # 2. Generate KUTTL files
 generate:
-  bun run generate-kuttl-tests.ts
+  bun run scripts/generate-kuttl-tests.ts
 
 # 3. run unit tests on charts (must fill in asserts first)
 test:

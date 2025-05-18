@@ -8,7 +8,6 @@ yarn-error.log*
 
 # Build output
 dist/
-synth_yaml/
 imports/
 
 # TypeScript
@@ -18,9 +17,6 @@ imports/
 !jest.config.js
 
 # CDK8s / KUTTL output
-kuttl_tests/
-cdk8s.out/
-cdk8s.yaml
 kubeconfig
 
 # Env files
