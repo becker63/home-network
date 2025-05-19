@@ -1,17 +1,12 @@
 # TODO:
 
-### extras 
-  * add a tool to look for TODO: comments in source and aggregate them
-  * typed helper to generate labels, lable name = deployment_varirableName.tostring
+### extras
+  * move all constants to secrets.json
 
-### 0. learn more about crossplane
-  * will procedural steps be reconciled?
-  * how would wrapping the argocd nix image build steps in a composition reconcile?
-  * how do we trigger the argocd image composition when digitalocean needs reconciliation 
-
-### 1. Add each phases responsibility and process in here.
-  * What will argocd do? what phase does it mostly sit in?
-  * What does the bootstrap phase do?
+### 1. Write golang nixos image builder
+  * crossplane function
+  * dont need DAG anymore!
+  * see "argocd crossplane integration" in chat
 
 ### 2. Fix the git-crypt encryption from previous revision
   * check config folder
@@ -19,10 +14,7 @@
   * make sure secrets.json is being encrypted again
   * test if we can read secrrets.json + constants
 
-### 3. Write the rest of the phases
-  * use testing strat below for each step
-
-### 4. Fix talosctl bootstrap code
+### 3. Fix talosctl bootstrap code
   * move our kubeconfig over
   * make sure a healthcheck succeeds
   * fully automate with omni/netboot docker container in future
@@ -32,7 +24,6 @@
 | Concern                                                              | Test? | Tool / Approach                                                                                   |
 |----------------------------------------------------------------------|-------|----------------------------------------------------------------------------------------------------|
 | ✅ Does my **Crossplane Composition render the correct resources**?  | Yes   | [KUTTL](https://kuttl.dev/) — assert that the right child resources are created                   |
-| ✅ Does **data wiring** (e.g., image slug from secret → Droplet) work?| Yes   | KUTTL or `kubectl get -o yaml` — verify fields are correctly populated                            |
 | ✅ Does the **image build work and boot a working system**?          | Yes   | Use [Nix VM integration tests](https://nix.dev/tutorials/nixos/integration-testing-using-virtual-machines.html) to run and validate the image before publishing |
 | 🚫 Do **doctl** / `aws` upload steps work                            | Skip  | Assume correctness — optionally verify once manually or via logs                                  |
 | 🚫 Does DigitalOcean **Droplet provisioning** work at the API level  | Skip  | Assume DO’s API is reliable — test only for integration at the Kubernetes level                   |
