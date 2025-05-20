@@ -1,114 +1,67 @@
 import { Construct } from "constructs";
-import { Chart } from "cdk8s";
-import {
-  Composition,
-  CompositionSpecMode,
-} from "../imports/apiextensions.crossplane.io";
-import { Function as CrossplaneFunction } from "../imports/pkg.crossplane.io";
-import {
-  Resources,
-  ResourcesResourcesPatchesType,
-  ResourcesResourcesPatchesCombineStrategy,
-} from "../imports/pt.fn.crossplane.io";
+import { Chart, Helm, ApiObject } from "cdk8s";
+import * as fs from "fs";
+import * as path from "path";
 
-export class Nix_Server_CompositionChart extends Chart {
+export class InstallGithubActionsRunner extends Chart {
   constructor(scope: Construct, id: string) {
     super(scope, id);
 
-    // 1. Define build function
-    new CrossplaneFunction(this, "FunctionBuildImage", {
+    const namespace = "actions-runner-system";
+
+    // 1. Load the GitHub PAT from a local secrets file
+    const secretsPath = path.join(process.cwd(), ".secrets.json");
+    const secrets = JSON.parse(fs.readFileSync(secretsPath, "utf8"));
+    const githubToken = secrets.github_token;
+
+    if (!githubToken) {
+      throw new Error('Missing "github_token" in .secrets.json');
+    }
+
+    // 2. Create the Kubernetes Secret
+    new ApiObject(this, "GithubPATSecret", {
+      apiVersion: "v1",
+      kind: "Secret",
       metadata: {
-        name: "build-nixos-image",
+        name: "controller-manager",
+        namespace: namespace,
       },
-      spec: {
-        package: "ghcr.io/your-org/builder:latest",
+      type: "Opaque",
+      data: {
+        // Kubernetes secrets must be base64-encoded
+        github_token: Buffer.from(githubToken).toString("base64"),
       },
     });
 
-    // 2. Define patch-and-transform function
-    new CrossplaneFunction(this, "FunctionPatchTransform", {
-      metadata: {
-        name: "function-patch-and-transform",
-      },
-      spec: {
-        package:
-          "xpkg.upbound.io/crossplane-contrib/function-patch-and-transform:v0.4.0",
-      },
+    // 3. Install the ARC Controller
+    new Helm(this, "ARCController", {
+      chart: "gha-runner-scale-set-controller",
+      releaseName: "arc-controller",
+      repo: "oci://ghcr.io/actions/actions-runner-controller-charts",
+      namespace,
     });
 
-    // 3. Define the Composition
-    new Composition(this, "CompositionNixServer", {
-      metadata: {
-        name: "do-nixos-droplet",
-      },
-      spec: {
-        compositeTypeRef: {
-          apiVersion: "infra.example.org/v1alpha1",
-          kind: "XNixServer",
+    // 4. Install the ARC Runner Set
+    new Helm(this, "RunnerScaleSet", {
+      chart: "gha-runner-scale-set",
+      releaseName: "arc-runner-set",
+      repo: "oci://ghcr.io/actions/actions-runner-controller-charts",
+      namespace,
+      values: {
+        githubConfigUrl: "https://github.com/YOUR_ORG/YOUR_REPO",
+        githubConfigSecret: {
+          name: "controller-manager",
         },
-        mode: CompositionSpecMode.PIPELINE,
-        pipeline: [
-          {
-            step: "build-nixos-image",
-            functionRef: {
-              name: "build-nixos-image",
-            },
+        template: {
+          spec: {
+            containers: [
+              {
+                name: "runner",
+                image: "ghcr.io/actions/runner:latest",
+              },
+            ],
           },
-          {
-            step: "inject-droplet",
-            functionRef: {
-              name: "function-patch-and-transform",
-            },
-            input: Resources.manifest({
-              resources: [
-                {
-                  name: "droplet",
-                  base: {
-                    apiVersion: "compute.digitalocean.crossplane.io/v1alpha1",
-                    kind: "Droplet",
-                    metadata: {
-                      name: "nixos-droplet",
-                    },
-                    spec: {
-                      forProvider: {
-                        region: "placeholder", // to be patched
-                        size: "s-1vcpu-1gb",
-                        image: "placeholder", // patched from build function
-                      },
-                      providerConfigRef: { name: "default" },
-                      writeConnectionSecretToRef: {
-                        name: "nixos-droplet-secret",
-                        namespace: "default",
-                      },
-                    },
-                  },
-                  patches: [
-                    {
-                      type: ResourcesResourcesPatchesType.COMBINE_FROM_COMPOSITE,
-                      combine: {
-                        strategy:
-                          ResourcesResourcesPatchesCombineStrategy.STRING,
-                        string: {
-                          fmt: "%s|%s",
-                        },
-                        variables: [
-                          { fromFieldPath: "context.imageSlug" }, // from build function
-                          { fromFieldPath: "spec.region" }, // from XR
-                        ],
-                      },
-                      toFieldPath: "spec.forProvider.image",
-                    },
-                    {
-                      type: ResourcesResourcesPatchesType.FROM_COMPOSITE_FIELD_PATH,
-                      fromFieldPath: "spec.region",
-                      toFieldPath: "spec.forProvider.region",
-                    },
-                  ],
-                },
-              ],
-            }),
-          },
-        ],
+        },
       },
     });
   }

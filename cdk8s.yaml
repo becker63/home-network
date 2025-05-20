@@ -8,3 +8,4 @@ imports:
   - crds/provider-digitalocean.yaml
   - crds/provider-aws.yaml
   - crds/function-patch-transform.yaml
+  - crds/provider-helm.yaml
