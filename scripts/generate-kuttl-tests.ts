@@ -8,7 +8,9 @@ import * as yaml from "js-yaml";
 const SYNTH_PATH = "./synth_yaml";
 const TESTS_PATH = "./kuttl_tests";
 
-const files = fs.readdirSync(SYNTH_PATH).filter((f) => f.endsWith(".yaml"));
+const files = fs
+  .readdirSync(SYNTH_PATH)
+  .filter((f) => f.endsWith(".yaml") && !/(\b|[_-])(nt|NT)(\b|[_-])/.test(f));
 
 type K8sManifest = {
   apiVersion?: string;

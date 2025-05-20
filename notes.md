@@ -2,6 +2,7 @@
 
 ### extras
   * move all constants to secrets.json
+    * we dont need a config folder
 
 ### 1. Write golang nixos image builder
   * crossplane function

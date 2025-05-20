@@ -8,6 +8,7 @@ yarn-error.log*
 # Build output
 dist/
 imports/
+crds/
 
 # TypeScript
 *.tsbuildinfo

@@ -3,3 +3,8 @@ app: bunx ts-node scripts/synth.ts
 output: synth_yaml
 imports:
   - k8s
+  - synth_yaml/crds/crossplane-core.yaml
+  - crds/crossplane-core.yaml
+  - crds/provider-digitalocean.yaml
+  - crds/provider-aws.yaml
+  - crds/function-patch-transform.yaml

@@ -17,18 +17,22 @@
     "upgrade:next": "bun install cdk8s@next cdk8s-cli@next"
   },
   "dependencies": {
+    "@kubernetes/client-node": "^1.2.0",
     "cdk8s": "^2.69.69",
     "cdk8s-plus-32": "^2.1.2",
     "commander": "^13.1.0",
     "constructs": "^10.4.2",
     "d3-dag": "^1.1.0",
     "execa": "^9.5.3",
-    "js-yaml": "^4.1.0"
+    "js-yaml": "^4.1.0",
+    "request": "^2.88.2"
   },
   "devDependencies": {
+    "@types/bun": "^1.2.13",
     "@types/fs-extra": "^11.0.4",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "20",
+    "@types/request": "^2.48.12",
     "cdk8s-cli": "^2.200.73",
     "ts-node": "^10",
     "typescript": "^5.8.3"

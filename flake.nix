@@ -60,6 +60,9 @@
             kuttl # KUTTL CLI (if available; otherwise, install manually)
             just
             nodejs
+            go
+            gopls
+            kubernetes-helm
 
             # Things I like
             zoxide
@@ -79,8 +82,8 @@
               echo "✅ Kind cluster 'kuttl' already exists"
             fi
 
-            export KUBECONFIG="$(kind get kubeconfig-path --name kuttl 2>/dev/null || echo $HOME/.kube/config)"
-            kubectl config use-context kind-kuttl
+            kind get kubeconfig --name kuttl > ./kubeconfig
+            export KUBECONFIG="$PWD/kubeconfig"
 
             echo "🌱 KUBECONFIG: $KUBECONFIG"
             echo "👉 Current context: $(kubectl config current-context)"
