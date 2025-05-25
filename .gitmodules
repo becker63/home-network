@@ -1,0 +1,6 @@
+[submodule "crossplane-providers/provider-cloudflare"]
+	path = crossplane-providers/provider-cloudflare
+	url = https://github.com/cdloh/provider-cloudflare
+[submodule "crossplane-providers/provider-proxmoxve"]
+	path = crossplane-providers/provider-proxmoxve
+	url = https://github.com/dougsong/provider-proxmoxve

@@ -1,30 +1,40 @@
-# _Hidden
+# ========================================
+# 📌 Provider Versions & Sources
+
+# Static CRD versions (used with doc.crds.dev)
+CROSSPLANE_VERSION := "v1.19.1"
+PROVIDER_HELM_VERSION := "v0.15.0"
+PATCH_FN_VERSION := "v0.7.0"
+
+# Upjet-based providers (Git submodules, name=url)
+UPJET_PROVIDERS := "provider-cloudflare=https://github.com/cdloh/provider-cloudflare provider-proxmoxve=https://github.com/dougsong/provider-proxmoxve"
+
+# ========================================
+# 🔧 Base Commands (Hidden)
+
 _default: _help
 
 _help:
 	@just --list
 
-# 0. Compile ts
+# ========================================
+# 🧱 Build & Test Flow
+
 compile:
 	rm -rf dist && bunx tsc --build
 
-# 1. Generate Kubernetes YAML
 synth:
 	bunx cdk8s synth
 
-# 2. Generate KUTTL files
 generate:
 	bun run scripts/generate-kuttl-tests.ts
 
-# 3. Run unit tests on charts (must fill in asserts first)
 test:
 	kubectl kuttl test ./kuttl_tests
 
-# Clean up synth_yaml
 clean:
 	rm -rf ./synth_yaml/*
 
-# 0–3. Full build & test cycle
 all:
 	just clean
 	just compile
@@ -32,47 +42,69 @@ all:
 	just generate
 	just test
 
-# 0–3. Full rebuild (TODO: rethink the file synth hashes maybe? So Argo doesn't reapply all the time)
 build:
 	just clean
 	just compile
 	just synth
 	just generate
 
-# get the crds for each of these
+# ========================================
+# 📦 CRD Sources: Prebuilt & Upjet
+
 download-crds:
 	mkdir -p crds
-	curl -L https://doc.crds.dev/raw/github.com/crossplane/crossplane@`bun run scripts/get-version.ts CROSSPLANE_VERSION` \
+	curl -L https://doc.crds.dev/raw/github.com/crossplane/crossplane@{{CROSSPLANE_VERSION}} \
 		-o crds/crossplane-core.yaml
-	curl -L https://doc.crds.dev/raw/github.com/crossplane-contrib/provider-helm@`bun run scripts/get-version.ts PROVIDER_HELM_VERSION` \
+	curl -L https://doc.crds.dev/raw/github.com/crossplane-contrib/provider-helm@{{PROVIDER_HELM_VERSION}} \
 		-o crds/provider-helm.yaml
-	curl -L https://doc.crds.dev/raw/github.com/crossplane-contrib/function-patch-and-transform@`bun run scripts/get-version.ts PATCH_FN_VERSION` \
+	curl -L https://doc.crds.dev/raw/github.com/crossplane-contrib/function-patch-and-transform@{{PATCH_FN_VERSION}} \
 		-o crds/function-patch-transform.yaml
 
-# Import those CRDs into CDK8s with explicit names
 importcrds:
 	bun run scripts/import-crds.ts
 
-fetch-imports:
-	just download-crds
-	just importcrds
-
-# Build provider-cloudflare
 build-cloudflare:
 	bun run scripts/upjet-make.ts crossplane-providers/provider-cloudflare
 
-# Build provider-proxmoxve
 build-proxmoxve:
 	bun run scripts/upjet-make.ts crossplane-providers/provider-proxmoxve
 
+build-upjet-providers:
+	just build-cloudflare
+	just build-proxmoxve
 
-# ================================
-# Dev environments
+add-upjet-provider-submodules:
+	mkdir -p crossplane-providers
+	bun run scripts/add-upjet-submodules.ts {{UPJET_PROVIDERS}}
 
-# Launch main dev environment
+# ========================================
+# 🔄 CRD Sync & Automation
+
+fetch-imports:
+    just dev-upjet
+	just add-upjet-provider-submodules
+	just download-crds
+	just build-upjet-providers
+	just importcrds
+	exit
+
+# ========================================
+# 🧪 Development Environments
+
 dev-main:
 	nix develop .#default
 
-# Launch Upjet provider dev environment (Go 1.19, Terraform)
 dev-upjet:
 	nix develop .#upjet-env
+
+# ========================================
+# 🧾 Info / Debug
+
+print-provider-versions:
+	@echo "Static CRD Versions:"
+	@echo "  crossplane:              {{CROSSPLANE_VERSION}}"
+	@echo "  provider-helm:           {{PROVIDER_HELM_VERSION}}"
+	@echo "  function-patch-transform:{{PATCH_FN_VERSION}}"
+	@echo
+	@echo "Upjet Providers:"
+	@echo "  {{UPJET_PROVIDERS}}"
