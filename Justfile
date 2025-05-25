@@ -106,3 +106,6 @@ dev-main:
 
 dev-upjet:
     nix develop .#upjet-env
+
+decrypt-secrets:
+    ./scripts/sops/sops-decrypt.sh secrets.json
