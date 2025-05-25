@@ -39,27 +39,40 @@ build:
 	just synth
 	just generate
 
-# Download CRDs for Crossplane, DigitalOcean, AWS, and Helm
+# get the crds for each of these
 download-crds:
 	mkdir -p crds
-	curl -L https://doc.crds.dev/raw/github.com/crossplane/crossplane@v1.19.1 \
+	curl -L https://doc.crds.dev/raw/github.com/crossplane/crossplane@`bun run scripts/get-version.ts CROSSPLANE_VERSION` \
 		-o crds/crossplane-core.yaml
-	curl -L https://doc.crds.dev/raw/github.com/crossplane-contrib/provider-digitalocean@v0.2.0 \
-		-o crds/provider-digitalocean.yaml
-	curl -L https://doc.crds.dev/raw/github.com/crossplane/provider-aws@v0.52.5 \
-		-o crds/provider-aws.yaml
-	curl -L https://doc.crds.dev/raw/github.com/crossplane-contrib/function-patch-and-transform@v0.7.0 \
-		-o crds/function-patch-transform.yaml
-	curl -L https://doc.crds.dev/raw/github.com/crossplane-contrib/provider-helm@v0.15.0 \
+	curl -L https://doc.crds.dev/raw/github.com/crossplane-contrib/provider-helm@`bun run scripts/get-version.ts PROVIDER_HELM_VERSION` \
 		-o crds/provider-helm.yaml
+	curl -L https://doc.crds.dev/raw/github.com/crossplane-contrib/function-patch-and-transform@`bun run scripts/get-version.ts PATCH_FN_VERSION` \
+		-o crds/function-patch-transform.yaml
 
 # Import those CRDs into CDK8s with explicit names
 importcrds:
-	bunx cdk8s import crds/crossplane-core.yaml
-	bunx cdk8s import crds/provider-digitalocean.yaml
-	bunx cdk8s import crds/provider-aws.yaml
-	bunx cdk8s import crds/function-patch-transform.yaml
+	bun run scripts/import-crds.ts
 
 fetch-imports:
 	just download-crds
 	just importcrds
+
+# Build provider-cloudflare
+build-cloudflare:
+	bun run scripts/upjet-make.ts crossplane-providers/provider-cloudflare
+
+# Build provider-proxmoxve
+build-proxmoxve:
+	bun run scripts/upjet-make.ts crossplane-providers/provider-proxmoxve
+
+
+# ================================
+# Dev environments
+
+# Launch main dev environment
+dev-main:
+	nix develop .#default
+
+# Launch Upjet provider dev environment (Go 1.19, Terraform)
+dev-upjet:
+	nix develop .#upjet-env

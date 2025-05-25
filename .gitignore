@@ -40,3 +40,5 @@ logs/
 
 # Ignore secret key for git-crypt
 config/git-crypt.key
+
+kind-config.yaml

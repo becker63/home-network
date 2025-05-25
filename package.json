@@ -24,6 +24,7 @@
     "constructs": "^10.4.2",
     "d3-dag": "^1.1.0",
     "execa": "^9.5.3",
+    "isomorphic-git": "^1.30.2",
     "js-yaml": "^4.1.0",
     "request": "^2.88.2"
   },
