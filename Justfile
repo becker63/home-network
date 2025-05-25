@@ -85,14 +85,22 @@ build-upjet-providers:
 # 🔄 CRD Sync & Automation
 
 fetch-imports:
-    @if [ -z "${IN_DEV_UPJET:-}" ]; then \
-        echo "❌ This must be run inside the dev-upjet shell!, try just dev-upjet." >&2; \
-        exit 1; \
-    fi
-    just download-crds
-    just build-upjet-providers
-    just importcrds
-    kubectl apply -f ./crds
+	@if [ -z "$${IN_DEV_UPJET:-}" ]; then \
+		echo "❌ This must be run inside the dev-upjet shell! Try running: just dev-upjet" >&2; \
+		exit 1; \
+	fi
+	@echo "🔁 Updating submodules..."
+	git submodule update --init --recursive
+	@echo "🔧 Patching provider Makefiles..."
+	./scripts/patch-providers.sh
+	@echo "📥 Downloading CRDs..."
+	just download-crds
+	@echo "🔨 Building patched providers..."
+	just build-upjet-providers
+	@echo "📦 Importing CRDs..."
+	just importcrds
+	@echo "🚀 Applying CRDs to the cluster..."
+	kubectl apply -f ./crds
 
 # ========================================
 # 🧪 Development Environments
