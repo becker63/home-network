@@ -5,16 +5,31 @@ import * as fs from "fs";
 
 const app = new App();
 
-// Resolve charts directory relative to the project root
-const chartsDir = path.join(process.cwd(), "charts");
+// Recursively walk a directory and return all .ts files (excluding .d.ts)
+function walk(dir: string): string[] {
+  let files: string[] = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      files = files.concat(walk(fullPath));
+    } else if (
+      entry.isFile() &&
+      entry.name.endsWith(".ts") &&
+      !entry.name.endsWith(".d.ts")
+    ) {
+      files.push(fullPath);
+    }
+  }
+  return files;
+}
 
-const chartFiles = fs
-  .readdirSync(chartsDir)
-  .filter((file) => file.endsWith(".ts") && !file.endsWith(".d.ts"));
+const chartsDir: string = path.join(process.cwd(), "charts");
+const chartFiles: string[] = walk(chartsDir);
+
+console.log(`⛏ Found ${chartFiles.length} chart files`);
 
 for (const file of chartFiles) {
-  const modulePath = path.join(chartsDir, path.basename(file, ".ts"));
-  const mod = require(modulePath);
+  const mod = require(file);
 
   for (const exportName of Object.keys(mod)) {
     const ExportedChart = mod[exportName];
@@ -22,8 +37,9 @@ for (const file of chartFiles) {
     if (typeof ExportedChart === "function") {
       try {
         new ExportedChart(app, exportName);
+        console.log(`✅ Synthesized: ${exportName}`);
       } catch (e) {
-        console.warn(`Skipping ${exportName}: ${e}`);
+        console.warn(`⚠️ Skipping ${exportName}: ${e}`);
       }
     }
   }

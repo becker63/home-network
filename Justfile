@@ -1,13 +1,17 @@
 # ========================================
 # 📌 Provider Versions & Sources
 
-# Static CRD versions (used with doc.crds.dev)
 CROSSPLANE_VERSION := "v1.19.1"
 PROVIDER_HELM_VERSION := "v0.15.0"
 PATCH_FN_VERSION := "v0.7.0"
+ARGOCD_VERSION := "v2.10.7"
 
-# Upjet-based providers (Git submodules, name=url)
 UPJET_PROVIDERS := "provider-cloudflare=https://github.com/cdloh/provider-cloudflare provider-proxmoxve=https://github.com/dougsong/provider-proxmoxve"
+
+# ========================================
+# 🛠️ Script Runner Config
+
+SCRIPT_RUNNER := "bunx tsx --tsconfig scripts/tsconfig.json"
 
 # ========================================
 # 🔧 Base Commands (Hidden)
@@ -26,8 +30,8 @@ compile:
 synth:
     bunx cdk8s synth
 
-generate:
-    bun run scripts/generate-kuttl-tests.ts
+generate-tests:
+    {{SCRIPT_RUNNER}} scripts/generate-kuttl-tests.ts
 
 test:
     kubectl kuttl test ./kuttl_tests
@@ -46,7 +50,7 @@ build:
     just clean
     just compile
     just synth
-    just generate
+    just generate-tests
 
 # ========================================
 # 📦 CRD Sources: Prebuilt & Upjet
@@ -59,15 +63,19 @@ download-crds:
         -o crds/provider-helm.yaml
     curl -L https://doc.crds.dev/raw/github.com/crossplane-contrib/function-patch-and-transform@{{PATCH_FN_VERSION}} \
         -o crds/function-patch-transform.yaml
+    curl -L https://raw.githubusercontent.com/argoproj/argo-cd/{{ARGOCD_VERSION}}/manifests/crds/application-crd.yaml \
+        -o crds/argocd-application.yaml
+    curl -L https://raw.githubusercontent.com/argoproj/argo-cd/{{ARGOCD_VERSION}}/manifests/crds/appproject-crd.yaml \
+        -o crds/argocd-appproject.yaml
 
 importcrds:
-    bun run scripts/import-crds.ts
+    {{SCRIPT_RUNNER}} scripts/import-crds.ts
 
 build-cloudflare:
-    bun run scripts/upjet-make.ts crossplane-providers/provider-cloudflare
+    {{SCRIPT_RUNNER}} scripts/upjet-make.ts crossplane-providers/provider-cloudflare
 
 build-proxmoxve:
-    bun run scripts/upjet-make.ts crossplane-providers/provider-proxmoxve
+    {{SCRIPT_RUNNER}} scripts/upjet-make.ts crossplane-providers/provider-proxmoxve
 
 build-upjet-providers:
     just build-cloudflare
@@ -75,7 +83,7 @@ build-upjet-providers:
 
 add-upjet-provider-submodules:
     mkdir -p crossplane-providers
-    bun run scripts/add-upjet-submodules.ts {{UPJET_PROVIDERS}}
+    {{SCRIPT_RUNNER}} scripts/add-upjet-submodules.ts {{UPJET_PROVIDERS}}
 
 # ========================================
 # 🔄 CRD Sync & Automation
@@ -98,15 +106,3 @@ dev-main:
 
 dev-upjet:
     nix develop .#upjet-env
-
-# ========================================
-# 🧾 Info / Debug
-
-print-provider-versions:
-    @echo "Static CRD Versions:"
-    @echo "  crossplane:              {{CROSSPLANE_VERSION}}"
-    @echo "  provider-helm:           {{PROVIDER_HELM_VERSION}}"
-    @echo "  function-patch-transform:{{PATCH_FN_VERSION}}"
-    @echo
-    @echo "Upjet Providers:"
-    @echo "  {{UPJET_PROVIDERS}}"

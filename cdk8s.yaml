@@ -1,5 +1,5 @@
 language: typescript
-app: bunx ts-node scripts/synth.ts
+app: bunx ts-node --project tsconfig.json scripts/synth.ts
 output: synth_yaml
 imports:
   - k8s
@@ -112,3 +112,5 @@ imports:
   - /Users/becker/home-network/crds/provider-helm.yaml
   - /Users/becker/home-network/crds/provider-cloudflare-emailrouting.cloudflare.upbound.io_settings.yaml
   - /Users/becker/home-network/crds/provider-cloudflare-access.cloudflare.upbound.io_applications.yaml
+  - /Users/becker/home-network/crds/argocd-application.yaml
+  - /Users/becker/home-network/crds/argocd-appproject.yaml

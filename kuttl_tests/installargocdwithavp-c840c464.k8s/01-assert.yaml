@@ -1,0 +1,264 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: argocd-application-controller
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: argocd-applicationset-controller
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: argocd-notifications-controller
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: argo-cd-argocd-repo-server
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: argocd-server
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: argocd-dex-server
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: argocd-notifications-secret
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: argocd-secret
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cmd-params-cm
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-gpg-keys-cm
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-notifications-cm
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-rbac-cm
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-ssh-known-hosts-cm
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-tls-certs-cm
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argo-cd-argocd-redis-health-configmap
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: applications.argoproj.io
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: applicationsets.argoproj.io
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: appprojects.argoproj.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: argo-cd-argocd-application-controller
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: argo-cd-argocd-notifications-controller
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: argo-cd-argocd-server
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: argo-cd-argocd-application-controller
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: argo-cd-argocd-notifications-controller
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: argo-cd-argocd-server
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: argo-cd-argocd-application-controller
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: argo-cd-argocd-applicationset-controller
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: argo-cd-argocd-notifications-controller
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: argo-cd-argocd-repo-server
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: argo-cd-argocd-server
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: argo-cd-argocd-dex-server
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: argo-cd-argocd-application-controller
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: argo-cd-argocd-applicationset-controller
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: argo-cd-argocd-notifications-controller
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: argo-cd-argocd-repo-server
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: argo-cd-argocd-server
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: argo-cd-argocd-dex-server
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: argo-cd-argocd-applicationset-controller
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: argo-cd-argocd-repo-server
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: argo-cd-argocd-server
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: argo-cd-argocd-dex-server
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: argo-cd-argocd-redis
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argo-cd-argocd-applicationset-controller
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argo-cd-argocd-notifications-controller
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argo-cd-argocd-repo-server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argo-cd-argocd-server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argo-cd-argocd-dex-server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argo-cd-argocd-redis
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: argo-cd-argocd-application-controller
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: argo-cd-argocd-redis-secret-init
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: argo-cd-argocd-redis-secret-init
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: argo-cd-argocd-redis-secret-init
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: argo-cd-argocd-redis-secret-init

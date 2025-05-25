@@ -1,0 +1,4 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestStep
+apply:
+  - ../../synth_yaml/installgithubactionsrunner-c817a18f.k8s.yaml

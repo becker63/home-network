@@ -1,0 +1,4 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestStep
+apply:
+  - ../../synth_yaml/ntinstall_argo_crossplane-c8aa80d8.k8s.yaml

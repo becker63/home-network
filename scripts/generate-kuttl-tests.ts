@@ -8,10 +8,6 @@ import * as yaml from "js-yaml";
 const SYNTH_PATH = "./synth_yaml";
 const TESTS_PATH = "./kuttl_tests";
 
-const files = fs
-  .readdirSync(SYNTH_PATH)
-  .filter((f) => f.endsWith(".yaml") && !/(\b|[_-])(nt|NT)(\b|[_-])/.test(f));
-
 type K8sManifest = {
   apiVersion?: string;
   kind?: string;
@@ -21,14 +17,33 @@ type K8sManifest = {
   [key: string]: any;
 };
 
-for (const file of files) {
-  const fullPath = path.join(SYNTH_PATH, file);
-  const contents = fs.readFileSync(fullPath, "utf8");
-  const docs = yaml.loadAll(contents) as K8sManifest[];
+function walk(dir: string): string[] {
+  let files: string[] = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      files = files.concat(walk(fullPath));
+    } else if (
+      entry.isFile() &&
+      entry.name.endsWith(".yaml") &&
+      !/(\b|[_-])(nt|NT)(\b|[_-])/.test(entry.name)
+    ) {
+      files.push(fullPath);
+    }
+  }
+  return files;
+}
 
-  const testName = path.basename(file, ".yaml");
+const files = walk(SYNTH_PATH);
+
+for (const fullPath of files) {
+  const relPath = path.relative(SYNTH_PATH, fullPath);
+  const testName = relPath.replace(/\.yaml$/, "").replace(/\//g, "-");
   const testDir = path.join(TESTS_PATH, testName);
   fs.mkdirSync(testDir, { recursive: true });
+
+  const contents = fs.readFileSync(fullPath, "utf8");
+  const docs = yaml.loadAll(contents) as K8sManifest[];
 
   const applyPath = path.join(testDir, "00-apply.yaml");
   const applyStep = {

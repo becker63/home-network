@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
     "alwaysStrict": true,
+    "declaration": true,
     "experimentalDecorators": true,
-    "lib": ["es2022", "dom", "dom.iterable"],
-    "module": "ESNext", // 🔄 Bun + top-level await
-    "moduleResolution": "node",
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "lib": ["es2016"],
+    "module": "CommonJS",
     "noEmit": false,
     "noEmitOnError": true,
     "noFallthroughCasesInSwitch": true,
@@ -16,10 +16,13 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "resolveJsonModule": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
     "stripInternal": true,
-    "target": "ES2022", // 🔄 required for top-level await
+    "target": "ES2017",
     "outDir": "dist"
   },
-  "include": ["charts", "config", "bootstrap", "scripts"],
-  "exclude": ["node_modules"]
+  "include": ["charts/**/*.ts"],
+  "exclude": ["node_modules", "scripts"]
 }

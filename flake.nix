@@ -56,10 +56,14 @@
         sharedShellHook = ''
           echo "💡 Running shared dev shell hook"
 
+          if [ -f ./secrets.json ]; then
+            echo "🔓 Attempting to decrypt secrets.json..."
+            sops -d ./secrets.json > /dev/null || echo "⚠️  Warning: secrets.json decryption failed"
+          fi
+
           echo "📦 Running \`bun install\`..."
           bun install
 
-          # ✅ Enter zsh only if not already in it
           if [ -n "$PS1" ] && [ -z "$ZSH_VERSION" ]; then
             exec zsh
           fi
