@@ -40,7 +40,7 @@ clean:
     rm -rf ./synth_yaml/*
 
 all:
-	nix develop .#upjet-env --command just fetch-imports
+	nix develop .#upjet-env --command just fetch-imports || true
 	nix develop .#default --command bash -c '\
 		just compile && \
 		just synth && \
