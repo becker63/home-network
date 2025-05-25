@@ -81,11 +81,10 @@ add-upjet-provider-submodules:
 # 🔄 CRD Sync & Automation
 
 fetch-imports:
-    @if [ -z "$IN_DEV_UPJET" ]; then \
-        echo "\033[0;31m❌ This must be run inside the dev-upjet shell!\033[0m" >&2; \
+    @if [ -z "${IN_DEV_UPJET:-}" ]; then \
+        echo "❌ This must be run inside the dev-upjet shell!, try just dev-upjet." >&2; \
         exit 1; \
     fi
-    @echo "\033[0;32m✅ Environment check passed: IN_DEV_UPJET=$IN_DEV_UPJET\033[0m"
     just add-upjet-provider-submodules
     just download-crds
     just build-upjet-providers

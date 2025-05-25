@@ -52,16 +52,15 @@
           bun
         ];
 
-        # 🧩 Shared shell hook logic (no git-crypt)
+        # 🧩 Shared shell hook logic
         sharedShellHook = ''
           echo "💡 Running shared dev shell hook"
 
           echo "📦 Running \`bun install\`..."
           bun install
 
-          # ✅ Always enter zsh if not already inside
-          if [ -z "$IN_NIX_SHELL_ZSH_ONCE" ]; then
-            export IN_NIX_SHELL_ZSH_ONCE=1
+          # ✅ Enter zsh only if not already in it
+          if [ -n "$PS1" ] && [ -z "$ZSH_VERSION" ]; then
             exec zsh
           fi
         '';
