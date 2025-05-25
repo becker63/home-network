@@ -112,6 +112,9 @@
 
               echo "🌱 KUBECONFIG: $KUBECONFIG"
               echo "👉 Current context: $(kubectl config current-context)"
+
+              echo "📜 Applying CRDs from ./crds..."
+              kubectl apply -f ./crds
             '';
           };
 

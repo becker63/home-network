@@ -1,11 +1,9 @@
-// scripts/synth.ts
 import { App } from "cdk8s";
 import * as path from "path";
 import * as fs from "fs";
 
 const app = new App();
 
-// Recursively walk a directory and return all .ts files (excluding .d.ts)
 function walk(dir: string): string[] {
   let files: string[] = [];
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -23,26 +21,56 @@ function walk(dir: string): string[] {
   return files;
 }
 
-const chartsDir: string = path.join(process.cwd(), "charts");
-const chartFiles: string[] = walk(chartsDir);
+const chartsDir = path.join(process.cwd(), "charts");
+console.log(`🔍 Searching for charts in: ${chartsDir}`);
+const chartFiles = walk(chartsDir);
 
-console.log(`⛏ Found ${chartFiles.length} chart files`);
+console.log(`📦 Found ${chartFiles.length} chart file(s).`);
+
+const usedIds = new Set<string>();
 
 for (const file of chartFiles) {
-  const mod = require(file);
+  console.log(`\n📄 Processing file: ${file}`);
 
-  for (const exportName of Object.keys(mod)) {
+  if (/lib/i.test(file)) {
+    console.log(`⏭️ Skipping file (lib): ${file}`);
+    continue;
+  }
+
+  let mod;
+  try {
+    mod = require(file);
+  } catch (e) {
+    console.error(`❌ Failed to require file: ${file}\n${e}`);
+    continue;
+  }
+
+  const exportNames = Object.keys(mod);
+  if (exportNames.length === 0) {
+    console.warn(`⚠️ No exports found in: ${file}`);
+    continue;
+  }
+
+  for (const exportName of exportNames) {
+    if (/lib/i.test(exportName)) {
+      console.log(`⏭️ Skipping export (lib): ${exportName}`);
+      continue;
+    }
+
     const ExportedChart = mod[exportName];
-
     if (typeof ExportedChart === "function") {
       try {
-        new ExportedChart(app, exportName);
-        console.log(`✅ Synthesized: ${exportName}`);
+        new ExportedChart(app, exportName); // <== use exportName directly
+        console.log(`✅ Synthesized chart: ${exportName}`);
       } catch (e) {
-        console.warn(`⚠️ Skipping ${exportName}: ${e}`);
+        console.warn(`⚠️ Skipping chart ${exportName}: ${e}`);
       }
+    } else {
+      console.log(`⏭️ Skipping non-function export: ${exportName}`);
     }
   }
 }
 
+console.log(`\n🚀 Running app.synth()...`);
 app.synth();
+console.log(`🎉 Synthesis complete.`);

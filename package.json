@@ -8,7 +8,7 @@
   "scripts": {
     "validate": "conftest test --policy rego-tests dist/",
     "import": "cdk8s import",
-    "synth": "cdk8s synth",
+    "synth": "tsx --tsconfig scripts/tsconfig.json scripts/synth.ts",
     "compile": "tsc --build",
     "watch": "tsc --build -w",
     "test": "kubeconform synth_yaml/ && conftest test synth_yaml/ --policy rego_tests --rego-version v1",

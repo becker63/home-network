@@ -5,6 +5,19 @@ metadata:
 spec: {}
 ---
 apiVersion: v1
+kind: Secret
+metadata:
+  name: project-secrets
+  namespace: crossplane-system
+immutable: false
+stringData:
+  CLOUDFLARE_TOKEN: Blah
+  CROSSPLANE_VERSION: v1.19.1
+  PATCH_FN_VERSION: v0.7.0
+  PROVIDER_HELM_VERSION: v0.15.0
+  test: super-secret-valu
+---
+apiVersion: v1
 kind: ServiceAccount
 metadata:
   labels:
@@ -149,7 +162,7 @@ data:
 
     \                  command: [\"/bin/bash\", \"-c\"]
 
-    \                  args: [\"helm template . --values values.yaml\"]
+    \                  args: [\"cp /secrets/secrets.json ./secrets.json\"]
 
     \                generate:
 
@@ -24502,7 +24515,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/cm: b405e8c449bf649f11bebbb49fee952258636da4fc6a0a0fc88d4951ab16966f
+        checksum/cm: 55b4b40b781e83843a9ceb534724a77f5d249e720ea4fef1c766a45feae31df3
         checksum/cmd-params: 4db5d88e543e2e99b10b083e8a6248f6a68431becaffa61cfa0fbff0d4166d07
       labels:
         app.kubernetes.io/component: repo-server
@@ -24896,7 +24909,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/cm: b405e8c449bf649f11bebbb49fee952258636da4fc6a0a0fc88d4951ab16966f
+        checksum/cm: 55b4b40b781e83843a9ceb534724a77f5d249e720ea4fef1c766a45feae31df3
         checksum/cmd-params: 4db5d88e543e2e99b10b083e8a6248f6a68431becaffa61cfa0fbff0d4166d07
       labels:
         app.kubernetes.io/component: server
@@ -25593,7 +25606,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/cm: b405e8c449bf649f11bebbb49fee952258636da4fc6a0a0fc88d4951ab16966f
+        checksum/cm: 55b4b40b781e83843a9ceb534724a77f5d249e720ea4fef1c766a45feae31df3
         checksum/cmd-params: 4db5d88e543e2e99b10b083e8a6248f6a68431becaffa61cfa0fbff0d4166d07
       labels:
         app.kubernetes.io/component: application-controller

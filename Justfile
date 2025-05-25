@@ -29,11 +29,11 @@ generate-tests:
     bun run scripts/generate-kuttl-tests.ts
 
 test:
-    kubectl kuttl test --config kuttl_tests/kuttl-test.yaml
+    kubectl kuttl test --config kuttl-test.yaml
 
 # dont touch me..
 test-one test:
-    bash -c 'test_dir="$(basename {{test}})"; echo "Running: kubectl kuttl test --config kuttl_tests/kuttl-test.yaml --test $test_dir"; kubectl kuttl test --config kuttl_tests/kuttl-test.yaml --test "$test_dir"'
+    bash -c 'test_dir="$(basename {{test}})"; echo "Running: kubectl kuttl test --config kuttl-test.yaml --test $test_dir"; kubectl kuttl test --config kuttl-test.yaml --test "$test_dir"'
 
 
 clean:
@@ -69,13 +69,13 @@ download-crds:
         -o crds/argocd-appproject.yaml
 
 importcrds:
-    bunx tsx --tsconfig scripts/tsconfig.json scripts/import-crds.ts
+    bun run scripts/import-crds.ts
 
 build-cloudflare:
-    bunx tsx --tsconfig scripts/tsconfig.json scripts/upjet-make.ts crossplane-providers/provider-cloudflare
+    bun run scripts/upjet-make.ts crossplane-providers/provider-cloudflare
 
 build-proxmoxve:
-    bunx tsx --tsconfig scripts/tsconfig.json scripts/upjet-make.ts crossplane-providers/provider-proxmoxve
+    bun run  scripts/upjet-make.ts crossplane-providers/provider-proxmoxve
 
 build-upjet-providers:
     just build-cloudflare
@@ -83,7 +83,7 @@ build-upjet-providers:
 
 add-upjet-provider-submodules:
     mkdir -p crossplane-providers
-    bunx tsx --tsconfig scripts/tsconfig.json scripts/add-upjet-submodules.ts {{UPJET_PROVIDERS}}
+    bun run scripts/add-upjet-submodules.ts {{UPJET_PROVIDERS}}
 
 # ========================================
 # 🔄 CRD Sync & Automation

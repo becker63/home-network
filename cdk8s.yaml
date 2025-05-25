@@ -114,3 +114,4 @@ imports:
   - /Users/becker/home-network/crds/provider-cloudflare-access.cloudflare.upbound.io_applications.yaml
   - /Users/becker/home-network/crds/argocd-application.yaml
   - /Users/becker/home-network/crds/argocd-appproject.yaml
+  - crds/provider-cloudflare-zone.cloudflare.upbound.io_zones.yaml

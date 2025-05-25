@@ -1,0 +1,11 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestAssert
+assert:
+  - apiVersion: argo.cloudflare.upbound.io/v1beta1
+    kind: TunnelRoute
+    metadata:
+      name: argocd-tunnel-route-test
+  - apiVersion: argo.cloudflare.upbound.io/v1beta1
+    kind: TunnelRoute
+    metadata:
+      name: dashboard-tunnel-route-test

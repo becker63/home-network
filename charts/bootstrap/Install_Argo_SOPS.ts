@@ -1,6 +1,8 @@
 import { Construct } from "constructs";
 import { Chart, Helm } from "cdk8s";
-import { Namespace } from "cdk8s-plus-32"; // or appropriate cdk8s-plus version
+import { Namespace, Secret } from "cdk8s-plus-32";
+import * as fs from "fs";
+import * as path from "path";
 
 export class bt_Install_ArgoCD_AVP extends Chart {
   constructor(scope: Construct, id: string) {
@@ -13,6 +15,23 @@ export class bt_Install_ArgoCD_AVP extends Chart {
       },
     });
 
+    // Load secrets from secrets.json
+    const secretsPath = path.join(process.cwd(), "secrets.json");
+    if (!fs.existsSync(secretsPath)) {
+      throw new Error(`❌ secrets.json not found at ${secretsPath}`);
+    }
+    const secretData = JSON.parse(fs.readFileSync(secretsPath, "utf8"));
+
+    // Create project-secrets Secret in crossplane-system
+    new Secret(this, "ProjectSecrets", {
+      metadata: {
+        name: "project-secrets",
+        namespace: "crossplane-system",
+      },
+      stringData: secretData,
+    });
+
+    // Install ArgoCD with AVP sidecar configured
     new Helm(this, "ArgoCD", {
       chart: "argo-cd",
       repo: "https://argoproj.github.io/argo-helm",
@@ -25,7 +44,7 @@ export class bt_Install_ArgoCD_AVP extends Chart {
               - name: avp
                 init:
                   command: ["/bin/bash", "-c"]
-                  args: ["helm template . --values values.yaml"]
+                  args: ["cp /secrets/secrets.json ./secrets.json"]
                 generate:
                   command: ["argocd-vault-plugin"]
                   args: ["generate", "./"]
@@ -44,13 +63,22 @@ export class bt_Install_ArgoCD_AVP extends Chart {
               ],
               volumeMounts: [
                 { name: "sops-key", mountPath: "/sops", readOnly: true },
+                {
+                  name: "project-secrets",
+                  mountPath: "/secrets",
+                  readOnly: true,
+                },
               ],
             },
           ],
           "plugin.volumes": [
+            { name: "sops-key", secret: { secretName: "sops-age-key" } },
             {
-              name: "sops-key",
-              secret: { secretName: "sops-age-key" },
+              name: "project-secrets",
+              secret: {
+                secretName: "project-secrets",
+                optional: false,
+              },
             },
           ],
         },
