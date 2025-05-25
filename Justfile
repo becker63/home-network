@@ -40,11 +40,12 @@ clean:
     rm -rf ./synth_yaml/*
 
 all:
-    just clean
-    just compile
-    just synth
-    just generate-tests
-    just test
+	nix develop .#upjet-env --command just fetch-imports
+	nix develop .#default --command bash -c '\
+		just compile && \
+		just synth && \
+		just generate-tests && \
+		just test'
 
 build:
     just clean
