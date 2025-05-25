@@ -1,4 +1,0 @@
-apiVersion: kuttl.dev/v1beta1
-kind: TestStep
-apply:
-  - ../../synth_yaml/bt_cloudflare_zone-c8fa9b58.k8s.yaml

@@ -1,6 +1,0 @@
-creation_rules:
-  - encrypted_regex: "^(data|stringData|.*)$"
-    path_regex: ^secrets\.json$
-    key_groups:
-      - age:
-          - age14g2g95nh43vgslta46gxp9mm7f0s9unluygqy52uccwscvgcqvps86xmqy
