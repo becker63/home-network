@@ -1,9 +1,0 @@
-apiVersion: worker.cloudflare.upbound.io/v1alpha1
-kind: KVNamespace
-metadata:
-  name: example-worker-kv-namespace
-  annotations:
-    uptest.upbound.io/pre-delete-hook: ../../cluster/test/cleanup-children.sh kvnamespace
-spec:
-  forProvider:
-    title: crossplane-kv-namespace
