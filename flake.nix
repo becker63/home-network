@@ -114,8 +114,8 @@
             ];
 
             shellHook = ''
+              export IN_DEV_UPJET=1
               ${sharedShellHook}
-
               echo "🧪 Upjet Dev Shell Loaded"
               echo "Using Go version: $(go version)"
               export GOCACHE=$PWD/.cache/go-build
