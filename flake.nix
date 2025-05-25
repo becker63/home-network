@@ -61,7 +61,7 @@
           fi
         '';
 
-        # Set up pre-commit hooks
+        # Pre-commit hook setup
         pre-commit = pre-commit-hooks-nix.lib.${system}.run {
           src = ./.;
           hooks = {
@@ -73,6 +73,19 @@
               pass_filenames = true;
             };
           };
+        };
+
+        terraform_1_3_3 = pkgs.stdenv.mkDerivation {
+          name = "terraform-1.3.3";
+          src = pkgs.fetchzip {
+            url = "https://releases.hashicorp.com/terraform/1.3.3/terraform_1.3.3_darwin_arm64.zip";
+            sha256 = "04244xbxmj9hmmvm0bvy0dg350grb415zy8y04zx00a1bfzsqwaw";
+          };
+          phases = [ "installPhase" ];
+          installPhase = ''
+            mkdir -p $out/bin
+            cp $src/terraform $out/bin/
+          '';
         };
 
       in
@@ -121,10 +134,10 @@
           upjet-env = pkgs.mkShell {
             packages = commonShellTools ++ [
               legacyPkgs.go_1_19
-              pkgs.terraform
               pkgs.gnumake
               pkgs.pkg-config
               pkgs.git
+              terraform_1_3_3
             ];
 
             shellHook = ''

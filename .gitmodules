@@ -1,3 +1,0 @@
-[submodule "crossplane-providers/provider-proxmoxve"]
-	path = crossplane-providers/provider-proxmoxve
-	url = https://github.com/dougsong/provider-proxmoxve

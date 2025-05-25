@@ -81,10 +81,6 @@ build-upjet-providers:
     just build-cloudflare
     just build-proxmoxve
 
-add-upjet-provider-submodules:
-    mkdir -p crossplane-providers
-    bun run scripts/add-upjet-submodules.ts {{UPJET_PROVIDERS}}
-
 # ========================================
 # 🔄 CRD Sync & Automation
 
@@ -93,10 +89,10 @@ fetch-imports:
         echo "❌ This must be run inside the dev-upjet shell!, try just dev-upjet." >&2; \
         exit 1; \
     fi
-    just add-upjet-provider-submodules
     just download-crds
     just build-upjet-providers
     just importcrds
+    kubectl apply -f ./crds
 
 # ========================================
 # 🧪 Development Environments
