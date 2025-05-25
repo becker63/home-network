@@ -46,41 +46,47 @@
           fd
           eza
           direnv
-          git-crypt
           curl
           unzip
           just
           bun
         ];
 
+        # 🧩 Shared shell hook logic (no git-crypt)
+        sharedShellHook = ''
+          echo "💡 Running shared dev shell hook"
+
+          echo "📦 Running \`bun install\`..."
+          bun install
+
+          # ✅ Always enter zsh if not already inside
+          if [ -z "$IN_NIX_SHELL_ZSH_ONCE" ]; then
+            export IN_NIX_SHELL_ZSH_ONCE=1
+            exec zsh
+          fi
+        '';
+
       in
       {
         devShells = {
           # 🧪 Main Dev Shell
           default = pkgs.mkShell {
-            packages =
-              with pkgs;
-              commonShellTools
-              ++ [
-                nixfmt-rfc-style
-                nil
-                nixd
-                bun
-                talosctl
-                kind
-                kubectl
-                kuttl
-                just
-                nodejs
-                go
-                gopls
-                kubernetes-helm
-              ];
+            packages = with pkgs; commonShellTools ++ [
+              nixfmt-rfc-style
+              nil
+              nixd
+              talosctl
+              kind
+              kubectl
+              kuttl
+              nodejs
+              go
+              gopls
+              kubernetes-helm
+            ];
 
             shellHook = ''
-              if [ -f ./secrets/git-crypt.key ]; then
-                git-crypt unlock ./secrets/git-crypt.key 2>/dev/null || true
-              fi
+              ${sharedShellHook}
 
               if ! kind get clusters | grep -q "^kuttl$"; then
                 echo "🔧 Spinning up Kind cluster 'kuttl'..."
@@ -94,13 +100,6 @@
 
               echo "🌱 KUBECONFIG: $KUBECONFIG"
               echo "👉 Current context: $(kubectl config current-context)"
-              echo "Bun installing for you"
-              bun install
-
-              if [ -z "$IN_NIX_SHELL_ZSH" ]; then
-                export IN_NIX_SHELL_ZSH=1
-                exec zsh
-              fi
             '';
           };
 
@@ -115,14 +114,11 @@
             ];
 
             shellHook = ''
+              ${sharedShellHook}
+
               echo "🧪 Upjet Dev Shell Loaded"
               echo "Using Go version: $(go version)"
               export GOCACHE=$PWD/.cache/go-build
-
-              if [ -z "$IN_NIX_SHELL_ZSH" ]; then
-                export IN_NIX_SHELL_ZSH=1
-                exec zsh
-              fi
             '';
           };
         };
