@@ -1,7 +1,7 @@
 import { Construct } from "constructs";
 import { Chart, Helm } from "cdk8s";
 
-export class ntInstall_Argo_Crossplane extends Chart {
+export class bt_Instal_Crossplane extends Chart {
   constructor(scope: Construct, id: string) {
     super(scope, id);
 

@@ -1,9 +1,17 @@
 import { Construct } from "constructs";
 import { Chart, Helm } from "cdk8s";
+import { Namespace } from "cdk8s-plus-32"; // or appropriate cdk8s-plus version
 
-export class InstallArgoCDWithAVP extends Chart {
+export class bt_Install_ArgoCD_AVP extends Chart {
   constructor(scope: Construct, id: string) {
     super(scope, id);
+
+    // Create namespace for ArgoCD
+    new Namespace(this, "ArgoCDNamespace", {
+      metadata: {
+        name: "argocd",
+      },
+    });
 
     new Helm(this, "ArgoCD", {
       chart: "argo-cd",
@@ -31,30 +39,18 @@ export class InstallArgoCDWithAVP extends Chart {
               command: ["/bin/argocd-vault-plugin"],
               args: ["server"],
               env: [
-                {
-                  name: "AVP_TYPE",
-                  value: "sops", // Use sops backend
-                },
-                {
-                  name: "SOPS_AGE_KEY_FILE",
-                  value: "/sops/keys.txt", // Mounted from secret or config
-                },
+                { name: "AVP_TYPE", value: "sops" },
+                { name: "SOPS_AGE_KEY_FILE", value: "/sops/keys.txt" },
               ],
               volumeMounts: [
-                {
-                  name: "sops-key",
-                  mountPath: "/sops",
-                  readOnly: true,
-                },
+                { name: "sops-key", mountPath: "/sops", readOnly: true },
               ],
             },
           ],
           "plugin.volumes": [
             {
               name: "sops-key",
-              secret: {
-                secretName: "sops-age-key", // Define this Secret separately
-              },
+              secret: { secretName: "sops-age-key" },
             },
           ],
         },

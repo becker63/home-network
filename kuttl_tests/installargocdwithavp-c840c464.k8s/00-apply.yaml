@@ -1,4 +1,0 @@
-apiVersion: kuttl.dev/v1beta1
-kind: TestStep
-apply:
-  - ../../synth_yaml/installargocdwithavp-c840c464.k8s.yaml

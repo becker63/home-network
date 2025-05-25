@@ -1,8 +1,11 @@
-// TODO refactor ai slop
-// prevent it from generating a hash per chat eg: nginxchart-c87fe4d0.k8s
-// Alternatively learn how this hash is generated, we need to make sure running synth twice creates the same charts
-import fs from "fs";
-import path from "path";
+import {
+  readFileSync,
+  readdirSync,
+  mkdirSync,
+  existsSync,
+  writeFileSync,
+} from "fs";
+import { join, relative, basename } from "path";
 import * as yaml from "js-yaml";
 
 const SYNTH_PATH = "./synth_yaml";
@@ -18,11 +21,12 @@ type K8sManifest = {
 };
 
 function walk(dir: string): string[] {
-  let files: string[] = [];
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const fullPath = path.join(dir, entry.name);
+  const files: string[] = [];
+
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = join(dir, entry.name);
     if (entry.isDirectory()) {
-      files = files.concat(walk(fullPath));
+      files.push(...walk(fullPath));
     } else if (
       entry.isFile() &&
       entry.name.endsWith(".yaml") &&
@@ -31,30 +35,34 @@ function walk(dir: string): string[] {
       files.push(fullPath);
     }
   }
+
   return files;
 }
 
 const files = walk(SYNTH_PATH);
 
 for (const fullPath of files) {
-  const relPath = path.relative(SYNTH_PATH, fullPath);
+  const relPath = relative(SYNTH_PATH, fullPath);
   const testName = relPath.replace(/\.yaml$/, "").replace(/\//g, "-");
-  const testDir = path.join(TESTS_PATH, testName);
-  fs.mkdirSync(testDir, { recursive: true });
+  const testDir = join(TESTS_PATH, testName);
+  mkdirSync(testDir, { recursive: true });
 
-  const contents = fs.readFileSync(fullPath, "utf8");
+  const contents = readFileSync(fullPath, "utf8");
   const docs = yaml.loadAll(contents) as K8sManifest[];
 
-  const applyPath = path.join(testDir, "00-apply.yaml");
+  // 00-apply.yaml
+  const applyPath = join(testDir, "00-apply.yaml");
   const applyStep = {
     apiVersion: "kuttl.dev/v1beta1",
     kind: "TestStep",
-    apply: [path.relative(testDir, fullPath)],
+    apply: [join("..", "..", SYNTH_PATH, relPath)],
   };
-  if (!fs.existsSync(applyPath)) {
-    fs.writeFileSync(applyPath, yaml.dump(applyStep));
+
+  if (!existsSync(applyPath)) {
+    writeFileSync(applyPath, yaml.dump(applyStep));
   }
 
+  // 01-assert.yaml
   const assertions: K8sManifest[] = docs
     .filter((doc) => doc?.kind && doc?.metadata?.name)
     .map((doc) => ({
@@ -65,13 +73,19 @@ for (const fullPath of files) {
       },
     }));
 
-  if (assertions.length > 0) {
-    const assertPath = path.join(testDir, "01-assert.yaml");
-    if (!fs.existsSync(assertPath)) {
-      fs.writeFileSync(
-        assertPath,
-        assertions.map((doc) => yaml.dump(doc)).join("---\n"),
-      );
-    }
+  const assertPath = join(testDir, "01-assert.yaml");
+  if (assertions.length > 0 && !existsSync(assertPath)) {
+    writeFileSync(
+      assertPath,
+      [
+        {
+          apiVersion: "kuttl.dev/v1beta1",
+          kind: "TestAssert",
+          assert: assertions,
+        },
+      ]
+        .map((doc) => yaml.dump(doc))
+        .join("---\n"),
+    );
   }
 }

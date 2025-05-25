@@ -9,11 +9,6 @@ ARGOCD_VERSION := "v2.10.7"
 UPJET_PROVIDERS := "provider-cloudflare=https://github.com/cdloh/provider-cloudflare provider-proxmoxve=https://github.com/dougsong/provider-proxmoxve"
 
 # ========================================
-# 🛠️ Script Runner Config
-
-SCRIPT_RUNNER := "bunx tsx --tsconfig scripts/tsconfig.json"
-
-# ========================================
 # 🔧 Base Commands (Hidden)
 
 _default: _help
@@ -31,10 +26,15 @@ synth:
     bunx cdk8s synth
 
 generate-tests:
-    {{SCRIPT_RUNNER}} scripts/generate-kuttl-tests.ts
+    bun run scripts/generate-kuttl-tests.ts
 
 test:
-    kubectl kuttl test ./kuttl_tests
+    kubectl kuttl test --config kuttl_tests/kuttl-test.yaml
+
+# dont touch me..
+test-one test:
+    bash -c 'test_dir="$(basename {{test}})"; echo "Running: kubectl kuttl test --config kuttl_tests/kuttl-test.yaml --test $test_dir"; kubectl kuttl test --config kuttl_tests/kuttl-test.yaml --test "$test_dir"'
+
 
 clean:
     rm -rf ./synth_yaml/*
@@ -43,7 +43,7 @@ all:
     just clean
     just compile
     just synth
-    just generate
+    just generate-tests
     just test
 
 build:
@@ -69,13 +69,13 @@ download-crds:
         -o crds/argocd-appproject.yaml
 
 importcrds:
-    {{SCRIPT_RUNNER}} scripts/import-crds.ts
+    bunx tsx --tsconfig scripts/tsconfig.json scripts/import-crds.ts
 
 build-cloudflare:
-    {{SCRIPT_RUNNER}} scripts/upjet-make.ts crossplane-providers/provider-cloudflare
+    bunx tsx --tsconfig scripts/tsconfig.json scripts/upjet-make.ts crossplane-providers/provider-cloudflare
 
 build-proxmoxve:
-    {{SCRIPT_RUNNER}} scripts/upjet-make.ts crossplane-providers/provider-proxmoxve
+    bunx tsx --tsconfig scripts/tsconfig.json scripts/upjet-make.ts crossplane-providers/provider-proxmoxve
 
 build-upjet-providers:
     just build-cloudflare
@@ -83,7 +83,7 @@ build-upjet-providers:
 
 add-upjet-provider-submodules:
     mkdir -p crossplane-providers
-    {{SCRIPT_RUNNER}} scripts/add-upjet-submodules.ts {{UPJET_PROVIDERS}}
+    bunx tsx --tsconfig scripts/tsconfig.json scripts/add-upjet-submodules.ts {{UPJET_PROVIDERS}}
 
 # ========================================
 # 🔄 CRD Sync & Automation

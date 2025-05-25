@@ -1,28 +1,16 @@
 {
   "compilerOptions": {
-    "alwaysStrict": true,
-    "declaration": true,
-    "experimentalDecorators": true,
-    "inlineSourceMap": true,
-    "inlineSources": true,
-    "lib": ["es2016"],
-    "module": "CommonJS",
-    "noEmit": false,
-    "noEmitOnError": true,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "module": "ESNext",
+    "target": "ES2022",
+    "lib": ["es2022", "dom"],
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
+    "noEmit": true,
     "strict": true,
-    "strictNullChecks": true,
-    "strictPropertyInitialization": true,
-    "stripInternal": true,
-    "target": "ES2017",
-    "outDir": "dist"
+    "skipLibCheck": true
   },
-  "include": ["charts/**/*.ts"],
-  "exclude": ["node_modules", "scripts"]
+  "include": ["scripts", "charts", "config"],
+  "exclude": ["node_modules", "synth_yaml"]
 }

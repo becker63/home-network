@@ -1,0 +1,14 @@
+apiVersion: kuttl.dev/v1beta1
+kind: TestAssert
+assert:
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: argocd-server
+      namespace: argocd
+    spec:
+      template:
+        spec:
+          containers:
+            - name: avp
+              image: ghcr.io/argoproj-labs/argocd-vault-plugin:v1.16.0
