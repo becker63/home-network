@@ -5,8 +5,6 @@ import-crds:
     kcl mod add cert-manager:0.3.0
     kcl mod add crossplane:1.17.3
 
-
-
 init-kcl:
     just download-crds
     just import-crds
