@@ -1,0 +1,38 @@
+
+
+# TypeScript
+*.tsbuildinfo
+*.d.ts
+*.js
+!jest.config.js
+
+# CDK8s / KUTTL output
+kubeconfig
+
+# Env files
+.env*
+!.env.example
+
+# Editor & system
+.vscode/
+.idea/
+.DS_Store
+
+# OS / misc
+*.pid
+*.pid.lock
+*.tgz
+.cache/
+coverage/
+*.lcov
+logs/
+*.log
+
+# Ignore secret key for git-crypt
+config/git-crypt.key
+
+kind-config.yaml
+
+# KCL import models dir 
+models
+crds
