@@ -33,6 +33,6 @@ config/git-crypt.key
 
 kind-config.yaml
 
-# KCL import models dir 
+KCL import models dir 
 models
 crds
