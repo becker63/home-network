@@ -58,23 +58,20 @@
           makePythonCli = import ./flake-modules/make-python-cli.nix;
 
           # Our custom python based shell script!
-          jsontotoml = makePythonCli {
-            inherit pkgs;
-            name = "jsontotoml";
-            scriptPath = ./scripts/src/cli/JsontoToml.py;
-            python = pythonEnv.virtualenv; # reuse shared virtualenv
-          };
-
-          testpy = makePythonCli {
-            inherit pkgs;
-            name = "testpy";
-            scriptPath = ./scripts/src/cli/Test.py;
-            python = pythonEnv.virtualenv; # reuse shared virtualenv
-          };
 
           pyCliTools = [
-            jsontotoml
-            testpy
+            (makePythonCli {
+              inherit pkgs;
+              name = "jsontotoml";
+              scriptPath = ./scripts/src/cli/JsontoToml.py;
+              python = pythonEnv.virtualenv;
+            })
+            (makePythonCli {
+              inherit pkgs;
+              name = "testpy";
+              scriptPath = ./scripts/src/cli/Test.py;
+              python = pythonEnv.virtualenv;
+            })
           ];
 
           nixTools = with pkgs; [
