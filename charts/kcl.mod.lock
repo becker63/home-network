@@ -38,6 +38,17 @@
     reg = "ghcr.io"
     repo = "kcl-lang/crossplane"
     oci_tag = "1.17.3"
+  [dependencies.frpc]
+    name = "frpc"
+    full_name = "frpc_0.0.1"
+    version = "0.0.1"
+  [dependencies.frps]
+    name = "frps"
+    full_name = "frps_0.0.1"
+    version = "0.0.1"
+    reg = "ghcr.io"
+    repo = "kcl-lang/frps"
+    oci_tag = "0.0.1"
   [dependencies.k8s]
     name = "k8s"
     full_name = "k8s_1.31.2"
@@ -46,6 +57,12 @@
     reg = "ghcr.io"
     repo = "kcl-lang/k8s"
     oci_tag = "1.31.2"
+  [dependencies.kcl-frp]
+    name = "kcl-frp"
+    full_name = "kcl-frp_0.0.1"
+    version = "0.0.1"
+    url = "https://github.com/becker63/kcl-frp"
+    commit = "dabdbcc"
   [dependencies.sealed-secrets]
     name = "sealed-secrets"
     full_name = "sealed-secrets_v0.27.2"

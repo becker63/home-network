@@ -5,6 +5,11 @@ import-crds:
     kcl mod add cert-manager:0.3.0
     kcl mod add crossplane:1.17.3
 
+[working-directory: "charts/frp"]
+gen-frp-schema:
+    go run gen-schema.go
+
 init-kcl:
     just download-crds
     just import-crds
+    just gen-frp-schema

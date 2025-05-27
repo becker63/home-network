@@ -71,6 +71,8 @@
             kuttl
             kubernetes-helm
             kcl
+            go
+            
           ];
 
         in
