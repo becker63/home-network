@@ -72,6 +72,17 @@
             python = pythonEnv.virtualenv; # reuse shared virtualenv
           };
 
+          pyCliTools = [
+            jsontotoml
+            testpy
+          ];
+
+          nixTools = with pkgs; [
+            nixfmt-rfc-style
+            nil
+            nixd
+          ];
+
           shellTools = with pkgs; [
             zoxide
             fd
@@ -80,9 +91,9 @@
             zsh
             git
             uv
-            nixfmt-rfc-style
-            nil
-            nixd
+          ];
+
+          kubeTools = with pkgs; [
             talosctl
             kind
             kubectl
@@ -90,13 +101,11 @@
             kubernetes-helm
             kcl
             go
-            jsontotoml
-            testpy
           ];
         in
         {
           devShells.default = pkgs.mkShell {
-            packages = shellTools ++ [ pythonEnv.virtualenv ];
+            packages = nixTools ++ shellTools ++ [ pythonEnv.virtualenv ] ++ kubeTools ++ pyCliTools;
 
             env = {
               UV_NO_SYNC = "1";
