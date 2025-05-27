@@ -1,4 +1,0 @@
-apiVersion: kuttl.dev/v1beta1
-kind: TestStep
-apply:
-  - ../../synth_yaml/bt_cloudflare_argo_tunnel_route-c8e7c2b1.k8s.yaml

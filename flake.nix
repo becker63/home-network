@@ -1,154 +1,106 @@
 {
-  description = "Dev shell + QCOW2 image builder (x86-only)";
+  description = "Nim + Kubernetes + uv2nix Python dev environment";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
-    flake-utils.url = "github:numtide/flake-utils";
-    nixos-generators.url = "github:nix-community/nixos-generators";
-    pre-commit-hooks-nix.url = "github:cachix/pre-commit-hooks.nix";
-    go119pkgs = {
-      url = "github:NixOS/nixpkgs/5a83f6f984f387d47373f6f0c43b97a64e7755c0";
-      flake = false;
-    };
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    uv2nix.url = "github:pyproject-nix/uv2nix";
+    pyproject-nix.url = "github:pyproject-nix/pyproject.nix";
+    pyproject-build-systems.url = "github:pyproject-nix/build-system-pkgs";
+
+    # Make dependencies follow nixpkgs
+    uv2nix.inputs.nixpkgs.follows = "nixpkgs";
+    uv2nix.inputs.pyproject-nix.follows = "pyproject-nix";
+    pyproject-nix.inputs.nixpkgs.follows = "nixpkgs";
+    pyproject-build-systems.inputs.nixpkgs.follows = "nixpkgs";
+    pyproject-build-systems.inputs.pyproject-nix.follows = "pyproject-nix";
+    pyproject-build-systems.inputs.uv2nix.follows = "uv2nix";
   };
 
   outputs =
-    {
+    inputs@{
       self,
       nixpkgs,
-      flake-utils,
-      nixos-generators,
-      pre-commit-hooks-nix,
-      go119pkgs,
+      flake-parts,
+      uv2nix,
+      pyproject-nix,
+      pyproject-build-systems,
       ...
     }:
-    flake-utils.lib.eachDefaultSystem (
-      system:
-      let
-        pkgs = import nixpkgs {
-          inherit system;
-          config.allowUnfree = true;
-        };
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = [
+        "x86_64-linux"
+        "aarch64-darwin"
+      ];
 
-        legacyPkgs = import go119pkgs { inherit system; };
+      perSystem =
+        { pkgs, system, ... }:
+        let
+          uv2nixLib = uv2nix.lib;
 
-        commonShellTools = with pkgs; [
-          zoxide
-          fd
-          eza
-          direnv
-          curl
-          unzip
-          just
-          bun
-          sops
-          age
-        ];
+          # Import Python environment module
+          pythonEnv = import ./flake-modules/python.nix {
+            inherit
+              pkgs
+              system
+              uv2nixLib
+              pyproject-nix
+              pyproject-build-systems
+              ;
 
-        sharedShellHook = ''
-          echo "💡 Running shared dev shell hook"
+            workspaceRoot = ./scripts;
+          };
 
-          if [ -f ./secrets.json ]; then
-            echo "🔓 Attempting to decrypt secrets.json in place..."
-            ./scripts/sops/sops-decrypt.sh secrets.json
-          fi
+          # Import kind shell hook script generator
+          kindShellScript = import ./flake-modules/kind-init.nix { inherit pkgs; };
 
-          echo "📦 Running \`bun install\`..."
-          bun install
+          shellTools = with pkgs; [
+            zoxide
+            fd
+            eza
+            just
+            zsh
+            git
+            uv
+            nixfmt-rfc-style
+            nil
+            nixd
+            talosctl
+            kind
+            kubectl
+            kuttl
+            kubernetes-helm
+            kcl
+            go
+            
+          ];
 
-          if [ -n "$PS1" ] && [ -z "$ZSH_VERSION" ]; then
-            exec zsh
-          fi
-        '';
+        in
+        {
+          devShells.default = pkgs.mkShell {
+            packages = shellTools ++ [ pythonEnv.virtualenv ];
 
-        # Pre-commit hook setup
-        pre-commit = pre-commit-hooks-nix.lib.${system}.run {
-          src = ./.;
-          hooks = {
-            sops-encrypt = {
-              enable = true;
-              entry = "./scripts/sops/sops-encrypt.sh";
-              files = "^secrets\\.json$";
-              language = "system";
-              pass_filenames = true;
+            env = {
+              UV_NO_SYNC = "1";
+              UV_PYTHON = "${pythonEnv.virtualenv}/bin/python";
+              UV_PYTHON_DOWNLOADS = "never";
             };
-          };
-        };
-
-        terraform_1_3_3 = pkgs.stdenv.mkDerivation {
-          name = "terraform-1.3.3";
-          src = pkgs.fetchzip {
-            url = "https://releases.hashicorp.com/terraform/1.3.3/terraform_1.3.3_darwin_arm64.zip";
-            sha256 = "04244xbxmj9hmmvm0bvy0dg350grb415zy8y04zx00a1bfzsqwaw";
-          };
-          phases = [ "installPhase" ];
-          installPhase = ''
-            mkdir -p $out/bin
-            cp $src/terraform $out/bin/
-          '';
-        };
-
-      in
-      {
-        devShells = {
-          default = pkgs.mkShell {
-            packages =
-              with pkgs;
-              commonShellTools
-              ++ [
-                nixfmt-rfc-style
-                nil
-                nixd
-                talosctl
-                kind
-                kubectl
-                kuttl
-                nodejs
-                go
-                gopls
-                kubernetes-helm
-              ];
 
             shellHook = ''
-              ${pre-commit.shellHook}
-              ${sharedShellHook}
+              unset PYTHONPATH
+              export REPO_ROOT=$(git rev-parse --show-toplevel)
 
-              if ! kind get clusters | grep -q "^kuttl$"; then
-                echo "🔧 Spinning up Kind cluster 'kuttl'..."
-                kind create cluster --name kuttl
-              else
-                echo "✅ Kind cluster 'kuttl' already exists"
+              # Run the kind shell hook script
+              ${kindShellScript}/bin/kind-shell-hook
+
+              echo "🐍 Python dev shell (uv2nix) ready 🐥"
+
+              if [ -n "$PS1" ] && [ -z "$IN_NIX_DEV_ZSH" ] && [ -z "$ZSH_VERSION" ]; then
+                export IN_NIX_DEV_ZSH=1
+                exec zsh
               fi
-
-              kind get kubeconfig --name kuttl > ./kubeconfig
-              export KUBECONFIG="$PWD/kubeconfig"
-
-              echo "🌱 KUBECONFIG: $KUBECONFIG"
-              echo "👉 Current context: $(kubectl config current-context)"
-
-              echo "📜 Applying CRDs from ./crds..."
-              kubectl apply -f ./crds
-            '';
-          };
-
-          upjet-env = pkgs.mkShell {
-            packages = commonShellTools ++ [
-              legacyPkgs.go_1_19
-              pkgs.gnumake
-              pkgs.pkg-config
-              pkgs.git
-              terraform_1_3_3
-            ];
-
-            shellHook = ''
-              export IN_DEV_UPJET=1
-              ${sharedShellHook}
-              echo "🧪 Upjet Dev Shell Loaded"
-              echo "Using Go version: $(go version)"
-              export GOCACHE=$PWD/.cache/go-build
             '';
           };
         };
-      }
-    );
+    };
 }
