@@ -1,4 +1,4 @@
-import frp_schema.frps as Server
+import schemas.frp_schema.frps as Server
 
 Server.ServerConfig {
     version: "1.0.0",

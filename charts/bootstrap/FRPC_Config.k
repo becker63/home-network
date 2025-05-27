@@ -1,4 +1,4 @@
-import frp_schema.frpc as Client
+import schemas.frp_schema.frpc as Client
 
 client_config: Client.ClientConfig {
     version: "1.0.0",  # required field
@@ -24,7 +24,7 @@ client_config: Client.ClientConfig {
         },
     },
     transport: Client.ClientTransportConfig {
-        protocol: "tcp",
+        "$protocol": "tcp",
         tls: Client.TlsclientConfig {
             enable: True,
             serverName: "example.com",
