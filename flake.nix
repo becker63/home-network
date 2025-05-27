@@ -53,6 +53,15 @@
 
           # Import kind shell hook script generator
           kindShellScript = import ./flake-modules/kind-init.nix { inherit pkgs; };
+          makePythonCli = import ./flake-modules/make-python-cli.nix;
+
+          # Our custom python based shell script!
+          jsontotoml = makePythonCli {
+            inherit pkgs;
+            name = "jsontotoml";
+            scriptPath = ./scripts/src/cli/JsontoToml.py;
+            python = pythonEnv.virtualenv; # reuse shared virtualenv
+          };
 
           shellTools = with pkgs; [
             zoxide
@@ -72,9 +81,8 @@
             kubernetes-helm
             kcl
             go
-            
+            jsontotoml
           ];
-
         in
         {
           devShells.default = pkgs.mkShell {
@@ -95,10 +103,10 @@
 
               echo "🐍 Python dev shell (uv2nix) ready 🐥"
 
-              if [ -n "$PS1" ] && [ -z "$IN_NIX_DEV_ZSH" ] && [ -z "$ZSH_VERSION" ]; then
-                export IN_NIX_DEV_ZSH=1
-                exec zsh
-              fi
+              # Only exec zsh if current shell is NOT zsh
+                if [ -n "$PS1" ] && [ -z "$ZSH_VERSION" ]; then
+                  exec zsh
+                fi
             '';
           };
         };
