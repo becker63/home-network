@@ -53,6 +53,8 @@
 
           # Import kind shell hook script generator
           kindShellScript = import ./flake-modules/kind-init.nix { inherit pkgs; };
+
+          # Import python cli/pkg creator
           makePythonCli = import ./flake-modules/make-python-cli.nix;
 
           # Our custom python based shell script!
@@ -60,6 +62,13 @@
             inherit pkgs;
             name = "jsontotoml";
             scriptPath = ./scripts/src/cli/JsontoToml.py;
+            python = pythonEnv.virtualenv; # reuse shared virtualenv
+          };
+
+          testpy = makePythonCli {
+            inherit pkgs;
+            name = "testpy";
+            scriptPath = ./scripts/src/cli/Test.py;
             python = pythonEnv.virtualenv; # reuse shared virtualenv
           };
 
@@ -82,6 +91,7 @@
             kcl
             go
             jsontotoml
+            testpy
           ];
         in
         {
