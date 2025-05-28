@@ -60,6 +60,7 @@
           # Our custom python based shell script!
 
           pyCliTools = [
+            # TODO: maybe automate this by globbing cli dir
             (makePythonCli {
               inherit pkgs;
               name = "jsontotoml";
@@ -68,8 +69,8 @@
             })
             (makePythonCli {
               inherit pkgs;
-              name = "testpy";
-              scriptPath = ./scripts/src/cli/Test.py;
+              name = "manual_iter_test";
+              scriptPath = ./scripts/src/cli/manual_iter_test.py;
               python = pythonEnv.virtualenv;
             })
           ];

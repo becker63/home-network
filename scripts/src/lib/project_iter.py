@@ -43,7 +43,7 @@ def project_filter_enum(
     print_debug: bool = True
 ) -> List[KFile]:
     if root is None:
-        root = (find_project_root() / "infra").resolve()
+        root = (find_project_root() / "kcl").resolve()
     print(root)
 
     results: List[KFile] = []
