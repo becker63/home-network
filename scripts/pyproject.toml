@@ -7,5 +7,6 @@ requires-python = ">=3.13"
 dependencies = [
     "colored>=2.3.0",
     "kcl-lib>=0.11.2",
+    "pytest>=8.3.5",
     "toml>=0.10.2",
 ]

@@ -28,6 +28,9 @@ config/git-crypt.key
 
 kind-config.yaml
 
-KCL import models dir 
+# KCL artifacts
 models
 crds
+
+# Ignore all .k files inside any schemas directory, recursively
+**/schemas/**/*.k
