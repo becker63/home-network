@@ -105,7 +105,7 @@
             packages = nixTools ++ shellTools ++ [ pythonEnv.virtualenv ] ++ kubeTools ++ pyCliTools;
 
             env = {
-              UV_NO_SYNC = "1";
+              # UV_NO_SYNC = "1";
               UV_PYTHON = "${pythonEnv.virtualenv}/bin/python";
               UV_PYTHON_DOWNLOADS = "never";
             };
@@ -113,6 +113,7 @@
             shellHook = ''
               unset PYTHONPATH
               export REPO_ROOT=$(git rev-parse --show-toplevel)
+              export PYTHONPATH=$PWD/scripts/src:$PYTHONPATH
 
               # Run the kind shell hook script
               ${kindShellScript}/bin/kind-shell-hook
