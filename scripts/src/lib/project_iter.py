@@ -3,30 +3,21 @@ from pathlib import Path
 from enum import Enum
 from typing import Callable, Optional, List, Dict
 from lib.helpers import find_project_root
-from concurrent.futures import ThreadPoolExecutor, as_completed
-import os
-import hashlib
-import traceback
-import re
-from io import StringIO
 import sys
 
+from rich.panel import Panel
 from rich.console import Console, Group
 from rich.table import Table
 from rich.live import Live
 from rich.text import Text
-from rich.panel import Panel
 from rich.syntax import Syntax
 from rich.progress import (
     Progress,
-    SpinnerColumn,
     BarColumn,
     TimeElapsedColumn,
-    TimeRemainingColumn,
     TextColumn,
 )
 
-# Enums and Metadata
 class DirEnum(Enum):
     BOOTSTRAP = "bootstrap"
     FRP_SCHEMA = "frp_schema"
@@ -42,14 +33,12 @@ DIR_META: Dict[DirEnum, str] = {
 
 PROJECT_ROOT = find_project_root() / "kcl"
 
-# Data Class
 @dataclass
 class KFile:
     path: Path
     dirname: DirEnum
     color: str
 
-# Utility Functions
 def classify_path_closest(path: Path) -> DirEnum:
     for part in reversed(path.parts):
         for dir_enum in DirEnum:
@@ -73,44 +62,20 @@ def find_kcl_files(
             results.append(kf)
     return results
 
-def clean_traceback(tb_text: str) -> str:
-    tb_text = re.sub(r"/nix/store/[a-z0-9]+-[^/\s]+/bin/", "", tb_text)
-    home_dir = os.path.expanduser("~") + "/home-network/scripts/src/"
-    tb_text = tb_text.replace(home_dir, "")
-    return tb_text
-
-# Parallel Execution
-def run_callbacks_parallel(
-    kfiles: List[KFile],
-    callback: Callable[[KFile], Optional[str]],
-    print_debug: bool = True,
-    title: Optional[str] = "KCL File Processing Status",
-) -> None:
+def run_callbacks_parallel(kfiles, callback, print_debug=True, title=None, hide_debug=False):
     console = Console()
     status_map = {kf.path: "[yellow]Pending" for kf in kfiles}
-    panels: List = []
+    panels = []
 
-    progress = Progress(
-        SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        BarColumn(),
-        "[progress.percentage]{task.percentage:>3.0f}%",
-        TimeElapsedColumn(),
-        TimeRemainingColumn(),
-    )
-
-    task_id = progress.add_task("Processing KCL files", total=len(kfiles))
-
-    def color_from_title(text: str) -> str:
+    def color_from_title(text):
         distinct_colors = [1, 2, 4, 5, 6, 11, 13, 14, 34, 82, 202, 226, 129, 45]
+        import hashlib
         h = hashlib.md5(text.encode()).hexdigest()
         index = int(h, 16) % len(distinct_colors)
         return f"color({distinct_colors[index]})"
 
     def render_table():
-        actual_title = title or ""
-        table_color = color_from_title(actual_title)
-        table = Table(title=Text(actual_title, style=f"bold {table_color}"), show_lines=True)
+        table = Table(show_lines=True)
         table.add_column("File")
         table.add_column("Type")
         table.add_column("Status")
@@ -119,89 +84,90 @@ def run_callbacks_parallel(
             table.add_row(path_str, f"[{kf.color}]{kf.dirname.name}", status_map[kf.path])
         return table
 
-    def _wrapped_callback(kf: KFile):
-        orig_stdout = sys.stdout
-        orig_stderr = sys.stderr
-        raw_out = StringIO()
-        raw_err = StringIO()
+    progress = Progress(
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+        TimeElapsedColumn(),
+        console=console,
+        transient=True,
+    )
+    task = progress.add_task("[cyan]Progress:", total=len(kfiles))
 
-        try:
-            # Redirect stdout and stderr to StringIO buffers
-            sys.stdout = raw_out
-            sys.stderr = raw_err
+    # Group progress + table + panels (initially empty panels)
+    def make_renderable():
+        items = [progress, render_table()]
+        if panels:
+            items.extend(panels)
+        group = Group(*items)
+        table_color = color_from_title(title)
+        return Panel(group, title=Text(title or "", style=f"bold {table_color}"), expand=True)
 
-            with console.capture() as capture:
-                result = callback(kf)
+    with Live(make_renderable(), console=console, refresh_per_second=10) as live:
+        for kf in kfiles:
+            try:
+                ret = callback(kf)
+                if isinstance(ret, tuple):
+                    result, extra_info = ret
+                else:
+                    result, extra_info = ret, None
 
-            # Restore original stdout and stderr immediately after callback returns
-            sys.stdout = orig_stdout
-            sys.stderr = orig_stderr
+                if not hide_debug and result:
+                    panels.append(
+                        Panel(
+                            Text(result, style="white"),
+                            title=f"[cyan]Result from {kf.path.name}",
+                            border_style="cyan",
+                            expand=True,
+                        )
+                    )
+                if not hide_debug and extra_info:
+                    panels.append(
+                        Panel(
+                            Syntax(extra_info, "text", theme="ansi_light", line_numbers=False, word_wrap=True),
+                            title=f"[magenta]Extra Info from {kf.path.name}",
+                            border_style="magenta",
+                            expand=True,
+                        )
+                    )
+                status_map[kf.path] = "[green]✔ Done"
 
-            rich_output = capture.get()
-            raw_output = raw_out.getvalue()
-            raw_error = raw_err.getvalue()
-
-            combined_output = ""
-            if rich_output.strip():
-                combined_output += rich_output.strip()
-            if raw_output.strip():
-                if combined_output:
-                    combined_output += "\n\n"
-                combined_output += raw_output.strip()
-            if raw_error.strip():
-                if combined_output:
-                    combined_output += "\n\n"
-                combined_output += f"STDERR:\n{raw_error.strip()}"
-
-            panels.append(Text())
-            panels.append(
-                Panel(
-                    Syntax(combined_output or "<no output>", "bash", theme="ansi_light", word_wrap=True),
-                    title=f"[bold blue]{kf.path.relative_to(PROJECT_ROOT)}",
-                    expand=True,
+            except Exception as e:
+                from rich.traceback import Traceback
+                tb = Traceback.from_exception(
+                    type(e), e, e.__traceback__,
+                    show_locals=False,
+                    max_frames=1,
+                    word_wrap=True,
+                    theme="ansi_light",
+                    indent_guides=True,
                 )
-            )
-            status_map[kf.path] = "[green]✔ Done"
-
-        except Exception as e:
-            # Make sure to restore stdout/stderr if error happens
-            sys.stdout = orig_stdout
-            sys.stderr = orig_stderr
-
-            tb_lines = traceback.format_exception(type(e), e, e.__traceback__, chain=True)
-            tb_text = ''.join(tb_lines)
-            cleaned_tb = clean_traceback(tb_text)
-            panels.append(Text())
-            panels.append(
-                Panel(
-                    Syntax(cleaned_tb, "python", theme="ansi_light", line_numbers=True, word_wrap=True),
-                    title=f"[red]Exception in {kf.path.name}",
-                    expand=True,
+                panels.append(
+                    Panel(
+                        tb,
+                        title=f"[red]Exception in {kf.path.name}",
+                        border_style="red",
+                        expand=True,
+                    )
                 )
-            )
-            status_map[kf.path] = "[red]✖ Error"
-        progress.update(task_id, advance=1)
+                status_map[kf.path] = "[red]✖ Error"
+                live.update(make_renderable())
+                sys.exit(1)
 
-    max_workers = min(32, (os.cpu_count() or 1) + 4)
+            progress.advance(task)
+            live.update(make_renderable())
 
-    print("\n")
-    with Live(refresh_per_second=10) as live:
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            futures = {executor.submit(_wrapped_callback, kf): kf for kf in kfiles}
-            for _ in as_completed(futures):
-                all_panels = [Text()] + [Group(panel, Text()) for panel in panels]
-                live.update(Group(render_table(), progress, *all_panels))
-    print("\n")
-
-# Public Entry
 def process_kcl_files(
     root: Optional[Path] = None,
     filter_fn: Callable[[KFile], bool] = lambda kf: True,
     callback: Optional[Callable[[KFile], Optional[str]]] = None,
     print_table: bool = True,
-    title: Optional[str] = "KCL File Processing Status",
+    title: Optional[str] = "",
+    hide_debug: bool = True,
 ) -> List[KFile]:
     kfiles = find_kcl_files(root=root, filter_fn=filter_fn, print_debug=print_table)
     if callback:
-        run_callbacks_parallel(kfiles, callback, print_debug=print_table, title=title)
+        run_callbacks_parallel(kfiles, callback, print_debug=print_table, title=title, hide_debug=hide_debug)
+        # add a few newlines between tests.
+        print("\n")
     return kfiles
