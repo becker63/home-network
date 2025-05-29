@@ -69,8 +69,8 @@
             })
             (makePythonCli {
               inherit pkgs;
-              name = "manual_iter_test";
-              scriptPath = ./scripts/src/cli/manual_iter_test.py;
+              name = "kclRunner";
+              scriptPath = ./scripts/src/cli/kclRunner.py;
               python = pythonEnv.virtualenv;
             })
           ];

@@ -3,15 +3,14 @@ from typing import Optional
 import subprocess
 from typing import List, Optional
 
+
 def find_project_root() -> Path:
     current = Path(__file__).resolve()
-    markers = ["flake.nix", ".git"]
-
     while True:
-        if any((current / marker).exists() for marker in markers):
+        if (current / "flake.nix").exists():
             return current
         if current.parent == current:
-            raise RuntimeError(f"Could not find project root. Missing any of: {markers}")
+            raise RuntimeError("Could not find project root (missing flake.nix)")
         current = current.parent
 
 class CommandError(Exception):

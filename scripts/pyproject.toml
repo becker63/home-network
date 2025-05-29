@@ -14,3 +14,13 @@ dependencies = [
     "toml>=0.10.2",
     "tqdm>=4.67.1",
 ]
+
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = ["src/kcl_tasks"]
+markers = [
+    "automation: marks tests that do automation (kubectl apply, etc)",
+    "validation: marks tests that validate output",
+]

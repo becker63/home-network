@@ -3,7 +3,7 @@ from pathlib import Path
 from enum import Enum
 from typing import Callable, Optional, List, Dict, Literal
 from colored import fg, attr
-from lib.helpers import find_project_root
+from helpers import find_project_root
 
 ColorName = Literal["blue", "green", "magenta", "grey_50"]
 
