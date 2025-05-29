@@ -39,7 +39,7 @@ def find_kcl_files(
     print_debug: bool = True,
 ) -> List[KFile]:
     if root is None:
-        root = (find_project_root() / "infra").resolve()
+        root = (find_project_root() / "kcl").resolve()
     if print_debug:
         print(f"Scanning KCL files in {root}")
 

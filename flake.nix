@@ -63,14 +63,8 @@
             # TODO: maybe automate this by globbing cli dir
             (makePythonCli {
               inherit pkgs;
-              name = "jsontotoml";
-              scriptPath = ./scripts/src/cli/JsontoToml.py;
-              python = pythonEnv.virtualenv;
-            })
-            (makePythonCli {
-              inherit pkgs;
-              name = "kclRunner";
-              scriptPath = ./scripts/src/cli/kclRunner.py;
+              name = "manual_kcl_find";
+              scriptPath = ./scripts/src/cli/manual_kcl_find.py;
               python = pythonEnv.virtualenv;
             })
           ];

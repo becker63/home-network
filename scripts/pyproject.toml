@@ -9,6 +9,7 @@ dependencies = [
     "kcl-lib>=0.11.2",
     "prompt-toolkit>=3.0.51",
     "pytest>=8.3.5",
+    "pytest-xdist>=3.7.0",
     "rich>=14.0.0",
     "textual>=3.2.0",
     "toml>=0.10.2",

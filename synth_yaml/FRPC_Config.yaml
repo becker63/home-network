@@ -1,0 +1,44 @@
+client_config:
+  auth:
+    method: token
+    oidc:
+      additionalEndpointParams:
+        param1: value1
+        param2: value2
+      audience: https://api.example.com
+      clientID: my-client-id
+      clientSecret: my-client-secret
+      scope: openid profile
+      tokenEndpointURL: https://auth.example.com/token
+  log:
+    level: info
+    maxDays: 7
+    to: /var/log/frpc.log
+  serverAddr: '127.0.0.1'
+  serverPort: 7000
+  transport:
+    protocol: tcp
+    quic:
+      keepalivePeriod: 20
+      maxIdleTimeout: 120
+      maxIncomingStreams: 100
+    tls:
+      certFile: /etc/tls/client-cert.pem
+      disableCustomTLSFirstByte: true
+      enable: true
+      keyFile: /etc/tls/client-key.pem
+      serverName: example.com
+      trustedCaFile: /etc/tls/ca.pem
+  version: '1.0.0'
+  webServer:
+    addr: '0.0.0.0'
+    assetsDir: /var/www/assets
+    password: password123
+    port: 8080
+    pprofEnable: true
+    tls:
+      certFile: /etc/tls/cert.pem
+      keyFile: /etc/tls/key.pem
+      serverName: example.com
+      trustedCaFile: /etc/tls/ca.pem
+    user: admin

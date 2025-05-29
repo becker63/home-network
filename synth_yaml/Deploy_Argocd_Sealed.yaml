@@ -1,0 +1,35 @@
+sealed_secret:
+  apiVersion: bitnami.com/v1alpha1
+  kind: SealedSecret
+  metadata:
+    name: my-secret
+    namespace: default
+  spec:
+    encryptedData:
+      username: AgB+…==
+      password: AgB+…==
+    template:
+      metadata:
+        labels:
+          app: demo
+argo_app:
+  apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    name: example-app
+    namespace: argocd
+  spec:
+    destination:
+      namespace: default
+      server: https://kubernetes.default.svc
+    project: default
+    source:
+      helm:
+        values: "\n      secretName: repo-creds\n    "
+      path: manifests/app
+      repoURL: https://github.com/example/repo.git
+      targetRevision: HEAD
+    syncPolicy:
+      automated:
+        prune: true
+        selfHeal: true

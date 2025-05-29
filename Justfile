@@ -1,7 +1,7 @@
 CRD_DIR := "crds/kuttl"
 
 # CRD imports (infra/)
-[working-directory: "infra"]
+[working-directory: "kcl"]
 import-crds:
     kcl mod add sealed-secrets:v0.27.2
     kcl mod add argo-cd:0.2.1
@@ -9,12 +9,12 @@ import-crds:
     kcl mod add crossplane:1.17.3
 
 # Schema generation (infra/schemas/frp_schema)
-[working-directory: "infra/schemas/frp_schema"]
+[working-directory: "kcl/schemas/frp_schema"]
 gen-frp-schema:
     go run gen-schema.go
 
-# KUTTL CRDs (kuttl-tests/)
-[working-directory: "kuttl-tests"]
+# KUTTL CRDs
+[working-directory: "kcl"]
 download-kuttl-crds:
     mkdir -p {{CRD_DIR}}
     curl -fsSL -o {{CRD_DIR}}/testassert_crd.yaml https://raw.githubusercontent.com/kudobuilder/kuttl/refs/heads/main/crds/testassert_crd.yaml &
@@ -22,9 +22,9 @@ download-kuttl-crds:
     curl -fsSL -o {{CRD_DIR}}/testsuite_crd.yaml https://raw.githubusercontent.com/kudobuilder/kuttl/refs/heads/main/crds/testsuite_crd.yaml &
     wait
 
-[working-directory: "kuttl-tests"]
+[working-directory: "kcl"]
 import-kuttl-crds:
-    kcl import -m crd ../{{CRD_DIR}}/*.yaml --output schema
+    kcl import -m crd {{CRD_DIR}}/*.yaml --output schemas/kuttl
 
 # sets up all schemas and CRDs
 all:

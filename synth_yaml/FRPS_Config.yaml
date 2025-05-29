@@ -1,0 +1,78 @@
+allowPorts:
+- end: 20000
+  start: 10000
+- single: 8088
+auth:
+  additionalScopes:
+  - HeartBeats
+  - NewWorkConns
+  method: oidc
+  oidc:
+    audience: https://api.example.com
+    issuer: https://auth.example.com
+    skipExpiryCheck: false
+    skipIssuerCheck: false
+  token: server-token
+bindAddr: '0.0.0.0'
+bindPort: 7000
+custom404Page: /var/www/404.html
+detailedErrorsToClient: true
+enablePrometheus: true
+httpPlugins:
+- addr: http://127.0.0.1:9000
+  name: authz
+  ops:
+  - NewProxy
+  - Ping
+  path: /plugin/authz
+  tlsVerify: false
+kcpBindPort: 7002
+log:
+  disablePrintColor: false
+  level: debug
+  maxDays: 7
+  to: /var/log/frps.log
+proxyBindAddr: '0.0.0.0'
+quicBindPort: 7001
+sshTunnelGateway:
+  authorizedKeysFile: /etc/frps/ssh/authorized_keys
+  autoGenPrivateKeyPath: /etc/frps/ssh/id_rsa.auto
+  bindPort: 2222
+  privateKeyFile: /etc/frps/ssh/id_rsa
+subDomainHost: frps.example.com
+tcpmuxHTTPConnectPort: 8081
+tcpmuxPassthrough: true
+transport:
+  heartbeatTimeout: 90
+  maxPoolCount: 10
+  quic:
+    keepalivePeriod: 20
+    maxIdleTimeout: 120
+    maxIncomingStreams: 100
+  tcpKeepalive: 60
+  tcpMux: true
+  tcpMuxKeepaliveInterval: 30
+  tls:
+    certFile: /etc/tls/server-cert.pem
+    force: true
+    keyFile: /etc/tls/server-key.pem
+    serverName: example.com
+    trustedCaFile: /etc/tls/ca.pem
+udpPacketSize: 1500
+userConnTimeout: 10
+version: '1.0.0'
+vhostHTTPPort: 8080
+vhostHTTPSPort: 8443
+vhostHTTPTimeout: 60
+webServer:
+  addr: '127.0.0.1'
+  assetsDir: /var/www/assets
+  password: securepass
+  port: 7500
+  pprofEnable: true
+  tls:
+    certFile: /etc/tls/web-cert.pem
+    keyFile: /etc/tls/web-key.pem
+    serverName: example.com
+    trustedCaFile: /etc/tls/ca.pem
+  user: admin
