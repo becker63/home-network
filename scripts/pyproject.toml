@@ -22,8 +22,10 @@ include = ["src"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-ra -q"
+addopts = "-ra -q -m 'not generated_group'"
 testpaths = ["src/kcl_tasks"]
+# Tell pytest to look for files with this substr
+python_files = "kcl_*"
 markers = [
     "automation: marks tests that do automation (kubectl apply, etc)",
     "validation: marks tests that validate output",

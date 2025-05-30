@@ -9,7 +9,7 @@ from lib.conftest_helpers import parametrize_group
 
 
 @pytest.mark.automation
-@parametrize_group(ProjectFilters.BOOTSTRAP)
+@parametrize_group([ProjectFilters.BOOTSTRAP, ProjectFilters.BOOTSTRAP_SYNTH])
 def test_generate_yaml_synth(
     filter_name: ProjectFilters,
     kcl_files_by_filter: Dict[ProjectFilters, List[KFile]]

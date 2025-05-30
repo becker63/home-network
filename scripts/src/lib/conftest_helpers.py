@@ -2,6 +2,7 @@ from typing import Callable, Dict, List, Iterable
 import pytest
 from .find_kcl_files import find_kcl_files
 from .common import KFile, FILTER_MAP, GroupKey, ProjectFilters
+import os
 
 def get_group_for_member(member: ProjectFilters) -> GroupKey:
     """
@@ -14,14 +15,22 @@ def get_group_for_member(member: ProjectFilters) -> GroupKey:
     raise ValueError(f"No group found containing {member}")
 
 
-def parametrize_group(member: ProjectFilters):
+def parametrize_group(filters: List[ProjectFilters]):
     """
-    Given one ProjectFilters member, find the full group and parametrize on
-    all individual ProjectFilters members in that group.
+    Parametrize on a list of ProjectFilters.
+    By default, only the first filter will run to avoid duplicate test runs.
+    If any filter in the group is mentioned in PYTEST_CURRENT_TEST (via -k), run all.
     """
-    group = get_group_for_member(member)
+    selected = os.getenv("PYTEST_CURRENT_TEST", "")
+    if any(f.value in selected for f in filters[1:]):
+        # Explicit selection detected; run all
+        selected_filters = filters
+    else:
+        # Default run: only first filter
+        selected_filters = [filters[0]]
+
     return pytest.mark.parametrize(
         "filter_name",
-        list(group),
-        ids=[f.value for f in group],
+        selected_filters,
+        ids=[f.value for f in selected_filters],
     )
