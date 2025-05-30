@@ -2,11 +2,10 @@ import pytest
 from kcl_lib import api
 from pytest_print import Printer
 
-from lib.common import KFile, ProjectFilters
+from lib.common import KFile
 from lib.helpers import find_project_root
 from lib.conftest_helpers import parametrize_files_for_group
-
-
+from kcl_tasks.filters import ProjectFilters
 
 @pytest.mark.automation
 @parametrize_files_for_group([ProjectFilters.BOOTSTRAP, ProjectFilters.BOOTSTRAP_SYNTH])

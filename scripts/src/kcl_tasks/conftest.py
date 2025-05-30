@@ -1,8 +1,9 @@
 from typing import Callable, Dict, List
 import pytest
-from lib.find_kcl_files import find_kcl_files
-from lib.common import KFile, FILTER_MAP, GroupKey, ProjectFilters
 
+from lib.find_kcl_files import find_kcl_files
+from lib.common import KFile, GroupKey
+from kcl_tasks.filters import ProjectFilters, FILTER_MAP
 
 # Type aliases for clarity
 FilterFunction = Callable[[KFile], bool]

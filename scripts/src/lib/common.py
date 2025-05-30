@@ -1,8 +1,13 @@
 from dataclasses import dataclass
 from pathlib import Path
-from enum import Enum, StrEnum
-from typing import Dict, Callable, List, Iterator
+from enum import Enum
+from typing import Callable, List, Iterator, TYPE_CHECKING, Dict
 from .helpers import find_project_root
+
+# If you import ProjectFilters directly at runtime in common.py, it causes a circular import problem (because filters.py imports common.py and vice versa).
+# This means the import inside if TYPE_CHECKING: only happens during static type checking — no runtime import occurs, so no circular import or runtime error.
+if TYPE_CHECKING:
+    from kcl_tasks.filters import ProjectFilters
 
 # ─────────────────────────────
 # Types
@@ -19,18 +24,12 @@ class KFile:
     path: Path
     dirname: DirEnum
 
-# StrEnum used to allow clean string comparisons and filter IDs
-class ProjectFilters(StrEnum):
-    BOOTSTRAP = "bootstrap"
-    BOOTSTRAP_SYNTH = "bootstrap_synth"
-    RANDOM = "random"
-
 # Custom key wrapper to support grouping filters with hashable keys
 class GroupKey:
-    def __init__(self, *members: ProjectFilters):
-        self.members: List[ProjectFilters] = list(members)
+    def __init__(self, *members: 'ProjectFilters'):
+        self.members: List['ProjectFilters'] = list(members)
 
-    def __iter__(self) -> Iterator[ProjectFilters]:
+    def __iter__(self) -> Iterator['ProjectFilters']:
         return iter(self.members)
 
     def __getitem__(self, idx):
@@ -45,18 +44,17 @@ class GroupKey:
     def __repr__(self):
         return f"GroupKey({', '.join(m.value for m in self.members)})"
 
-def group(*args: ProjectFilters) -> GroupKey:
+def group(*args: 'ProjectFilters') -> GroupKey:
     return GroupKey(*args)
 
 # ─────────────────────────────
 # Constants
 # ─────────────────────────────
 
-# Grouped test filters: group(...) creates a GroupKey used in FILTER_MAP
-FILTER_MAP: Dict[GroupKey, Callable[[KFile], bool]] = {
-    group(ProjectFilters.BOOTSTRAP, ProjectFilters.BOOTSTRAP_SYNTH): lambda kf: kf.dirname == DirEnum.BOOTSTRAP,
-    group(ProjectFilters.RANDOM): lambda kf: True
-}
+# Delay the import to avoid circular dependency
+def get_filter_map() -> Dict[GroupKey, Callable[[KFile], bool]]:
+    from kcl_tasks.filters import FILTER_MAP
+    return FILTER_MAP
 
 PROJECT_ROOT: Path = find_project_root()
 KCL_ROOT: Path = (PROJECT_ROOT / "kcl").resolve()

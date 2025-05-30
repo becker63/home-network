@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Optional
 import subprocess
-from typing import List, Optional
+from typing import List
 
 
 def find_project_root() -> Path:

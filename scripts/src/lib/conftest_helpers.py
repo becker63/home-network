@@ -1,7 +1,8 @@
-from typing import Callable, Dict, List, Iterable
+from typing import List
 import pytest
 from .find_kcl_files import find_kcl_files
-from .common import KFile, FILTER_MAP, GroupKey, ProjectFilters
+from .common import GroupKey
+from kcl_tasks.filters import ProjectFilters, FILTER_MAP
 from .helpers import find_project_root
 import os
 
