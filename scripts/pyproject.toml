@@ -16,6 +16,9 @@ dependencies = [
     "tqdm>=4.67.1",
 ]
 
+[tool.pyright]
+include = ["src"]
+
 
 [tool.pytest.ini_options]
 minversion = "6.0"

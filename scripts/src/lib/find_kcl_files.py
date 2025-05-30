@@ -1,24 +1,7 @@
-from dataclasses import dataclass
+from typing import Callable, Optional, List
 from pathlib import Path
-from enum import Enum
-from typing import Callable, Optional, List, Dict, Literal
-from colored import fg, attr
-from helpers import find_project_root
-
-ColorName = Literal["blue", "green", "magenta", "grey_50"]
-
-class DirEnum(Enum):
-    BOOTSTRAP = "bootstrap"
-    FRP_SCHEMA = "frp_schema"
-    SCHEMAS = "schemas"
-    DEFAULT = "default"
-
-DIR_META: Dict[DirEnum, ColorName] = {
-    DirEnum.BOOTSTRAP: "blue",
-    DirEnum.FRP_SCHEMA: "green",
-    DirEnum.SCHEMAS: "magenta",
-    DirEnum.DEFAULT: "grey_50",
-}
+from .common import DirEnum, KFile, DIR_META
+from .helpers import find_project_root
 
 def classify_path_closest(path: Path) -> DirEnum:
     for part in reversed(path.parts):
@@ -26,12 +9,6 @@ def classify_path_closest(path: Path) -> DirEnum:
             if dir_enum.value == part:
                 return dir_enum
     return DirEnum.DEFAULT
-
-@dataclass
-class KFile:
-    path: Path
-    dirname: DirEnum
-    color: ColorName
 
 def find_kcl_files(
     root: Optional[Path] = None,
