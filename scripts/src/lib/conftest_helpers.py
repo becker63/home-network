@@ -2,6 +2,7 @@ from typing import Callable, Dict, List, Iterable
 import pytest
 from .find_kcl_files import find_kcl_files
 from .common import KFile, FILTER_MAP, GroupKey, ProjectFilters
+from .helpers import find_project_root
 import os
 
 def get_group_for_member(member: ProjectFilters) -> GroupKey:
@@ -14,23 +15,27 @@ def get_group_for_member(member: ProjectFilters) -> GroupKey:
             return group
     raise ValueError(f"No group found containing {member}")
 
-
-def parametrize_group(filters: List[ProjectFilters]):
+def parametrize_files_for_group(filters: List[ProjectFilters]):
     """
-    Parametrize on a list of ProjectFilters.
-    By default, only the first filter will run to avoid duplicate test runs.
-    If any filter in the group is mentioned in PYTEST_CURRENT_TEST (via -k), run all.
+    Parametrize the test on individual KFiles that belong to the specified ProjectFilters.
+    Handles group expansion the same way as `parametrize_group`, but yields (filter_name, KFile).
     """
     selected = os.getenv("PYTEST_CURRENT_TEST", "")
     if any(f.value in selected for f in filters[1:]):
-        # Explicit selection detected; run all
-        selected_filters = filters
+        selected_filters = filters  # run all
     else:
-        # Default run: only first filter
-        selected_filters = [filters[0]]
+        selected_filters = [filters[0]]  # run default
 
-    return pytest.mark.parametrize(
-        "filter_name",
-        selected_filters,
-        ids=[f.value for f in selected_filters],
-    )
+    # Flattened list of (filter_name, KFile)
+    params = []
+    ids = []
+    for filter_name in selected_filters:
+        group = get_group_for_member(filter_name)
+        filter_fn = FILTER_MAP[group]
+        files = find_kcl_files(filter_fn=filter_fn, print_debug=False)
+        for kf in files:
+            params.append((filter_name, kf))
+            rel_path = kf.path.relative_to(find_project_root())
+            ids.append(f"{filter_name.value}::{rel_path}")
+
+    return pytest.mark.parametrize("filter_name,kf", params, ids=ids)

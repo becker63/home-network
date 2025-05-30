@@ -3,6 +3,7 @@ import pytest
 from lib.find_kcl_files import find_kcl_files
 from lib.common import KFile, FILTER_MAP, GroupKey, ProjectFilters
 
+
 # Type aliases for clarity
 FilterFunction = Callable[[KFile], bool]
 GroupedFilterMap = Dict[GroupKey, FilterFunction]

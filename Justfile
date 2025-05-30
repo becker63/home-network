@@ -36,3 +36,9 @@ all:
     just download-kuttl-crds
     @echo -e "\033[1;35m==> Importing KUTTL CRDs...\033[0m"
     just import-kuttl-crds
+
+[working-directory: "."]
+git-commit MESSAGE:
+    git add .
+    git commit -m "{{MESSAGE}}"
+    git push

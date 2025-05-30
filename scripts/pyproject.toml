@@ -2,31 +2,33 @@
 name = "scripts"
 version = "0.1.0"
 description = "Add your description here"
-readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "colored>=2.3.0",
     "kcl-lib>=0.11.2",
-    "prompt-toolkit>=3.0.51",
     "pytest>=8.3.5",
+    "pytest-print>=1.1.0",
+    "pytest-sugar>=1.0.0",
     "pytest-xdist>=3.7.0",
-    "rich>=14.0.0",
-    "textual>=3.2.0",
     "toml>=0.10.2",
-    "tqdm>=4.67.1",
 ]
+
 
 [tool.pyright]
 include = ["src"]
 
-
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-ra -q"
+# Once we have enough tests, we can also add "-n auto" to run all of them in parallel
+# For now single threaded will almost always be faster
+addopts = "-ra -s -v"
 testpaths = ["src/kcl_tasks"]
-# Tell pytest to look for files with this substr
 python_files = "kcl_*"
 markers = [
     "automation: marks tests that do automation (kubectl apply, etc)",
     "validation: marks tests that validate output",
+]
+filterwarnings = [
+    "error",
+    "ignore::UserWarning:google.protobuf.runtime_version",
+    'ignore:function ham\(\) is deprecated:DeprecationWarning',
 ]
