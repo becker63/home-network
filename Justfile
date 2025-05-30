@@ -1,6 +1,10 @@
+# Justfile for managing KCL projects and testing
+
 CRD_DIR := "crds/kuttl"
 
-# CRD imports (infra/)
+# ─────────────────────────────
+# CRD Imports (infra/)
+# ─────────────────────────────
 [working-directory: "kcl"]
 import-crds:
     kcl mod add sealed-secrets:v0.27.2
@@ -8,12 +12,16 @@ import-crds:
     kcl mod add cert-manager:0.3.0
     kcl mod add crossplane:1.17.3
 
-# Schema generation (infra/schemas/frp_schema)
+# ─────────────────────────────
+# Schema Generation (infra/schemas/frp_schema)
+# ─────────────────────────────
 [working-directory: "kcl/schemas/frp_schema"]
 gen-frp-schema:
     go run gen-schema.go
 
-# KUTTL CRDs
+# ─────────────────────────────
+# KUTTL CRDs Download & Import
+# ─────────────────────────────
 [working-directory: "kcl"]
 download-kuttl-crds:
     mkdir -p {{CRD_DIR}}
@@ -26,7 +34,9 @@ download-kuttl-crds:
 import-kuttl-crds:
     kcl import -m crd {{CRD_DIR}}/*.yaml --output schemas/kuttl
 
-# sets up all schemas and CRDs
+# ─────────────────────────────
+# Full Setup: all schemas and CRDs
+# ─────────────────────────────
 all:
     @echo -e "\033[1;34m==> Importing infra CRDs...\033[0m"
     just import-crds
@@ -37,8 +47,20 @@ all:
     @echo -e "\033[1;35m==> Importing KUTTL CRDs...\033[0m"
     just import-kuttl-crds
 
+# ─────────────────────────────
+# Git Commands
+# ─────────────────────────────
 [working-directory: "."]
 git-commit MESSAGE:
     git add .
     git commit -m "{{MESSAGE}}"
     git push
+
+# ─────────────────────────────
+# Pytest with optional -k expression
+# Runs tests in 'scripts' directory
+# ─────────────────────────────
+[working-directory: "scripts"]
+[no-exit-message] # hide justs distracting output, but keep the exit code
+test K_EXPRESSION="":
+    @bash -c 'if [ "{{K_EXPRESSION}}" = "" ]; then pytest; else pytest -k "{{K_EXPRESSION}}"; fi'
