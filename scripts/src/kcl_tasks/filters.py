@@ -9,7 +9,8 @@ class ProjectFilters(StrEnum):
 
 FILTER_MAP: Dict[GroupKey, Callable[[KFile], bool]] = {
     group(
-        ProjectFilters.BOOTSTRAP, ProjectFilters.BOOTSTRAP_SYNTH
+        ProjectFilters.BOOTSTRAP,
+        ProjectFilters.BOOTSTRAP_SYNTH
     ): lambda kf: kf.dirname == DirEnum.BOOTSTRAP,
 
     group(

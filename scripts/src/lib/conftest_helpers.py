@@ -1,42 +1,35 @@
-from typing import List
 import pytest
-from .find_kcl_files import find_kcl_files
-from .common import GroupKey
+from lib.helpers import find_project_root
 from kcl_tasks.filters import ProjectFilters, FILTER_MAP
-from .helpers import find_project_root
-import os
+from lib.common import GroupKey, KFile
+from lib.find_kcl_files import find_kcl_files
 
 def get_group_for_member(member: ProjectFilters) -> GroupKey:
-    """
-    Find the GroupKey from FILTER_MAP that contains the given ProjectFilters member.
-    Raises ValueError if none found.
-    """
     for group in FILTER_MAP:
         if member in group:
             return group
     raise ValueError(f"No group found containing {member}")
 
-def parametrize_files_for_group(filters: List[ProjectFilters]):
-    """
-    Parametrize the test on individual KFiles that belong to the specified ProjectFilters.
-    Handles group expansion the same way as `parametrize_group`, but yields (filter_name, KFile).
-    """
-    selected = os.getenv("PYTEST_CURRENT_TEST", "")
-    if any(f.value in selected for f in filters[1:]):
-        selected_filters = filters  # run all
-    else:
-        selected_filters = [filters[0]]  # run default
-
-    # Flattened list of (filter_name, KFile)
+def parametrize_files_for_group(filters: list[ProjectFilters]):
     params = []
     ids = []
-    for filter_name in selected_filters:
+
+    for filter_name in filters:
         group = get_group_for_member(filter_name)
         filter_fn = FILTER_MAP[group]
         files = find_kcl_files(filter_fn=filter_fn, print_debug=False)
         for kf in files:
-            params.append((filter_name, kf))
             rel_path = kf.path.relative_to(find_project_root())
-            ids.append(f"{filter_name.value}::{rel_path}")
+            test_id = f"{filter_name.value}::{rel_path}"
+            # Use pytest.param to attach mark to each param
+            params.append(
+                pytest.param(
+                    filter_name,
+                    kf,
+                    id=test_id,
+                    marks=pytest.mark.__getattr__(filter_name.value)
+                )
+            )
+            ids.append(test_id)  # ids not necessary here but kept for clarity
 
-    return pytest.mark.parametrize("filter_name,kf", params, ids=ids)
+    return pytest.mark.parametrize("filter_name,kf", params)

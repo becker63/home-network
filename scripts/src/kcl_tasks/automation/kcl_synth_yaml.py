@@ -8,7 +8,7 @@ from lib.conftest_helpers import parametrize_files_for_group
 from kcl_tasks.filters import ProjectFilters
 
 @pytest.mark.automation
-@parametrize_files_for_group([ProjectFilters.BOOTSTRAP, ProjectFilters.BOOTSTRAP_SYNTH])
+@parametrize_files_for_group([ ProjectFilters.BOOTSTRAP_SYNTH, ProjectFilters.BOOTSTRAP])
 def test_generate_yaml_synth(
     filter_name: ProjectFilters,
     kf: KFile,
