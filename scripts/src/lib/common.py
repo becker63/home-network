@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 from enum import Enum, StrEnum
-from typing import Literal, Dict, Callable, List, Iterator
+from typing import Dict, Callable, List, Iterator
 from .helpers import find_project_root
 
 # ─────────────────────────────
@@ -14,18 +14,16 @@ class DirEnum(Enum):
     SCHEMAS = "schemas"
     DEFAULT = "default"
 
-ColorName = Literal["blue", "green", "magenta", "grey_50"]
-
 @dataclass
 class KFile:
     path: Path
     dirname: DirEnum
-    color: ColorName
 
 # StrEnum used to allow clean string comparisons and filter IDs
-class ProjectFilters(StrEnum):  # Python types are dookie
+class ProjectFilters(StrEnum):
     BOOTSTRAP = "bootstrap"
     BOOTSTRAP_SYNTH = "bootstrap_synth"
+    RANDOM = "random"
 
 # Custom key wrapper to support grouping filters with hashable keys
 class GroupKey:
@@ -54,16 +52,10 @@ def group(*args: ProjectFilters) -> GroupKey:
 # Constants
 # ─────────────────────────────
 
-DIR_META: Dict[DirEnum, ColorName] = {
-    DirEnum.BOOTSTRAP: "blue",
-    DirEnum.FRP_SCHEMA: "green",
-    DirEnum.SCHEMAS: "magenta",
-    DirEnum.DEFAULT: "grey_50",
-}
-
 # Grouped test filters: group(...) creates a GroupKey used in FILTER_MAP
 FILTER_MAP: Dict[GroupKey, Callable[[KFile], bool]] = {
-    group(ProjectFilters.BOOTSTRAP, ProjectFilters.BOOTSTRAP_SYNTH): lambda kf: kf.dirname == DirEnum.BOOTSTRAP
+    group(ProjectFilters.BOOTSTRAP, ProjectFilters.BOOTSTRAP_SYNTH): lambda kf: kf.dirname == DirEnum.BOOTSTRAP,
+    group(ProjectFilters.RANDOM): lambda kf: True
 }
 
 PROJECT_ROOT: Path = find_project_root()

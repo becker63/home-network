@@ -22,7 +22,7 @@ include = ["src"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-ra -q -m 'not generated_group'"
+addopts = "-ra -q"
 testpaths = ["src/kcl_tasks"]
 # Tell pytest to look for files with this substr
 python_files = "kcl_*"

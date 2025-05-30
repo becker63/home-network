@@ -1,6 +1,6 @@
 from typing import Callable, Optional, List
 from pathlib import Path
-from .common import DirEnum, KFile, DIR_META
+from .common import DirEnum, KFile
 from .helpers import find_project_root
 
 def classify_path_closest(path: Path) -> DirEnum:
@@ -24,8 +24,7 @@ def find_kcl_files(
 
     for file_path in root.rglob("*.k"):
         dirname = classify_path_closest(file_path)
-        color_name = DIR_META.get(dirname, DIR_META[DirEnum.DEFAULT])
-        kf = KFile(path=file_path, dirname=dirname, color=color_name)
+        kf = KFile(path=file_path, dirname=dirname)
 
         if filter_fn(kf):
             results.append(kf)
