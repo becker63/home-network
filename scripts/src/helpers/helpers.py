@@ -1,22 +1,5 @@
-from pathlib import Path
 from typing import Optional, List
 import subprocess
-
-from kcl_lib import api
-from kcl_lib.api import ExecProgram_Args
-
-from .proj_types import KFile
-
-def find_project_root() -> Path:
-    current = Path(__file__).resolve()
-    while True:
-        if (current / "flake.nix").exists():
-            return current
-        if current.parent == current:
-            raise RuntimeError("Could not find project root (missing flake.nix)")
-        current = current.parent
-
-KCL_ROOT: Path = (find_project_root() / "kcl").resolve()
 
 class CommandError(Exception):
     def __init__(self, extra_info: Optional[str] = None):

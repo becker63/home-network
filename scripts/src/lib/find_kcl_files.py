@@ -1,8 +1,8 @@
 from typing import Callable, Optional, List
 from pathlib import Path
 
-from .proj_types import DirEnum, KFile
-from .helpers import KCL_ROOT
+from lib.proj_types import KFile
+from project_config import DirEnum, KCL_ROOT
 
 def classify_path_closest(path: Path) -> DirEnum:
     for part in reversed(path.parts):

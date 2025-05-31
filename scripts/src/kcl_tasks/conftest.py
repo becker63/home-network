@@ -4,7 +4,11 @@ import pytest
 from lib import find_kcl_files
 from lib import KFile, GroupKey
 
-from .filters import ProjectFilters, FILTER_MAP
+from project_config import ProjectConfig
+
+DirEnum = ProjectConfig.DirEnum
+ProjectFilters = ProjectConfig.ProjectFilters
+FILTER_MAP = ProjectConfig.FILTER_MAP
 
 FilterFunction = Callable[[KFile], bool]
 GroupedFilterMap = Dict[GroupKey, FilterFunction]

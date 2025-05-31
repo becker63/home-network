@@ -1,17 +1,12 @@
-# lib/types.py
-
 from dataclasses import dataclass
 from pathlib import Path
-from enum import Enum
+from typing import TYPE_CHECKING
 
-
-class DirEnum(Enum):
-    BOOTSTRAP = "bootstrap"
-    FRP_SCHEMA = "frp_schema"
-    SCHEMAS = "schemas"
-    DEFAULT = "default"
+if TYPE_CHECKING:
+    # Only import for type checking (no runtime import)
+    from project_config import ProjectConfig
 
 @dataclass
 class KFile:
     path: Path
-    dirname: DirEnum
+    dirname: 'ProjectConfig.DirEnum'  # forward ref as string

@@ -2,7 +2,7 @@
 from typing import List, Iterator, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from kcl_tasks.filters import ProjectFilters
+    from project_config import ProjectFilters
 
 class GroupKey:
     def __init__(self, *members: 'ProjectFilters'):
