@@ -4,6 +4,7 @@ from typing import List, Iterator, TYPE_CHECKING
 if TYPE_CHECKING:
     from project_config import ProjectFilters
 
+# When this is consumed in tests with @fileset([ProjectFilters.BOOTSTRAP_SYNTH, ProjectFilters.BOOTSTRAP]) the test output will always output the first one
 class GroupKey:
     def __init__(self, *members: 'ProjectFilters'):
         self.members: List['ProjectFilters'] = list(members)

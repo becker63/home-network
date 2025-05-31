@@ -1,65 +1,58 @@
 import pytest
-from typing import List
-
-from lib import PROJECT_ROOT
-from lib.group import GroupKey
+from typing import List, Set
 from lib.find_kcl_files import find_kcl_files
-
-from project_config import ProjectFilters, FILTER_MAP
-
-def get_group_for_member(member: ProjectFilters) -> GroupKey:
-    for group in FILTER_MAP:
-        if member in group:
-            return group
-    raise ValueError(f"No group found containing {member}")
-
-def get_groups_for_filter(filter_name: ProjectFilters) -> List[GroupKey]:
-    return [group for group in FILTER_MAP if filter_name in group]
-
-def validate_filters_compatible(filters: List[ProjectFilters]) -> None:
-    groups_per_filter = [set(get_groups_for_filter(f)) for f in filters]
-    if not groups_per_filter:
-        raise RuntimeError(f"No groups found for filters {filters}")
-    common_groups = set.intersection(*groups_per_filter)
-    if not common_groups:
-        raise RuntimeError(
-            f"\n\n{filters}\n\n"
-            "belong to different groups with different filter functions.\n\n"
-            "Cannot parametrize tests across incompatible filter groups.\n\n"
-            "Try making the lambdas the same."
-        )
+from project_config import ProjectFilters, GroupKey, PARENT_FILTER_MAP
+from lib import PROJECT_ROOT
 
 def fileset(filters: List[ProjectFilters]):
-    validate_filters_compatible(filters)
+
+    if not filters:
+        raise ValueError("Must provide at least one filter")
+
+    filter_set = set(filters)
+
+    # Find all group keys that contain at least one filter in filters
+    matched_groups = []
+    for parent_name, group_list in PARENT_FILTER_MAP.items():
+        for group_key, filter_fn in group_list:
+            if filter_set.intersection(set(group_key.members)):
+                matched_groups.append((parent_name, group_key, filter_fn))
+
+    if not matched_groups:
+        raise RuntimeError(f"No groups matched for filters {filters}")
+
+    # Aggregate unique files from all matched groups
+    unique_files = {}
+    for parent_name, group_key, filter_fn in matched_groups:
+        files = find_kcl_files(filter_fn=filter_fn, print_debug=False)
+        for kf in files:
+            unique_files[kf.path] = kf
+
+    files = list(unique_files.values())
+
+    # Use the first filter for marking and id prefix
+    first_filter = filters[0]
 
     params = []
-    seen_paths = set()
-
-    for filter_name in filters:
-        group = get_group_for_member(filter_name)
-        filter_fn = FILTER_MAP[group]
-        files = find_kcl_files(filter_fn=filter_fn, print_debug=False)
-
-        for kf in files:
-            if kf.path in seen_paths:
-                continue
-            seen_paths.add(kf.path)
-
-            rel_path = kf.path.relative_to(PROJECT_ROOT)
-            test_id = f"{filter_name.value}::{rel_path}"
-
-            params.append(
-                pytest.param(
-                    filter_name,
-                    kf,
-                    id=test_id,
-                    marks=pytest.mark.__getattr__(filter_name.value)
-                )
+    for kf in files:
+        rel_path = kf.path.relative_to(PROJECT_ROOT)
+        test_id = f"{first_filter.value}::{rel_path}"
+        params.append(
+            pytest.param(
+                first_filter,
+                kf,
+                id=test_id,
+                marks=[pytest.mark.__getattr__(first_filter.value)],
             )
+        )
 
     def decorator(func):
-        for filter_name in filters:
-            func = pytest.mark.__getattr__(filter_name.value)(func)
+        if not params:
+            return func
+        # Mark the test function with the first filter
+        func = pytest.mark.__getattr__(first_filter.value)(func)
+
+        # Parametrize test with all files
         return pytest.mark.parametrize("filter_name,kf", params)(func)
 
     return decorator

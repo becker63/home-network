@@ -4,9 +4,9 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     # Only import for type checking (no runtime import)
-    from project_config import ProjectConfig
+    from project_config import DirEnum
 
 @dataclass
 class KFile:
     path: Path
-    dirname: 'ProjectConfig.DirEnum'  # forward ref as string
+    dirname: 'DirEnum'  # forward ref as string
