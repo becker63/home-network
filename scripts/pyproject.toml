@@ -7,6 +7,7 @@ dependencies = [
     "kcl-lib>=0.11.2",
     "pytest>=8.3.5",
     "pytest-print>=1.1.0",
+    "pytest-subtests>=0.14.1",
     "pytest-sugar>=1.0.0",
     "pytest-xdist>=3.7.0",
     "toml>=0.10.2",

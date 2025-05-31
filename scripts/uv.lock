@@ -3,6 +3,15 @@ revision = 2
 requires-python = ">=3.13"
 
 [[package]]
+name = "attrs"
+version = "25.3.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/5a/b0/1367933a8532ee6ff8d63537de4f1177af4bff9f3e829baf7331f595bb24/attrs-25.3.0.tar.gz", hash = "sha256:75d7cefc7fb576747b2c81b4442d4d4a1ce0900973527c011d1030fd3bf4af1b", size = 812032, upload-time = "2025-03-13T11:10:22.779Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/77/06/bb80f5f86020c4551da315d78b3ab75e8228f89f0162f2c3a819e407941a/attrs-25.3.0-py3-none-any.whl", hash = "sha256:427318ce031701fea540783410126f03899a97ffc6f61596ad581ac2e40e3bc3", size = 63815, upload-time = "2025-03-13T11:10:21.14Z" },
+]
+
+[[package]]
 name = "colorama"
 version = "0.4.6"
 source = { registry = "https://pypi.org/simple" }
@@ -102,6 +111,19 @@ wheels = [
 ]
 
 [[package]]
+name = "pytest-subtests"
+version = "0.14.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "attrs" },
+    { name = "pytest" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c0/4c/ba9eab21a2250c2d46c06c0e3cd316850fde9a90da0ac8d0202f074c6817/pytest_subtests-0.14.1.tar.gz", hash = "sha256:350c00adc36c3aff676a66135c81aed9e2182e15f6c3ec8721366918bbbf7580", size = 17632, upload-time = "2024-12-10T00:21:04.856Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a9/b7/7ca948d35642ae72500efda6ba6fa61dcb6683feb596d19c4747c63c0789/pytest_subtests-0.14.1-py3-none-any.whl", hash = "sha256:e92a780d98b43118c28a16044ad9b841727bd7cb6a417073b38fd2d7ccdf052d", size = 8833, upload-time = "2024-12-10T00:20:58.873Z" },
+]
+
+[[package]]
 name = "pytest-sugar"
 version = "1.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -136,6 +158,7 @@ dependencies = [
     { name = "kcl-lib" },
     { name = "pytest" },
     { name = "pytest-print" },
+    { name = "pytest-subtests" },
     { name = "pytest-sugar" },
     { name = "pytest-xdist" },
     { name = "toml" },
@@ -146,6 +169,7 @@ requires-dist = [
     { name = "kcl-lib", specifier = ">=0.11.2" },
     { name = "pytest", specifier = ">=8.3.5" },
     { name = "pytest-print", specifier = ">=1.1.0" },
+    { name = "pytest-subtests", specifier = ">=0.14.1" },
     { name = "pytest-sugar", specifier = ">=1.0.0" },
     { name = "pytest-xdist", specifier = ">=3.7.0" },
     { name = "toml", specifier = ">=0.10.2" },
