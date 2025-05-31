@@ -1,9 +1,10 @@
 from typing import Callable, Dict, List
 import pytest
 
-from lib.find_kcl_files import find_kcl_files
-from lib.common import KFile, GroupKey
-from kcl_tasks.filters import ProjectFilters, FILTER_MAP
+from lib import find_kcl_files
+from lib import KFile, GroupKey
+
+from .filters import ProjectFilters, FILTER_MAP
 
 FilterFunction = Callable[[KFile], bool]
 GroupedFilterMap = Dict[GroupKey, FilterFunction]

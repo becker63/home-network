@@ -1,7 +1,8 @@
 from typing import Callable, Optional, List
 from pathlib import Path
-from .common import DirEnum, KFile
-from .helpers import find_project_root
+
+from .proj_types import DirEnum, KFile
+from .helpers import KCL_ROOT
 
 def classify_path_closest(path: Path) -> DirEnum:
     for part in reversed(path.parts):
@@ -16,7 +17,7 @@ def find_kcl_files(
     print_debug: bool = True,
 ) -> List[KFile]:
     if root is None:
-        root = (find_project_root() / "kcl").resolve()
+        root = KCL_ROOT
     if print_debug:
         print(f"Scanning KCL files in {root}")
 

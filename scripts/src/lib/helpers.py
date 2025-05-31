@@ -1,8 +1,11 @@
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List
 import subprocess
-from typing import List
 
+from kcl_lib import api
+from kcl_lib.api import ExecProgram_Args
+
+from .proj_types import KFile
 
 def find_project_root() -> Path:
     current = Path(__file__).resolve()
@@ -13,6 +16,8 @@ def find_project_root() -> Path:
             raise RuntimeError("Could not find project root (missing flake.nix)")
         current = current.parent
 
+KCL_ROOT: Path = (find_project_root() / "kcl").resolve()
+
 class CommandError(Exception):
     def __init__(self, extra_info: Optional[str] = None):
         super().__init__()
@@ -22,7 +27,6 @@ class CommandError(Exception):
         return "your command broke dawg"
 
 def run_command(cmd: List[str], kf_name: Optional[str] = None) -> str:
-    """Run a shell command and return stdout, raising CommandError on failure."""
     try:
         result = subprocess.run(
             cmd,
@@ -32,7 +36,6 @@ def run_command(cmd: List[str], kf_name: Optional[str] = None) -> str:
         )
         return result.stdout.strip()
     except subprocess.CalledProcessError as e:
-        # Use e.stderr, e.stdout directly from exception object
         raise CommandError(
             extra_info=e.stderr.strip() or e.stdout.strip() or "No stderr or stdout output"
         ) from e
