@@ -1,6 +1,1 @@
-# src/kcl_tasks/conftest.py
-
-import pytest
-from project_config import ProjectFilters, FILTERS
-from lib.find_kcl_files import find_kcl_files
-from lib.proj_types import KFile
+# This is a little magic file that pytest looks for to know where tests are

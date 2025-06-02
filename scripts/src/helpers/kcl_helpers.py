@@ -4,7 +4,7 @@ from pathlib import Path
 from kcl_lib import api
 from kcl_lib.api import UpdateDependencies_Args
 
-from project_config import KCL_ROOT
+from config.base import KCL_ROOT
 
 
 # Thread safe kcl api singleton with our deps

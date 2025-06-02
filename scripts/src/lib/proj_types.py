@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     # Only import for type checking (no runtime import)
-    from project_config import DirEnum
+    from config.schema import DirEnum
 
 @dataclass
 class KFile:

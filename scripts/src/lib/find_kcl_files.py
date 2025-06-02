@@ -7,7 +7,7 @@ from lib.proj_types import KFile
 
 def classify_path_closest(path: Path):
     # We do a lazy import here to avoid circular‐import problems
-    from project_config import DirEnum
+    from config.schema import DirEnum
 
     for part in reversed(path.parts):
         for dir_enum in DirEnum:
@@ -21,7 +21,7 @@ def find_kcl_files(
     print_debug: bool = True,
 ) -> List[KFile]:
     # Lazy import to avoid circular import
-    from project_config import KCL_ROOT
+    from config.base import KCL_ROOT
 
     if root is None:
         root = KCL_ROOT
