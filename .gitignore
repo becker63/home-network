@@ -23,20 +23,17 @@ coverage/
 logs/
 *.log
 
-# Ignore secret key for git-crypt
-config/git-crypt.key
-
 kind-config.yaml
 
 # KCL artifacts
 models
 crds
 
-# Ignore all .k files inside any schemas directory, recursively
-**/schemas/**/*.k
-
 # Python artifacts
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
+
+# Nix handles this
+.pre-commit-config.yaml
