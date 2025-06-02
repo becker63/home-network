@@ -7,8 +7,9 @@
     uv2nix.url = "github:pyproject-nix/uv2nix";
     pyproject-nix.url = "github:pyproject-nix/pyproject.nix";
     pyproject-build-systems.url = "github:pyproject-nix/build-system-pkgs";
+    pre-commit-hooks.url = "github:cachix/git-hooks.nix";
 
-    # Make dependencies follow nixpkgs
+    # Input linking
     uv2nix.inputs.nixpkgs.follows = "nixpkgs";
     uv2nix.inputs.pyproject-nix.follows = "pyproject-nix";
     pyproject-nix.inputs.nixpkgs.follows = "nixpkgs";
@@ -18,14 +19,14 @@
   };
 
   outputs =
-    inputs@{
-      self,
-      nixpkgs,
-      flake-parts,
-      uv2nix,
-      pyproject-nix,
-      pyproject-build-systems,
-      ...
+    inputs@{ self
+    , nixpkgs
+    , flake-parts
+    , uv2nix
+    , pyproject-nix
+    , pyproject-build-systems
+    , pre-commit-hooks
+    , ...
     }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [
@@ -36,9 +37,11 @@
       perSystem =
         { pkgs, system, ... }:
         let
-          uv2nixLib = uv2nix.lib;
+          lib = pkgs.lib;
 
-          # Import Python environment module
+          # Imports
+          uv2nixLib = uv2nix.lib;
+          gitHooks = import ./flake-modules/git-hooks.nix { inherit lib; };
           pythonEnv = import ./flake-modules/python.nix {
             inherit
               pkgs
@@ -47,20 +50,19 @@
               pyproject-nix
               pyproject-build-systems
               ;
-
             workspaceRoot = ./scripts;
           };
-
-          # Import kind shell hook script generator
           kindShellScript = import ./flake-modules/kind-init.nix { inherit pkgs; };
-
-          # Import python cli/pkg creator
           makePythonCli = import ./flake-modules/make-python-cli.nix;
 
-          # Our custom python based shell script!
+          # Git hooks setup
+          pre-commit = pre-commit-hooks.lib.${system}.run {
+            src = ./.;
+            hooks = gitHooks.pre-commit.hooks;
+          };
 
+          # Python-based CLI tools
           pyCliTools = [
-            # TODO: maybe automate this by globbing cli dir
             (makePythonCli {
               inherit pkgs;
               name = "manual_kcl_find";
@@ -69,12 +71,12 @@
             })
           ];
 
+          # Tool groups
           nixTools = with pkgs; [
             nixfmt-rfc-style
             nil
             nixd
           ];
-
           shellTools = with pkgs; [
             zoxide
             fd
@@ -84,7 +86,6 @@
             git
             uv
           ];
-
           kubeTools = with pkgs; [
             talosctl
             kind
@@ -94,31 +95,39 @@
             kcl
             go
           ];
+
         in
         {
+          checks.pre-commit-check = pre-commit;
+
           devShells.default = pkgs.mkShell {
-            packages = nixTools ++ shellTools ++ [ pythonEnv.virtualenv ] ++ kubeTools ++ pyCliTools;
+            packages =
+              nixTools
+              ++ shellTools
+              ++ [ pythonEnv.virtualenv ]
+              ++ kubeTools
+              ++ pyCliTools
+              ++ pre-commit.enabledPackages;
 
             env = {
-              # UV_NO_SYNC = "1";
               UV_PYTHON = "${pythonEnv.virtualenv}/bin/python";
               UV_PYTHON_DOWNLOADS = "never";
             };
 
             shellHook = ''
+              ${pre-commit.shellHook}
+
               unset PYTHONPATH
               export REPO_ROOT=$(git rev-parse --show-toplevel)
               export PYTHONPATH=$PWD/scripts/src:$PYTHONPATH
 
-              # Run the kind shell hook script
               ${kindShellScript}/bin/kind-shell-hook
 
               echo "🐍 Python dev shell (uv2nix) ready 🐥"
 
-              # Only exec zsh if current shell is NOT zsh
-                if [ -n "$PS1" ] && [ -z "$ZSH_VERSION" ]; then
-                  exec zsh
-                fi
+              if [ -n "$PS1" ] && [ -z "$ZSH_VERSION" ]; then
+                exec zsh
+              fi
             '';
           };
         };

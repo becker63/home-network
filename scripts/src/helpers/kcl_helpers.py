@@ -1,5 +1,5 @@
-from threading import Lock
 from pathlib import Path
+from threading import Lock
 
 from kcl_lib import api
 from kcl_lib.api import UpdateDependencies_Args

@@ -2,7 +2,7 @@
 name = "scripts"
 version = "0.1.0"
 description = "Add your description here"
-requires-python = ">=3.13"
+requires-python = ">=3.13" # KEEP IN SYNC WITH BELOW! \/
 dependencies = [
     "kcl-lib>=0.11.2",
     "pytest>=8.3.5",
@@ -10,8 +10,13 @@ dependencies = [
     "pytest-subtests>=0.14.1",
     "pytest-sugar>=1.0.0",
     "pytest-xdist>=3.7.0",
+    "ruff>=0.11.12",
     "toml>=0.10.2",
 ]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313" # KEEP IN SYNC WITH ABOVE! /\
 
 
 [tool.pyright]
@@ -33,3 +38,12 @@ filterwarnings = [
     "ignore::UserWarning:google.protobuf.runtime_version",
     'ignore:function ham\(\) is deprecated:DeprecationWarning',
 ]
+
+[tool.ruff.lint]
+# Enable additional lint rule sets (beyond Ruff's defaults):
+# F   = Pyflakes (undefined names, unused imports, etc.)
+# I   = isort (import sorting)
+# UP  = pyupgrade (modernize code to newer Python syntax)
+# B   = bugbear (common bugs & design issues)
+# SIM = flake8-simplify (unnecessary conditionals, redundant logic)
+extend-select = ["F", "I", "UP", "B", "SIM"]

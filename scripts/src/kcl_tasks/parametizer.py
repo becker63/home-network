@@ -1,10 +1,10 @@
-import pytest
-from functools import wraps
-from typing import Callable, Optional
 
-from lib.find_kcl_files import find_kcl_files
-from config.schema import KFile, ProjectFilters
+import pytest
+
 from config.filters import FILTERS
+from config.schema import ProjectFilters
+from lib.find_kcl_files import find_kcl_files
+
 
 def parametrize_kcl_files(*filters: ProjectFilters, print_debug: bool = False):
     def decorator(func):

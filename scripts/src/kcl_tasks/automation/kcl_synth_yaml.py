@@ -1,8 +1,8 @@
-from config.schema import ProjectFilters, KFile
 from config.base import PROJECT_ROOT
-
-from kcl_tasks.parametizer import parametrize_kcl_files
+from config.schema import KFile, ProjectFilters
 from helpers.kcl_helpers import Exec
+from kcl_tasks.parametizer import parametrize_kcl_files
+
 
 @parametrize_kcl_files(ProjectFilters.BOOTSTRAP)
 def test_generate_yaml_synth(pf: ProjectFilters, kf: KFile):

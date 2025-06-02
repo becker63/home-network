@@ -1,15 +1,15 @@
-from typing import Optional, List
 import subprocess
 
+
 class CommandError(Exception):
-    def __init__(self, extra_info: Optional[str] = None):
+    def __init__(self, extra_info: str | None = None):
         super().__init__()
         self.__rich_info__ = extra_info
 
     def __str__(self) -> str:
         return "your command broke dawg"
 
-def run_command(cmd: List[str], kf_name: Optional[str] = None) -> str:
+def run_command(cmd: list[str], kf_name: str | None = None) -> str:
     try:
         result = subprocess.run(
             cmd,

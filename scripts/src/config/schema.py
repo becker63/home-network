@@ -1,6 +1,8 @@
 from enum import Enum, StrEnum
 from pathlib import Path
-from dataclasses import dataclass
+
+from pydantic import BaseModel
+
 
 class DirEnum(Enum):
     BOOTSTRAP  = "bootstrap"
@@ -13,7 +15,9 @@ class ProjectFilters(StrEnum):
     BOOTSTRAP_SYNTH = "bootstrap_synth"
     RANDOM          = "random"
 
-@dataclass(frozen=True)
-class KFile:
+class KFile(BaseModel):
     path: Path
     dirname: DirEnum
+
+    class Config:
+        frozen = True  # makes it hashable / like a dataclass(frozen=True)

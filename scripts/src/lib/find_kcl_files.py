@@ -1,9 +1,10 @@
 # src/lib/find_kcl_files.py
 
-from typing import Callable, Optional, List
+from collections.abc import Callable
 from pathlib import Path
 
-from lib.proj_types import KFile
+from config.schema import KFile
+
 
 def classify_path_closest(path: Path):
     # We do a lazy import here to avoid circular‐import problems
@@ -16,10 +17,10 @@ def classify_path_closest(path: Path):
     return DirEnum.DEFAULT
 
 def find_kcl_files(
-    root: Optional[Path] = None,
+    root: Path | None = None,
     filter_fn: Callable[[KFile], bool] = lambda kf: True,
     print_debug: bool = True,
-) -> List[KFile]:
+) -> list[KFile]:
     # Lazy import to avoid circular import
     from config.base import KCL_ROOT
 
@@ -28,7 +29,7 @@ def find_kcl_files(
     if print_debug:
         print(f"Scanning KCL files in {root}")
 
-    results: List[KFile] = []
+    results: list[KFile] = []
     for file_path in root.rglob("*.k"):
         dirname = classify_path_closest(file_path)
         kf = KFile(path=file_path, dirname=dirname)

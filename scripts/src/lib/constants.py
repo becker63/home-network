@@ -1,5 +1,7 @@
-from .find_proj_root import find_project_root
 from enum import Enum
+
+from .find_proj_root import find_project_root
+
 
 class DirEnum(Enum):
     BOOTSTRAP = "bootstrap"
