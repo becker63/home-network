@@ -13,11 +13,11 @@ import-crds:
     kcl mod add crossplane:1.17.3
 
 # ─────────────────────────────
-# Schema Generation (infra/schemas/frp_schema)
+# Schema Generation (infra/schemas/go)
 # ─────────────────────────────
-[working-directory: "kcl/schemas/frp_schema"]
-gen-frp-schema:
-    go run gen-schema.go
+[working-directory: "kcl/schemas/go/"]
+gen-go-schema:
+    go run schema-gen.go
 
 # ─────────────────────────────
 # KUTTL CRDs Download & Import
@@ -41,7 +41,7 @@ all:
     @echo -e "\033[1;34m==> Importing infra CRDs...\033[0m"
     just import-crds
     @echo -e "\033[1;32m==> Generating FRP schema...\033[0m"
-    just gen-frp-schema
+    just gen-go-schema
     @echo -e "\033[1;33m==> Downloading KUTTL CRDs...\033[0m"
     just download-kuttl-crds
     @echo -e "\033[1;35m==> Importing KUTTL CRDs...\033[0m"
