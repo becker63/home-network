@@ -1,5 +1,5 @@
-from config.base import PROJECT_ROOT
-from config.schema import KFile, ProjectFilters
+from lib.schema_interface import PROJECT_ROOT
+from lib.project_schema_runtime import KFile, ProjectFilters
 from helpers.kcl_helpers import Exec
 from kcl_tasks.parametizer import parametrize_kcl_files
 

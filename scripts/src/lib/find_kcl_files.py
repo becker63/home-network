@@ -3,12 +3,12 @@
 from collections.abc import Callable
 from pathlib import Path
 
-from config.schema import KFile
+from lib.project_schema_runtime import KFile
 
 
 def classify_path_closest(path: Path):
     # We do a lazy import here to avoid circular‐import problems
-    from config.schema import DirEnum
+    from schema_impl import DirEnum
 
     for part in reversed(path.parts):
         for dir_enum in DirEnum:
@@ -22,7 +22,7 @@ def find_kcl_files(
     print_debug: bool = True,
 ) -> list[KFile]:
     # Lazy import to avoid circular import
-    from config.base import KCL_ROOT
+    from src.schema_impl import KCL_ROOT
 
     if root is None:
         root = KCL_ROOT

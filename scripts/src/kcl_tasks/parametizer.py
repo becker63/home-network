@@ -1,8 +1,8 @@
 
 import pytest
 
-from config.filters import FILTERS
-from config.schema import ProjectFilters
+from lib.project_schema_runtime import FILTERS
+from lib.project_schema_runtime import ProjectFilters
 from lib.find_kcl_files import find_kcl_files
 
 

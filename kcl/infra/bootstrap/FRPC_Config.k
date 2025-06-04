@@ -24,7 +24,7 @@ client_config: Client.ClientConfig {
         },
     },
     transport: Client.ClientTransportConfig {
-        "$protocol": "tcp",
+        "protocol": "tcp",
         tls: Client.TlsclientConfig {
             enable: True,
             serverName: "example.com",

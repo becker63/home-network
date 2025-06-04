@@ -5,6 +5,7 @@ description = "Add your description here"
 requires-python = ">=3.13" # KEEP IN SYNC WITH BELOW! \/
 dependencies = [
     "kcl-lib>=0.11.2",
+    "pydantic>=2.11.5",
     "pytest>=8.3.5",
     "pytest-print>=1.1.0",
     "pytest-subtests>=0.14.1",
