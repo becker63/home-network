@@ -4,10 +4,8 @@ from enum import Enum, StrEnum
 from pydantic import BaseModel, ConfigDict
 from .find_proj_root import find_project_root
 
-# === CONSTANT: PROJECT_ROOT only ===
 PROJECT_ROOT: Path = find_project_root()
 
-# === GENERIC KFile MODEL ===
 Dir = TypeVar("Dir", bound=Enum)
 
 class KFile(BaseModel, Generic[Dir]):
