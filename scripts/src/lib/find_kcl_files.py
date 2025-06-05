@@ -1,11 +1,11 @@
 from collections.abc import Callable
 from pathlib import Path
 
-from lib.config_interface import DirEnum, KFile
+from configuration import DirEnum, KFile
 
 
 def classify_path_closest(path: Path) -> DirEnum:
-    from lib.config_interface import DirEnum
+    from configuration import DirEnum
 
     for part in reversed(path.parts):
         for dir_enum in DirEnum:
@@ -19,7 +19,7 @@ def find_kcl_files(
     filter_fn: Callable[[KFile], bool] = lambda kf: True,
     print_debug: bool = True,
 ) -> list[KFile]:
-    from lib.config_interface import KCL_ROOT  # Lazy import to avoid circular ref
+    from configuration import KCL_ROOT  # Lazy import to avoid circular ref
 
     if root is None:
         root = KCL_ROOT

@@ -1,4 +1,4 @@
-from configuration import (
+from .configuration import (
     KFile,
     KCL_ROOT,
     DirEnum,

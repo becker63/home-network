@@ -1,7 +1,7 @@
 from typing import Callable, Any, TypeAlias
 import pytest
 
-from lib.config_interface import FILTERS, ProjectFilters, KFile
+from configuration import FILTERS, ProjectFilters, KFile
 from lib.find_kcl_files import find_kcl_files
 
 TestFunc: TypeAlias = Callable[[ProjectFilters, KFile], None]

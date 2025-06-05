@@ -4,7 +4,7 @@ from threading import Lock
 from kcl_lib import api
 from kcl_lib.api import UpdateDependencies_Args
 
-from lib.config_interface import KCL_ROOT
+from configuration import KCL_ROOT
 
 
 # Thread safe kcl api singleton with our deps
