@@ -1,5 +1,4 @@
-from lib.config_interface import PROJECT_ROOT
-from lib.runtime_config import KFile, ProjectFilters
+from lib.config_interface import PROJECT_ROOT, KFile, ProjectFilters
 from helpers.kcl_helpers import Exec
 from kcl_tasks.parametizer import parametrize_kcl_files
 

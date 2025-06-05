@@ -1,25 +1,22 @@
-from typing import TypeVar, Generic, Protocol, Callable
-from pathlib import Path
-from enum import Enum, StrEnum
-from pydantic import BaseModel, ConfigDict
-from .find_proj_root import find_project_root
+# src/lib/runtime_config.py
 
-PROJECT_ROOT: Path = find_project_root()
+from configuration import (
+    KFile,
+    KCL_ROOT,
+    DirEnum,
+    ProjectFilters,
+    FILTERS,
+    PROJECT_ROOT
+)
 
-Dir = TypeVar("Dir", bound=Enum)
+assert hasattr(DirEnum, "DEFAULT"), "DirEnum must define DEFAULT"
+assert hasattr(ProjectFilters, "DEFAULT"), "ProjectFilters must define DEFAULT"
 
-class KFile(BaseModel, Generic[Dir]):
-    model_config = ConfigDict(frozen=True)
-    path: Path
-    dirname: Dir
-
-# === PROTOCOL: ProjectSchema Interface ===
-Filter = TypeVar("Filter", bound=StrEnum)
-
-class ProjectSchema(Protocol[Dir, Filter]):
-    DirEnum: type[Dir]
-    ProjectFilters: type[Filter]
-    KFile: type[KFile[Dir]]
-
-    def get_filters(self) -> dict[Filter, Callable[[object], bool]]:
-        ...
+__all__ = [
+    "PROJECT_ROOT",
+    "KCL_ROOT",
+    "DirEnum",
+    "ProjectFilters",
+    "KFile",
+    "FILTERS",
+]
