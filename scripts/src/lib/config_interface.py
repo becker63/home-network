@@ -1,5 +1,3 @@
-# src/lib/runtime_config.py
-
 from configuration import (
     KFile,
     KCL_ROOT,

@@ -1,12 +1,9 @@
-# src/configuration.py
-
 from enum import StrEnum
 from pathlib import Path
 from typing import Callable
 from pydantic import BaseModel, ConfigDict
 from lib.find_proj_root import find_project_root
 
-# === Enum Definitions ===
 class DirEnum(StrEnum):
     BOOTSTRAP = "bootstrap"
     FRP_SCHEMA = "frp_schema"
@@ -21,7 +18,6 @@ class ProjectFilters(StrEnum):
     DEFAULT = "default"
 
 
-# === KFile Model ===
 class KFile(BaseModel):
     path: Path
     dirname: DirEnum
@@ -29,7 +25,6 @@ class KFile(BaseModel):
     model_config = ConfigDict(frozen=True)
 
 
-# === Constants ===
 PROJECT_ROOT = find_project_root()
 KCL_ROOT = (PROJECT_ROOT / "kcl").resolve()
 
