@@ -1,6 +1,13 @@
 # Justfile for managing KCL projects and testing
 
-CRD_DIR := "crds/kuttl"
+# ─────────────────────────────
+# Paths for CRDs and Schema Output
+# ─────────────────────────────
+KUTTL_CRD_DIR := "crds/kuttl"
+KUTTL_SCHEMA_DIR := "schemas/kuttl"
+
+INFISICAL_CRD_DIR := "crds/infisical"
+INFISICAL_SCHEMA_DIR := "schemas/infisical"
 
 # ─────────────────────────────
 # CRD Imports (infra/)
@@ -20,20 +27,34 @@ gen-go-schema:
     go run schema-gen.go
 
 # ─────────────────────────────
-# KUTTL CRDs Import
+# Import KUTTL CRDs
 # ─────────────────────────────
 [working-directory: "kcl"]
 import-kuttl-crds:
-    mkdir -p {{CRD_DIR}}
-    curl -fsSL -o {{CRD_DIR}}/testassert_crd.yaml https://raw.githubusercontent.com/kudobuilder/kuttl/refs/heads/main/crds/testassert_crd.yaml
-    curl -fsSL -o {{CRD_DIR}}/teststep_crd.yaml https://raw.githubusercontent.com/kudobuilder/kuttl/refs/heads/main/crds/teststep_crd.yaml
-    curl -fsSL -o {{CRD_DIR}}/testsuite_crd.yaml https://raw.githubusercontent.com/kudobuilder/kuttl/refs/heads/main/crds/testsuite_crd.yaml
-    kcl import -m crd {{CRD_DIR}}/*.yaml --output schemas/kuttl
+    mkdir -p {{KUTTL_CRD_DIR}} {{KUTTL_SCHEMA_DIR}}
+    curl -fsSL -o {{KUTTL_CRD_DIR}}/testassert_crd.yaml https://raw.githubusercontent.com/kudobuilder/kuttl/refs/heads/main/crds/testassert_crd.yaml
+    curl -fsSL -o {{KUTTL_CRD_DIR}}/teststep_crd.yaml https://raw.githubusercontent.com/kudobuilder/kuttl/refs/heads/main/crds/teststep_crd.yaml
+    curl -fsSL -o {{KUTTL_CRD_DIR}}/testsuite_crd.yaml https://raw.githubusercontent.com/kudobuilder/kuttl/refs/heads/main/crds/testsuite_crd.yaml
+    kcl import -m crd {{KUTTL_CRD_DIR}}/*.yaml --output {{KUTTL_SCHEMA_DIR}}
+
+# ─────────────────────────────
+# Import Infisical CRDs
+# ─────────────────────────────
+[working-directory: "kcl"]
+import-infisical-crds:
+    mkdir -p {{INFISICAL_CRD_DIR}} {{INFISICAL_SCHEMA_DIR}}
+    curl -fsSL -o {{INFISICAL_CRD_DIR}}/infisicaldynamicsecret_crd.yaml https://raw.githubusercontent.com/Infisical/infisical/refs/heads/main/k8-operator/config/crd/bases/secrets.infisical.com_infisicaldynamicsecrets.yaml
+    kcl import -m crd {{INFISICAL_CRD_DIR}}/*.yaml --output {{INFISICAL_SCHEMA_DIR}}
+
+# ─────────────────────────────
+# Import All CRDs (modular)
+# ─────────────────────────────
+import-all-crds: import-kuttl-crds import-infisical-crds
 
 # ─────────────────────────────
 # Full Setup: all schemas and CRDs
 # ─────────────────────────────
-all: import-crds gen-go-schema import-kuttl-crds
+all: import-crds gen-go-schema import-all-crds
 
 # ─────────────────────────────
 # Git Commands
