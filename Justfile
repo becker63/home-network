@@ -6,18 +6,18 @@
 KUTTL_CRD_DIR := "crds/kuttl"
 KUTTL_SCHEMA_DIR := "schemas/kuttl"
 
-INFISICAL_CRD_DIR := "crds/infisical"
-INFISICAL_SCHEMA_DIR := "schemas/infisical"
-
 # ─────────────────────────────
 # CRD Imports (infra/)
 # ─────────────────────────────
 [working-directory: "kcl"]
 import-crds:
-    kcl mod add sealed-secrets:v0.27.2
+    kcl mod add external-secrets:0.1.4
     kcl mod add argo-cd:0.2.1
+    kcl mod add fluxcd-helm-controller:v1.0.3
+    kcl mod add fluxcd:0.1.2
     kcl mod add cert-manager:0.3.0
     kcl mod add crossplane:1.17.3
+
 
 # ─────────────────────────────
 # Schema Generation (infra/schemas/go)
@@ -38,18 +38,9 @@ import-kuttl-crds:
     kcl import -m crd {{KUTTL_CRD_DIR}}/*.yaml --output {{KUTTL_SCHEMA_DIR}}
 
 # ─────────────────────────────
-# Import Infisical CRDs
-# ─────────────────────────────
-[working-directory: "kcl"]
-import-infisical-crds:
-    mkdir -p {{INFISICAL_CRD_DIR}} {{INFISICAL_SCHEMA_DIR}}
-    curl -fsSL -o {{INFISICAL_CRD_DIR}}/infisicaldynamicsecret_crd.yaml https://raw.githubusercontent.com/Infisical/infisical/refs/heads/main/k8-operator/config/crd/bases/secrets.infisical.com_infisicaldynamicsecrets.yaml
-    kcl import -m crd {{INFISICAL_CRD_DIR}}/*.yaml --output {{INFISICAL_SCHEMA_DIR}}
-
-# ─────────────────────────────
 # Import All CRDs (modular)
 # ─────────────────────────────
-import-all-crds: import-kuttl-crds import-infisical-crds
+import-all-crds: import-kuttl-crds
 
 # ─────────────────────────────
 # Full Setup: all schemas and CRDs

@@ -1,17 +1,4 @@
 import argo_cd.v1alpha1 as Argo
-import sealed_secrets.v1alpha1 as SS
-
-sealed_secret: SS.SealedSecret {
-    metadata.name = "my-secret"
-    metadata.namespace = "default"
-    spec.encryptedData = {
-        "username": "AgB+…==",  # replace with real sealed value
-        "password": "AgB+…=="
-    }
-    spec.template.metadata.labels = {
-        "app": "demo"
-    }
-}
 
 argo_app: Argo.Application {
     metadata.name = "example-app"
