@@ -14,7 +14,7 @@ COMMAND_MAP = {
 
 
 @parametrize_kcl_files(ProjectFilters.PROXY_TEST)
-def test_frp_validate(pf: ProjectFilters, kf: KFile, tmp_path: Path) -> None:
+def check_frp_validate(pf: ProjectFilters, kf: KFile, tmp_path: Path) -> None:
     command = COMMAND_MAP.get(kf.path.name)
     if not command:
         pytest.skip(f"No frp command mapped for {kf.path.name}")
@@ -26,6 +26,7 @@ def test_frp_validate(pf: ProjectFilters, kf: KFile, tmp_path: Path) -> None:
 
     completed = subprocess.run(
         [command, "verify", f"--config={config_path}"],
+        capture_output=True,
         check=False
     )
 

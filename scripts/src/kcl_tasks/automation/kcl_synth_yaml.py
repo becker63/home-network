@@ -4,7 +4,7 @@ from kcl_tasks.parametizer import parametrize_kcl_files
 
 
 @parametrize_kcl_files(ProjectFilters.BASE)
-def test_generate_yaml_synth(pf: ProjectFilters, kf: KFile):
+def auto_generate_yaml_synth(pf: ProjectFilters, kf: KFile):
     synth_dir = PROJECT_ROOT / "synth_yaml"
     synth_dir.mkdir(parents=True, exist_ok=True)
 

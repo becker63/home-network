@@ -29,12 +29,13 @@ typeCheckingMode = "strict"
 minversion = "6.0"
 # Once we have enough tests, we can also add "-n auto" to run all of them in parallel
 # For now single threaded will almost always be faster
+python_functions = ["auto_*", "check_*", "e2e_*"]
 addopts = "-ra -s -v"
 testpaths = ["src/kcl_tasks"]
 python_files = "kcl_*"
 markers = [
-    "automation: marks tests that do automation (kubectl apply, etc)",
-    "validation: marks tests that validate output",
+    "automation: marks tests that do automation (kubectl apply, synth yaml etc)",
+    "check: marks tests that validate output",
 ]
 filterwarnings = [
     "error",
