@@ -22,6 +22,7 @@ target-version = "py313" # KEEP IN SYNC WITH ABOVE! /\
 
 [tool.pyright]
 include = ["src"]
+reportMissingTypeStubs = "none"
 typeCheckingMode = "strict"
 
 [tool.pytest.ini_options]

@@ -1,26 +1,27 @@
 from pathlib import Path
 from threading import Lock
+from typing import Optional, Any
 
 from kcl_lib import api
-from kcl_lib.api import UpdateDependencies_Args
+from kcl_lib.api import UpdateDependencies_Args, ExecProgram_Result
 
 from configuration import KCL_ROOT
 
 
 # Thread safe kcl api singleton with our deps
 class KCLContext:
-    _instance: "KCLContext | None" = None
+    _instance: Optional["KCLContext"] = None
     _lock: Lock = Lock()
 
-    def __init__(self):
+    def __init__(self) -> None:
         if getattr(self, "_initialized", False):
             return
 
         self.api: api.API = api.API()
 
-        deps_args = UpdateDependencies_Args(manifest_path=str(KCL_ROOT))
+        deps_args: UpdateDependencies_Args = UpdateDependencies_Args(manifest_path=str(KCL_ROOT))
         deps_result = self.api.update_dependencies(deps_args)
-        self.external_pkgs = deps_result.external_pkgs
+        self.external_pkgs: Any = deps_result.external_pkgs  # Replace 'Any' with the actual type if known
 
         self._initialized = True
 
@@ -32,12 +33,13 @@ class KCLContext:
                     cls._instance = cls()
         return cls._instance
 
-def Exec(path: Path):
+
+def Exec(path: Path) -> ExecProgram_Result:
     ctx = KCLContext.instance()
 
     exec_args = api.ExecProgram_Args(
         k_filename_list=[str(path)],
-            external_pkgs=ctx.external_pkgs
+        external_pkgs=ctx.external_pkgs
     )
 
     return ctx.api.exec_program(exec_args)

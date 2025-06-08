@@ -1,0 +1,45 @@
+apiVersion: v1
+data:
+  frpc.json: '{"auth": {"token": "your-shared-token"}, "proxies": [{"healthCheck": {"intervalSeconds": 10, "maxFailed": 3, "path": "/", "timeoutSeconds": 3, "type": "http"}, "loadBalancer": {"group": "headlamp", "groupKey": "your-shared-key"}, "localIP": "headlamp.kube-system.svc.cluster.local", "localPort": 80, "name": "headlamp", "remotePort": 30080, "type": "tcp"}], "serverAddr": "frps.example.com", "serverPort": 7000, "version": "1.0.0"}'
+kind: ConfigMap
+metadata:
+  name: frpc-config
+  namespace: kube-system
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: frpc
+  name: frpc-daemonset
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: frpc
+  template:
+    metadata:
+      labels:
+        app: frpc
+    spec:
+      containers:
+      - command:
+        - /entrypoint.sh
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        image: snowdreamtech/frpc:v0.58.0
+        name: frpc
+        volumeMounts:
+        - mountPath: /etc/frpc/frpc.json
+          name: config-volume
+          subPath: frpc.json
+      hostNetwork: true
+      volumes:
+      - configMap:
+          name: frpc-config
+        name: config-volume
+  updateStrategy:
+    type: RollingUpdate

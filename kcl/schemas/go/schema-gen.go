@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/invopop/jsonschema"
@@ -16,12 +17,13 @@ import (
 )
 
 type SchemaTarget struct {
-	Dir      string      // Directory to output schema to
-	Filename string      // Schema filename (e.g., cmp.schema.json)
-	Example  interface{} // Go struct to reflect into JSON Schema
+	Dir             string            // Directory to output schema to
+	Filename        string            // Schema filename
+	Example         interface{}       // Go struct to reflect into JSON Schema
+	PatchProperties map[string]string // Map of "Schema.Property" -> patch type (e.g., "array<any>")
 }
 
-func generateSchema(filepath string, example interface{}) error {
+func generateSchema(filepath string, example interface{}, patch map[string]string) error {
 	schema := jsonschema.Reflect(example)
 
 	rawBytes, err := json.Marshal(schema)
@@ -32,6 +34,57 @@ func generateSchema(filepath string, example interface{}) error {
 	var normalized map[string]interface{}
 	if err := json.Unmarshal(rawBytes, &normalized); err != nil {
 		return fmt.Errorf("unmarshal deduplication: %w", err)
+	}
+
+	// Support both $defs (JSON Schema 2020-12) and definitions (older drafts)
+	defsKey := "$defs"
+	if _, ok := normalized["definitions"]; ok {
+		defsKey = "definitions"
+	}
+
+	defs, ok := normalized[defsKey].(map[string]interface{})
+	if !ok {
+		return fmt.Errorf("could not find definitions under %q", defsKey)
+	}
+
+	// 🔧 Apply patches using Schema.Property format
+	for patchPath, patchType := range patch {
+		parts := strings.Split(patchPath, ".")
+		if len(parts) != 2 {
+			fmt.Fprintf(os.Stderr, "⚠️ Invalid patch key format (use Schema.Property): %q\n", patchPath)
+			continue
+		}
+		schemaName := parts[0]
+		propName := parts[1]
+
+		targetSchema, ok := defs[schemaName].(map[string]interface{})
+		if !ok {
+			fmt.Fprintf(os.Stderr, "⚠️ Schema %q not found\n", schemaName)
+			continue
+		}
+
+		props, ok := targetSchema["properties"].(map[string]interface{})
+		if !ok {
+			fmt.Fprintf(os.Stderr, "⚠️ Schema %q has no properties\n", schemaName)
+			continue
+		}
+
+		switch patchType {
+		case "any":
+			props[propName] = map[string]interface{}{}
+		case "array<any>":
+			props[propName] = map[string]interface{}{
+				"type":  "array",
+				"items": map[string]interface{}{},
+			}
+		case "object<any>":
+			props[propName] = map[string]interface{}{
+				"type":                 "object",
+				"additionalProperties": map[string]interface{}{},
+			}
+		default:
+			fmt.Fprintf(os.Stderr, "⚠️ Unknown patch type: %s for %s\n", patchType, patchPath)
+		}
 	}
 
 	file, err := os.Create(filepath)
@@ -104,7 +157,7 @@ func handleSchema(target SchemaTarget) error {
 
 	fmt.Println("🧬 generateSchema")
 	schemaPath := filepath.Join(target.Dir, target.Filename)
-	if err := generateSchema(schemaPath, target.Example); err != nil {
+	if err := generateSchema(schemaPath, target.Example, target.PatchProperties); err != nil {
 		return err
 	}
 
@@ -123,11 +176,20 @@ func main() {
 			Dir:      "frp_schema/frpc",
 			Filename: "frpc.schema.json",
 			Example:  &frpv1.ClientConfig{},
+			PatchProperties: map[string]string{
+				"ClientConfig.proxies":  "array<any>",
+				"ClientConfig.visitors": "array<any>",
+			},
 		},
 		{
 			Dir:      "frp_schema/frps",
 			Filename: "frps.schema.json",
 			Example:  &frpv1.ServerConfig{},
+		},
+		{
+			Dir:      "frp_schema/frpc/tcp_proxy",
+			Filename: "tcp_proxy.schema.json",
+			Example:  &frpv1.TCPProxyConfig{},
 		},
 		{
 			Dir:      "argo-cmp",

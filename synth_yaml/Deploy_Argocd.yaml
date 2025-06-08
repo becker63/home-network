@@ -1,17 +1,3 @@
-sealed_secret:
-  apiVersion: bitnami.com/v1alpha1
-  kind: SealedSecret
-  metadata:
-    name: my-secret
-    namespace: default
-  spec:
-    encryptedData:
-      username: AgB+…==
-      password: AgB+…==
-    template:
-      metadata:
-        labels:
-          app: demo
 argo_app:
   apiVersion: argoproj.io/v1alpha1
   kind: Application
