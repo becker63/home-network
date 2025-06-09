@@ -4,12 +4,11 @@ from pathlib import Path
 
 from configuration import FILTERS, ProjectFilters, KFile
 from lib.find_kcl_files import find_kcl_files
-from typing import Protocol, Callable, TypeVar, ParamSpec, Any
+from typing import Protocol, TypeVar, ParamSpec
 
 P = ParamSpec("P")
 R = TypeVar("R")
 
-# Accepts at least (pf: ProjectFilters, kf: KFile), possibly more
 class TestFunc(Protocol):
     def __call__(self, pf: ProjectFilters, kf: KFile, *args: Any, **kwargs: Any) -> Any: ...
 
@@ -25,9 +24,10 @@ def parametrize_kcl_files(
 
         for pf in filters:
             filter_fn = FILTERS[pf]
+
             for kf in find_kcl_files(filter_fn=filter_fn, print_debug=print_debug):
                 if kf.path in seen_paths:
-                    continue  # Skip duplicate file
+                    continue
                 seen_paths.add(kf.path)
 
                 case_id = f"{pf.value}::{kf.path.stem}"

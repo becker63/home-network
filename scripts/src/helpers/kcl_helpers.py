@@ -1,10 +1,10 @@
+from configuration import KFile
 from pathlib import Path
 from threading import Lock
 from typing import Optional, Any
-
-from kcl_lib import api
+from enum import Enum, auto
+import kcl_lib.api as bapi
 from kcl_lib.api import UpdateDependencies_Args, ExecProgram_Result
-
 from configuration import KCL_ROOT
 
 
@@ -17,7 +17,7 @@ class KCLContext:
         if getattr(self, "_initialized", False):
             return
 
-        self.api: api.API = api.API()
+        self.api: bapi.API = bapi.API()
 
         deps_args: UpdateDependencies_Args = UpdateDependencies_Args(manifest_path=str(KCL_ROOT))
         deps_result = self.api.update_dependencies(deps_args)
@@ -37,9 +37,41 @@ class KCLContext:
 def Exec(path: Path) -> ExecProgram_Result:
     ctx = KCLContext.instance()
 
-    exec_args = api.ExecProgram_Args(
+    exec_args = bapi.ExecProgram_Args(
         k_filename_list=[str(path)],
         external_pkgs=ctx.external_pkgs
     )
 
     return ctx.api.exec_program(exec_args)
+
+class FRPTYPE(Enum):
+    FRPC = auto()
+    FRPS = auto()
+    DAEMONSET = auto()
+    NONE = auto()
+
+
+from google.protobuf.message import Message
+from google.protobuf.json_format import MessageToDict
+
+def kcl_path_to_frp_relevant(kf: KFile) -> FRPTYPE:
+    args = bapi.ListVariables_Args(files=[str(kf.path)])
+    api = bapi.API()
+    result: Message = api.list_variables(args)
+
+    # Convert to dict for easy lookup
+    data = MessageToDict(result)
+
+    try:
+        exported = data["variables"]["main"]
+
+        if "ClientConfig" in str(exported):
+            return FRPTYPE.FRPC
+        if "ServerConfig" in str(exported):
+            return FRPTYPE.FRPS
+        if "DaemonSet" in str(exported):
+            return FRPTYPE.DAEMONSET
+    except (KeyError, TypeError):
+        pass
+
+    return FRPTYPE.NONE

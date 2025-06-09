@@ -1,6 +1,7 @@
 import schemas.go.frp_schema.frps as Server
+import manifests
 
-Server.ServerConfig {
+main = Server.ServerConfig {
     version: "1.0.0"
 
     # Basic server listener config to match frpc
@@ -22,3 +23,5 @@ Server.ServerConfig {
     enablePrometheus: True
     detailedErrorsToClient: True
 }
+
+manifests.yaml_stream(main)

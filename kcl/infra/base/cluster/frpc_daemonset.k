@@ -15,7 +15,7 @@ configs = [core.ConfigMap {
 }]
 
 # Single DaemonSet that runs on all nodes
-sets = [apps.DaemonSet {
+main = [apps.DaemonSet {
     metadata: {
         name: "frpc-daemonset"
         namespace: "kube-system"
@@ -70,4 +70,4 @@ sets = [apps.DaemonSet {
 }]
 
 # Emit both ConfigMap and DaemonSet
-manifests.yaml_stream(configs + sets)
+manifests.yaml_stream(main + sets)

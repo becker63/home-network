@@ -36,6 +36,7 @@ python_files = "kcl_*"
 markers = [
     "automation: marks tests that do automation (kubectl apply, synth yaml etc)",
     "check: marks tests that validate output",
+    "e2e: marks e2e tests",
 ]
 filterwarnings = [
     "error",
