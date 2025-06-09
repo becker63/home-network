@@ -16,3 +16,12 @@ def pytest_collection_modifyitems(config: Config, items: List[Item]) -> None:
             item.add_marker(pytest.mark.check)
         elif "e2e" in file_path.parts:
             item.add_marker(pytest.mark.e2e)
+
+
+from lib.find_kcl_files import find_kcl_files
+from configuration import KFile
+
+@pytest.fixture(scope="session")
+def all_kcl_project_files() -> list[KFile]:
+    # Glob everything, no suffix filter yet
+    return find_kcl_files(glob_pattern="*", print_debug=False)

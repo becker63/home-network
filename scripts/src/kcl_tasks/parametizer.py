@@ -1,38 +1,34 @@
-from typing import Callable, Any, TypeAlias
-import pytest
-from pathlib import Path
+# kcl_tasks/parametizer.py
 
+from typing import Any, TypeAlias
+from pathlib import Path
 from configuration import FILTERS, ProjectFilters, KFile
 from lib.find_kcl_files import find_kcl_files
-from typing import Protocol, TypeVar, ParamSpec
+import pytest
 
-P = ParamSpec("P")
-R = TypeVar("R")
+_all_kcl_files_cache: list[KFile] | None = None
 
-class TestFunc(Protocol):
-    def __call__(self, pf: ProjectFilters, kf: KFile, *args: Any, **kwargs: Any) -> Any: ...
+def get_all_kcl_files_once() -> list[KFile]:
+    global _all_kcl_files_cache
+    if _all_kcl_files_cache is None:
+        _all_kcl_files_cache = find_kcl_files(glob_pattern="*")
+    return _all_kcl_files_cache
 
-Decorator: TypeAlias = Callable[[TestFunc], TestFunc]
-TestCase: TypeAlias = Any  # pytest.param(...) is dynamically typed
 
-def parametrize_kcl_files(
-    *filters: ProjectFilters, print_debug: bool = False
-) -> Decorator:
-    def decorator(func: TestFunc) -> TestFunc:
-        cases: list[TestCase] = []
-        seen_paths: set[Path] = set()
+TestCase: TypeAlias = Any  # pytest.param(...)
 
-        for pf in filters:
-            filter_fn = FILTERS[pf]
+def filter_kcl_files(
+    *filters: ProjectFilters,
+) -> list[TestCase]:
+    all_files = get_all_kcl_files_once()
+    seen_paths: set[Path] = set()
+    cases: list[TestCase] = []
 
-            for kf in find_kcl_files(filter_fn=filter_fn, print_debug=print_debug):
-                if kf.path in seen_paths:
-                    continue
-                seen_paths.add(kf.path)
-
-                case_id = f"{pf.value}::{kf.path.stem}"
-                cases.append(pytest.param(pf, kf, id=case_id))
-
-        return pytest.mark.parametrize("pf, kf", cases)(func)
-
-    return decorator
+    for pf in filters:
+        filter_fn = FILTERS[pf]
+        for kf in all_files:
+            if not filter_fn(kf) or kf.path in seen_paths:
+                continue
+            seen_paths.add(kf.path)
+            cases.append(pytest.param(pf, kf, id=f"{pf.value}::{kf.path.stem}"))
+    return cases

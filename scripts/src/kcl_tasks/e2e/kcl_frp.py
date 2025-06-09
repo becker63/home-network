@@ -1,8 +1,13 @@
+import pytest
+from pathlib import Path
+
 from configuration import KFile, ProjectFilters
-from kcl_tasks.parametizer import parametrize_kcl_files
+from kcl_tasks.parametizer import filter_kcl_files
 from helpers.kcl_helpers import kcl_path_to_frp_relevant
 
-
-@parametrize_kcl_files(ProjectFilters.PROXY_E2E)
-def auto_generate_yaml_synth(pf: ProjectFilters, kf: KFile):
-    print(kcl_path_to_frp_relevant(kf), kf.path.name)
+@pytest.mark.parametrize(
+    "pf, kf",
+    filter_kcl_files(ProjectFilters.PROXY_E2E)
+)
+def e2e_frp_kuttl(pf: ProjectFilters, kf: KFile, tmp_path: Path) -> None:
+    print(kcl_path_to_frp_relevant(kf, tmp_path), kf.path.name)

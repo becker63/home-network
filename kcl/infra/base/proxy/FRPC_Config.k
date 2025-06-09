@@ -2,8 +2,7 @@ import schemas.go.frp_schema.frpc as Client
 import schemas.go.frp_schema.frpc.tcp_proxy as Tcp
 import manifests
 
-# Named vars = dont export
-main = Client.ClientConfig {
+clientconfig = Client.ClientConfig {
     version: "1.0.0"
     serverAddr: "frps.example.com"
     serverPort: 7000
@@ -32,4 +31,4 @@ main = Client.ClientConfig {
     ]
 }
 
-manifests.yaml_stream(main)
+manifests.yaml_stream(clientconfig)

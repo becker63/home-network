@@ -7,7 +7,6 @@ import kcl_lib.api as bapi
 from kcl_lib.api import UpdateDependencies_Args, ExecProgram_Result
 from configuration import KCL_ROOT
 
-
 # Thread safe kcl api singleton with our deps
 class KCLContext:
     _instance: Optional["KCLContext"] = None
@@ -51,27 +50,17 @@ class FRPTYPE(Enum):
     NONE = auto()
 
 
-from google.protobuf.message import Message
-from google.protobuf.json_format import MessageToDict
-
-def kcl_path_to_frp_relevant(kf: KFile) -> FRPTYPE:
-    args = bapi.ListVariables_Args(files=[str(kf.path)])
+def kcl_path_to_frp_relevant(kf: KFile, outfile: Path) -> FRPTYPE:
+    args = bapi.ParseFile_Args(path=str(kf.path))
     api = bapi.API()
-    result: Message = api.list_variables(args)
+    result = api.parse_file(args).ast_json
 
-    # Convert to dict for easy lookup
-    data = MessageToDict(result)
-
-    try:
-        exported = data["variables"]["main"]
-
-        if "ClientConfig" in str(exported):
-            return FRPTYPE.FRPC
-        if "ServerConfig" in str(exported):
-            return FRPTYPE.FRPS
-        if "DaemonSet" in str(exported):
-            return FRPTYPE.DAEMONSET
-    except (KeyError, TypeError):
-        pass
+    # TODO: actually parse the ast for manifests.yaml_stream(...) to get the list of exported types to iterate through
+    if "ClientConfig" in result:
+        return FRPTYPE.FRPC
+    if "ServerConfig" in result:
+        return FRPTYPE.FRPS
+    if "DaemonSet" in result:
+        return FRPTYPE.DAEMONSET
 
     return FRPTYPE.NONE

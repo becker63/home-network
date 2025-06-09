@@ -1,27 +1,30 @@
-from configuration import KFile, ProjectFilters
-from helpers.kcl_helpers import Exec
-from kcl_tasks.parametizer import parametrize_kcl_files
-from helpers.kcl_helpers import kcl_path_to_frp_relevant, FRPTYPE
 import subprocess
 from pathlib import Path
+
 import pytest
+
+from configuration import KFile, ProjectFilters
+from kcl_tasks.parametizer import filter_kcl_files
+from helpers.kcl_helpers import Exec, kcl_path_to_frp_relevant, FRPTYPE
 
 FRP_COMMANDS = {
     FRPTYPE.FRPC: "frpc",
     FRPTYPE.FRPS: "frps",
 }
 
-@parametrize_kcl_files(ProjectFilters.PROXY_TEST)
+@pytest.mark.parametrize(
+    "pf, kf",
+    filter_kcl_files(ProjectFilters.PROXY_TEST)
+)
 def check_frp_validate(pf: ProjectFilters, kf: KFile, tmp_path: Path) -> None:
-    frp_type = kcl_path_to_frp_relevant(kf)
+    frp_type = kcl_path_to_frp_relevant(kf, tmp_path)
     command = FRP_COMMANDS.get(frp_type)
 
     if not command:
         pytest.skip(f"No FRP binary matched for {kf.path.name} (type={frp_type})")
 
-    result = Exec(kf.path).json_result
     config_path = tmp_path / "test.json"
-    config_path.write_text(result)
+    config_path.write_text(Exec(kf.path).json_result)
 
     completed = subprocess.run(
         [command, "verify", f"--config={config_path}"],

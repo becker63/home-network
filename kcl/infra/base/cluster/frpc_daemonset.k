@@ -10,12 +10,12 @@ configs = [core.ConfigMap {
         namespace: "kube-system"
     }
     data: {
-        "frpc.json": json.encode(frpc.config)
+        "frpc.json": json.encode(frpc.clientconfig)
     }
 }]
 
 # Single DaemonSet that runs on all nodes
-main = [apps.DaemonSet {
+sets = [apps.DaemonSet {
     metadata: {
         name: "frpc-daemonset"
         namespace: "kube-system"
@@ -70,4 +70,4 @@ main = [apps.DaemonSet {
 }]
 
 # Emit both ConfigMap and DaemonSet
-manifests.yaml_stream(main + sets)
+manifests.yaml_stream(configs + sets)
