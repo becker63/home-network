@@ -37,3 +37,19 @@ def make_kcl_test(filter: ProjectFilters) -> Callable[[Callable[..., Any]], Call
         return func
 
     return wrapper
+
+def make_kcl_group_test(
+    types: list[str],
+    filter_group: ProjectFilters,
+) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
+    """
+    Decorator factory for tests that require a group of files, each defining a distinct type string.
+
+    The test will receive one argument per type, named after the type (lowercase with `_kf` suffix).
+    """
+
+    def wrapper(func: Callable[..., Any]) -> Callable[..., Any]:
+            setattr(func, "_kcl_group_types", types)
+            setattr(func, "_kcl_group_filter", filter_group)
+            return func
+    return wrapper
