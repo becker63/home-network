@@ -1,7 +1,7 @@
 import pytest
 
 from configuration import KFile, ProjectFilters
-from kcl_tasks.parametizer import filter_kcl_files
+from lib.filter import filter_kcl_files
 
 @pytest.mark.parametrize(
     "pf, kf",

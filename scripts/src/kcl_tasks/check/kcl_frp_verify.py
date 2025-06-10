@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from configuration import KFile, ProjectFilters
-from kcl_tasks.parametizer import filter_kcl_files
+from lib.filter import filter_kcl_files
 from helpers.kcl_helpers import Exec, kcl_path_to_frp_relevant, FRPTYPE
 
 FRP_COMMANDS = {

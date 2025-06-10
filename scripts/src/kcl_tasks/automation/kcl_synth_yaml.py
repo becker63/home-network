@@ -1,7 +1,7 @@
 import pytest
 
 from configuration import PROJECT_ROOT, KFile, ProjectFilters
-from kcl_tasks.parametizer import filter_kcl_files
+from lib.filter import filter_kcl_files
 from helpers.kcl_helpers import Exec
 
 @pytest.mark.parametrize(

@@ -53,7 +53,7 @@ FILTERS: dict[ProjectFilters, Callable[[KFile], bool]] = {
 
     # Matches files under the 'infra' folder, classified by folder name
     ProjectFilters.INFRA_KCL: lambda kf: (
-        (KCL_ROOT / DirEnum.INFRA) in kf.path.parents
+        DirEnum.INFRA.value in kf.path.parts
     ),
 
     # Catch-all for all files scanned
