@@ -1,26 +1,15 @@
-# kcl_tasks/parametizer.py
-
 from typing import Any, TypeAlias
 from pathlib import Path
-from configuration import FILTERS, ProjectFilters, KFile
-from lib.find_kcl_files import find_kcl_files
 import pytest
 
-_all_kcl_files_cache: list[KFile] | None = None
-
-def get_all_kcl_files_once() -> list[KFile]:
-    global _all_kcl_files_cache
-    if _all_kcl_files_cache is None:
-        _all_kcl_files_cache = find_kcl_files()  # ✅ use default '*.k'
-    return _all_kcl_files_cache
-
+from configuration import FILTERS, ProjectFilters, KFile
 
 TestCase: TypeAlias = Any  # pytest.param(...)
 
 def filter_kcl_files(
+    all_files: list[KFile],
     *filters: ProjectFilters,
 ) -> list[TestCase]:
-    all_files = get_all_kcl_files_once()
     seen_paths: set[Path] = set()
     cases: list[TestCase] = []
 

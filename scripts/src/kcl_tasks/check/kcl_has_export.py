@@ -1,12 +1,7 @@
-import pytest
-
 from configuration import KFile, ProjectFilters
-from lib.filter import filter_kcl_files
+from lib.test_factory import make_kcl_test
 
-@pytest.mark.parametrize(
-    "pf, kf",
-    filter_kcl_files(ProjectFilters.BASE)
-)
+@make_kcl_test(ProjectFilters.BASE)
 def check_has_export(pf: ProjectFilters, kf: KFile) -> None:
     with open(kf.path, "r") as file:
         content = file.read()

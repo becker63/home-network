@@ -1,10 +1,8 @@
 import subprocess
 from pathlib import Path
 
-import pytest
-
 from configuration import KFile, ProjectFilters
-from lib.filter import filter_kcl_files
+from lib.test_factory import make_kcl_test
 from helpers.kcl_helpers import Exec, kcl_path_to_frp_relevant, FRPTYPE
 
 FRP_COMMANDS = {
@@ -12,15 +10,13 @@ FRP_COMMANDS = {
     FRPTYPE.FRPS: "frps",
 }
 
-@pytest.mark.parametrize(
-    "pf, kf",
-    filter_kcl_files(ProjectFilters.PROXY_TEST)
-)
+@make_kcl_test(ProjectFilters.PROXY_TEST)
 def check_frp_validate(pf: ProjectFilters, kf: KFile, tmp_path: Path) -> None:
     frp_type = kcl_path_to_frp_relevant(kf, tmp_path)
     command = FRP_COMMANDS.get(frp_type)
 
     if not command:
+        import pytest
         pytest.skip(f"No FRP binary matched for {kf.path.name} (type={frp_type})")
 
     config_path = tmp_path / "test.json"

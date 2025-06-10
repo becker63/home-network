@@ -1,13 +1,8 @@
-import pytest
-
-from configuration import PROJECT_ROOT, KFile, ProjectFilters
-from lib.filter import filter_kcl_files
+from configuration import KFile, ProjectFilters, PROJECT_ROOT
+from lib.test_factory import make_kcl_test
 from helpers.kcl_helpers import Exec
 
-@pytest.mark.parametrize(
-    "pf, kf",
-    filter_kcl_files(ProjectFilters.CLUSTER)
-)
+@make_kcl_test(ProjectFilters.CLUSTER)
 def auto_generate_yaml_synth(pf: ProjectFilters, kf: KFile) -> None:
     synth_dir = PROJECT_ROOT / "synth_yaml"
     synth_dir.mkdir(parents=True, exist_ok=True)
