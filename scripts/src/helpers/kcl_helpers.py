@@ -42,25 +42,3 @@ def Exec(path: Path) -> ExecProgram_Result:
     )
 
     return ctx.api.exec_program(exec_args)
-
-class FRPTYPE(Enum):
-    FRPC = auto()
-    FRPS = auto()
-    DAEMONSET = auto()
-    NONE = auto()
-
-
-def kcl_path_to_frp_relevant(kf: KFile, outfile: Path) -> FRPTYPE:
-    args = bapi.ParseFile_Args(path=str(kf.path))
-    api = bapi.API()
-    result = api.parse_file(args).ast_json
-
-    # TODO: actually parse the ast for manifests.yaml_stream(...) to get the list of exported types to iterate through
-    if "ClientConfig" in result:
-        return FRPTYPE.FRPC
-    if "ServerConfig" in result:
-        return FRPTYPE.FRPS
-    if "DaemonSet" in result:
-        return FRPTYPE.DAEMONSET
-
-    return FRPTYPE.NONE

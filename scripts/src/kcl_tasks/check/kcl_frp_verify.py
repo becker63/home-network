@@ -2,34 +2,27 @@ import subprocess
 from pathlib import Path
 
 from configuration import KFile, ProjectFilters
-from lib.test_factory import make_kcl_test
-from helpers.kcl_helpers import Exec, kcl_path_to_frp_relevant, FRPTYPE
+from lib.test_factory import make_kcl_group_test
+from helpers.kcl_helpers import Exec
 
-FRP_COMMANDS = {
-    FRPTYPE.FRPC: "frpc",
-    FRPTYPE.FRPS: "frps",
-}
 
-@make_kcl_test(ProjectFilters.PROXY_TEST)
-def check_frp_validate(pf: ProjectFilters, kf: KFile, tmp_path: Path) -> None:
-    frp_type = kcl_path_to_frp_relevant(kf, tmp_path)
-    command = FRP_COMMANDS.get(frp_type)
+@make_kcl_group_test(["ClientConfig", "ServerConfig"], ProjectFilters.PROXY_TEST)
+def check_frp_validate(clientconfig_kf: KFile, serverconfig_kf: KFile, tmp_path: Path) -> None:
+    def run_frp_verify(name: str, kf: KFile) -> None:
+        config_path = tmp_path / f"{name}.json"
+        config_path.write_text(Exec(kf.path).json_result)
 
-    if not command:
-        import pytest
-        pytest.skip(f"No FRP binary matched for {kf.path.name} (type={frp_type})")
+        completed = subprocess.run(
+            [name, "verify", f"--config={config_path}"],
+            capture_output=True,
+            check=False
+        )
 
-    config_path = tmp_path / "test.json"
-    config_path.write_text(Exec(kf.path).json_result)
+        assert completed.returncode == 0, (
+            f"{name} verify failed\n"
+            f"stdout: {completed.stdout.decode()}\n"
+            f"stderr: {completed.stderr.decode()}"
+        )
 
-    completed = subprocess.run(
-        [command, "verify", f"--config={config_path}"],
-        capture_output=True,
-        check=False
-    )
-
-    assert completed.returncode == 0, (
-        f"{command} verify failed\n"
-        f"stdout: {completed.stdout.decode()}\n"
-        f"stderr: {completed.stderr.decode()}"
-    )
+    run_frp_verify("frpc", clientconfig_kf)
+    run_frp_verify("frps", serverconfig_kf)
