@@ -37,3 +37,4 @@ __pycache__/
 
 # Nix handles this
 .pre-commit-config.yaml
+.direnv
