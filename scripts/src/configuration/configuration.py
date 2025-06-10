@@ -10,6 +10,7 @@ class DirEnum(StrEnum):
     SCHEMAS = "schemas"
     INFRA = "infra"
     DEFAULT = "default"
+    BASE = "base"
 
 
 class ProjectFilters(StrEnum):
@@ -34,33 +35,27 @@ KCL_ROOT = (PROJECT_ROOT / "kcl").resolve()
 
 
 FILTERS: dict[ProjectFilters, Callable[[KFile], bool]] = {
-    # Matches files in the cluster directory, only if they are .k files
+    # Matches nested files in the base folder
     ProjectFilters.BASE: lambda kf: (
-        kf.dirname == DirEnum.CLUSTER and kf.path.suffix == ".k"
+        DirEnum.BASE.value in kf.path.parts
     ),
 
-    # Matches .k files in the proxy directory
+    # Matches files classified as 'proxy'
     ProjectFilters.PROXY_TEST: lambda kf: (
-        kf.dirname == DirEnum.PROXY and kf.path.suffix == ".k"
+        kf.dirname == DirEnum.PROXY
     ),
 
-    # Matches .k files in proxy OR cluster/frpc_daemonset specifically
+    # Matches files in 'proxy' or specifically frpc_daemonset.k in 'cluster'
     ProjectFilters.PROXY_E2E: lambda kf: (
-        kf.path.suffix == ".k"
-        and (
-            kf.dirname == DirEnum.PROXY
-            or (kf.dirname == DirEnum.CLUSTER and "frpc_daemonset" in kf.path.name)
-        )
+        kf.dirname == DirEnum.PROXY
+        or (kf.dirname == DirEnum.CLUSTER and "frpc_daemonset" in kf.path.name)
     ),
 
-    # Every kcl file under the infra folder,
-    # (I'm not sure why we need to use kf.path.parents or KCL_ROOT —
-    # we need to look at our classifier under find_kcl_files I think)
+    # Matches files under the 'infra' folder, classified by folder name
     ProjectFilters.INFRA_KCL: lambda kf: (
-        kf.path.suffix == ".k"
-        and (KCL_ROOT / DirEnum.INFRA) in kf.path.parents
+        (KCL_ROOT / DirEnum.INFRA) in kf.path.parents
     ),
 
-    # Every file under the kcl dir, including schemas and dirs
+    # Catch-all for all files scanned
     ProjectFilters.DEFAULT: lambda kf: True,
 }

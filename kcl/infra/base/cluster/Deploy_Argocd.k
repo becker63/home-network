@@ -1,6 +1,7 @@
 import argo_cd.v1alpha1 as Argo
+import manifests
 
-argo_app: Argo.Application {
+argo_app = Argo.Application {
     metadata.name = "example-app"
     metadata.namespace = "argocd"
     spec.project = "default"
@@ -19,3 +20,5 @@ argo_app: Argo.Application {
       secretName: repo-creds
     """
 }
+
+manifests.yaml_stream(argo_app)

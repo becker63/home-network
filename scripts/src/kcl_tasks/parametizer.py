@@ -11,7 +11,7 @@ _all_kcl_files_cache: list[KFile] | None = None
 def get_all_kcl_files_once() -> list[KFile]:
     global _all_kcl_files_cache
     if _all_kcl_files_cache is None:
-        _all_kcl_files_cache = find_kcl_files(glob_pattern="*")
+        _all_kcl_files_cache = find_kcl_files()  # ✅ use default '*.k'
     return _all_kcl_files_cache
 
 
