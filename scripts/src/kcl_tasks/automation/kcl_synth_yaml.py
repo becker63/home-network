@@ -6,7 +6,7 @@ from helpers.kcl_helpers import Exec
 
 @pytest.mark.parametrize(
     "pf, kf",
-    filter_kcl_files(ProjectFilters.BASE)
+    filter_kcl_files(ProjectFilters.CLUSTER)
 )
 def auto_generate_yaml_synth(pf: ProjectFilters, kf: KFile) -> None:
     synth_dir = PROJECT_ROOT / "synth_yaml"

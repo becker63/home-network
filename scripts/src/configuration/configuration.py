@@ -21,6 +21,7 @@ class ProjectFilters(StrEnum):
     DEFAULT = auto()
     INFRA_KCL = auto()
     INFRA_NIX = auto()
+    CLUSTER = auto()
 
 
 class KFile(BaseModel):
@@ -54,6 +55,11 @@ FILTERS: dict[ProjectFilters, Callable[[KFile], bool]] = {
     # Matches files under the 'infra' folder, classified by folder name
     ProjectFilters.INFRA_KCL: lambda kf: (
         DirEnum.INFRA.value in kf.path.parts
+    ),
+
+    # everything inside cluster, mostly for yaml synth
+    ProjectFilters.CLUSTER: lambda kf: (
+        DirEnum.CLUSTER.value in kf.path.parts
     ),
 
     # Catch-all for all files scanned
