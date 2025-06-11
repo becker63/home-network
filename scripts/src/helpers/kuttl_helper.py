@@ -11,17 +11,6 @@ def run_kuttl_test(
     namespace: str = "default",
     start_kind_cluster: bool = False,
 ) -> None:
-    """
-    Writes KUTTL resource and assert YAMLs into a temporary directory and runs `kuttl test`.
-
-    :param tmp_dir: The pytest-provided temporary directory (e.g., tmp_path)
-    :param test_name: A name for this test, used as the directory name within tmp_dir
-    :param resource_yaml: The resource YAML content (e.g., a DaemonSet)
-    :param assert_yaml: The assert YAML content (e.g., an assert on DaemonSet ready)
-    :param timeout: KUTTL test timeout in seconds
-    :param namespace: Kubernetes namespace for the test
-    :param start_kind_cluster: Whether to let KUTTL start a kind cluster
-    """
 
     test_dir = tmp_dir / test_name
     test_dir.mkdir(parents=True, exist_ok=True)
