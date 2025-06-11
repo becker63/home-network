@@ -32,7 +32,7 @@ def build_frps_image_with_config(server_config_json: str, tmp_path: Path, tag: s
 
 
 @contextmanager
-def Frps_container(server_config_json: str, tmp_path: Path, bind_port: int = 7000) -> Generator[Container, None, None]:
+def run_frps_container_with_yield(server_config_json: str, tmp_path: Path, bind_port: int = 7000) -> Generator[Container, None, None]:
     image_tag = "test-frps:latest"
     build_frps_image_with_config(server_config_json, tmp_path, tag=image_tag)
 
@@ -73,10 +73,10 @@ def e2e_frp_kuttl(clientconfig_kf: KFile, serverconfig_kf: KFile, daemonset_kf: 
         serverconfig = Exec(serverconfig_kf.path).json_result
         daemonset = Exec(daemonset_kf.path).yaml_result
 
-        with Frps_container(serverconfig, tmp_path, bind_port=BINDPORT) as container:
+        with run_frps_container_with_yield(serverconfig, tmp_path, bind_port=BINDPORT) as container:
             assert container.status == "running", "FRPS container failed to start"
 
-            run_kuttl_test(
+            result = run_kuttl_test(
                 tmp_dir=tmp_path,
                 test_name="frpc-daemonset-check",
                 resource_yaml=daemonset,
@@ -92,3 +92,5 @@ def e2e_frp_kuttl(clientconfig_kf: KFile, serverconfig_kf: KFile, daemonset_kf: 
                 timeout=30,
                 namespace="kube-system",
             )
+
+            assert result.returncode == 0, f"KUTTL test failed:\nSTDOUT:\n{result.stdout}\nSTDERR:\n{result.stderr}"

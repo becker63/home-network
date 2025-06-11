@@ -1,5 +1,7 @@
 import subprocess
 from pathlib import Path
+from subprocess import CompletedProcess
+
 
 
 def run_kuttl_test(
@@ -10,24 +12,19 @@ def run_kuttl_test(
     timeout: int = 20,
     namespace: str = "default",
     start_kind_cluster: bool = False,
-) -> None:
+) -> CompletedProcess[str]:
 
     test_dir = tmp_dir / test_name
     test_dir.mkdir(parents=True, exist_ok=True)
 
-    # Write test.yaml (resources to apply)
-    test_yaml_path = test_dir / "test.yaml"
-    test_yaml_path.write_text(resource_yaml)
+    (test_dir / "test.yaml").write_text(resource_yaml)
+    (test_dir / "assert.yaml").write_text(assert_yaml)
 
-    # Write assert.yaml (expected state)
-    assert_yaml_path = test_dir / "assert.yaml"
-    assert_yaml_path.write_text(assert_yaml)
-
-    # Run kuttl test
     cmd = [
         "kubectl", "kuttl", "test", str(test_dir),
         "--timeout", str(timeout),
         "--namespace", namespace,
     ]
 
-    subprocess.run(cmd, check=True)
+    # Return process object to inspect exit code or output
+    return subprocess.run(cmd, capture_output=True, text=True)
