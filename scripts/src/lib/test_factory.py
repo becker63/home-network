@@ -44,8 +44,6 @@ def make_kcl_group_test(
 ) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """
     Decorator factory for tests that require a group of files, each defining a distinct type string.
-
-    The test will receive one argument per type, named after the type (lowercase with `_kf` suffix).
     """
 
     def wrapper(func: Callable[..., Any]) -> Callable[..., Any]:

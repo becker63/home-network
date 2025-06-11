@@ -4,24 +4,28 @@ import manifests
 serverconfig = Server.ServerConfig {
     version: "1.0.0"
 
-    # Basic server listener config to match frpc
+    # Server-side token must match client `auth.token`
+    auth: Server.AuthServerConfig {
+        token: "OVERWRITEME!"
+    }
+
+    # Basic listener config
     bindAddr: "0.0.0.0"
     bindPort: 7000
 
-    # Basic logging
+    # Logging
     log: Server.LogConfig {
         level: "info"
         maxDays: 7
     }
 
-    # Optional transport settings if needed (can be omitted for defaults)
+    # Transport (optional)
     transport: Server.ServerTransportConfig {
         heartbeatTimeout: 60
     }
 
-    # Optional features to simplify
-    enablePrometheus: True
+    # Enable optional features
     detailedErrorsToClient: True
 }
 
-manifests.yaml_stream(serverconfig)
+manifests.yaml_stream([serverconfig])
