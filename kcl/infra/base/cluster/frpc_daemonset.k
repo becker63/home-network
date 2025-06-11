@@ -57,6 +57,13 @@ sets = [apps.DaemonSet {
                         subPath: "frpc.json"
                     }]
                     command: ["/entrypoint.sh"]
+                    readinessProbe: {
+                        tcpSocket: {
+                            port: frpc.clientconfig.serverPort
+                        }
+                        initialDelaySeconds: 1
+                        periodSeconds: 2
+                    }
                 }]
                 volumes: [{
                     name: "config-volume"

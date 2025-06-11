@@ -1,5 +1,11 @@
 import subprocess
+import socket
 
+def get_free_port() -> int:
+    """Bind to port 0 to let the OS choose a free port, then close and return it."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(('', 0))
+        return s.getsockname()[1]
 
 class CommandError(Exception):
     def __init__(self, extra_info: str | None = None):
