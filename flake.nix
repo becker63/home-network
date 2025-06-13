@@ -9,6 +9,9 @@
     pyproject-build-systems.url = "github:pyproject-nix/build-system-pkgs";
     pre-commit-hooks.url = "github:cachix/git-hooks.nix";
 
+    dagger.url = "github:dagger/nix";
+    dagger.inputs.nixpkgs.follows = "nixpkgs";
+
     # Input linking
     uv2nix.inputs.nixpkgs.follows = "nixpkgs";
     uv2nix.inputs.pyproject-nix.follows = "pyproject-nix";
@@ -27,6 +30,7 @@
       pyproject-nix,
       pyproject-build-systems,
       pre-commit-hooks,
+      dagger,
       ...
     }:
     flake-parts.lib.mkFlake { inherit inputs; } {
@@ -95,6 +99,7 @@
             kcl
             go
           ];
+          daggerTools = [ dagger.packages.${system}.dagger ];
         in
         {
           checks.pre-commit-check = pre-commit;
@@ -105,6 +110,7 @@
               ++ shellTools
               ++ [ pythonEnv.virtualenv ]
               ++ kubeTools
+              ++ daggerTools
               ++ pyCliTools
               ++ pre-commit.enabledPackages;
 

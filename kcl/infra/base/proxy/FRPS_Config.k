@@ -1,8 +1,10 @@
 import schemas.go.frp_schema.frps as Server
 import manifests
 
+
+
 serverconfig = Server.ServerConfig {
-    version: "1.0.0"
+    version: "v0.62.1"
 
     # Server-side token must match client `auth.token`
     auth: Server.AuthServerConfig {
