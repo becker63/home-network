@@ -22,14 +22,13 @@ logs/
 
 kind-config.yaml
 
-# KCL artifacts
-models
-crds
-kcl/schemas/**/values.yaml
-kcl/schemas/**/values.schema.json
-kcl/schemas/**/main.k
-kcl/schemas/**/kcl.mod*
-kcl/schemas/**/models/
+# KCL artifacts (generated)
+**/kcl.mod
+**/kcl.mod.lock
+**/main.k
+**/values.yaml
+**/values.schema.json
+**/models/
 
 # Python artifacts
 __pycache__/
@@ -43,6 +42,7 @@ __pycache__/
 # CLI artifact scripts / outputs
 scripts/src/cli/artifacts/*.json
 scripts/src/cli/artifacts/*.yaml
+scripts/src/cli/artifacts/__pycache__/
 
 # Nix handles this
 .pre-commit-config.yaml
