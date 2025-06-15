@@ -35,7 +35,43 @@ class KFile(BaseModel):
 
 PROJECT_ROOT = find_project_root()
 KCL_ROOT = (PROJECT_ROOT / "kcl").resolve()
+CRD_ROOT = KCL_ROOT / "crds"
+SCHEMA_ROOT = KCL_ROOT / "schemas"
 
+# TODO: turn each of these version urls/strs into something more parsible, like a json file at the root so we can easily bump them
+CRD_SPECS  = {
+    "traefik": {
+        "urls": [
+            "https://raw.githubusercontent.com/traefik/traefik/refs/heads/v3.4/docs/content/reference/dynamic-configuration/kubernetes-crd-definition-v1.yml"
+        ]
+    },
+    "kuttl": {
+        "urls": [
+            "https://raw.githubusercontent.com/kudobuilder/kuttl/refs/heads/main/crds/testassert_crd.yaml",
+            "https://raw.githubusercontent.com/kudobuilder/kuttl/refs/heads/main/crds/teststep_crd.yaml",
+            "https://raw.githubusercontent.com/kudobuilder/kuttl/refs/heads/main/crds/testsuite_crd.yaml"
+        ]
+    },
+}
+
+HELM_VALUES = {
+    "oauth2-proxy": {
+        "urls": [
+            "https://raw.githubusercontent.com/oauth2-proxy/manifests/main/helm/oauth2-proxy/values.yaml"
+        ]
+    },
+}
+
+KCL_IMPORTS = {
+    "external-secrets": "0.1.4",
+    "argo-cd": "0.2.1",
+    "fluxcd-helm-controller": "v1.0.3",
+    "fluxcd": "0.1.2",
+    "cert-manager": "0.3.0",
+    "crossplane": "1.17.3",
+    "fluxcd-source-controller": "v1.3.2",
+    "crossplane-provider-gcp": "0.22.2",
+}
 
 FILTERS: dict[ProjectFilters, Callable[[KFile], bool]] = {
     # Matches nested files in the base folder

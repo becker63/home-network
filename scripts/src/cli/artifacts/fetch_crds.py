@@ -1,41 +1,40 @@
-#!/usr/bin/env python3
-
 import subprocess
-from urllib.request import urlretrieve
-from configuration import PROJECT_ROOT
+import urllib.request
+from pathlib import Path
+from configuration import CRD_SPECS, CRD_ROOT, SCHEMA_ROOT
 
-CRDS = {
-    "kuttl": {
-        "urls": [
-            "https://raw.githubusercontent.com/kudobuilder/kuttl/refs/heads/main/crds/testassert_crd.yaml",
-            "https://raw.githubusercontent.com/kudobuilder/kuttl/refs/heads/main/crds/teststep_crd.yaml",
-            "https://raw.githubusercontent.com/kudobuilder/kuttl/refs/heads/main/crds/testsuite_crd.yaml",
-        ]
-    },
-    "traefik": {
-        "urls": [
-            "https://raw.githubusercontent.com/traefik/traefik/refs/heads/v3.4/docs/content/reference/dynamic-configuration/kubernetes-crd-definition-v1.yml"
-        ]
-    },
-}
+def ensure_dir(path: Path) -> None:
+    path.mkdir(parents=True, exist_ok=True)
 
-def fetch_crds():
-    for name, conf in CRDS.items():
-        crd_dir = PROJECT_ROOT / "kcl" / "crds" / name
-        schema_dir = PROJECT_ROOT / "kcl" / "schemas" / name
-        crd_dir.mkdir(parents=True, exist_ok=True)
-        schema_dir.mkdir(parents=True, exist_ok=True)
+def download(url: str, dest: Path) -> None:
+    print(f"📥 Downloading {url}")
+    try:
+        with urllib.request.urlopen(url) as response:
+            dest.write_bytes(response.read())
+    except Exception as e:
+        raise RuntimeError(f"❌ Failed to download {url}: {e}")
 
-        print(f"📦 Fetching {name} CRDs...")
-        for url in conf["urls"]:
-            target = crd_dir / url.split("/")[-1]
-            print(f"  ↳ Downloading {url}")
-            urlretrieve(url, target)
+def fetch_crds() -> None:
+    for name, spec in CRD_SPECS.items():
+        print(f"\n📦 Fetching {name} CRDs...")
+        crd_dir = CRD_ROOT / name
+        schema_dir = SCHEMA_ROOT / name
+        ensure_dir(crd_dir)
+        ensure_dir(schema_dir)
+
+        for url in spec.get("urls", []):
+            filename = url.split("/")[-1]
+            download(url, crd_dir / filename)
+
+        yaml_files = list(crd_dir.glob("*.yaml")) + list(crd_dir.glob("*.yml"))
+        if not yaml_files:
+            raise FileNotFoundError(f"❌ No YAML files found in {crd_dir}")
 
         print(f"📥 Importing {name} CRDs to {schema_dir}")
-
-        command = f'kcl import -m crd {crd_dir}/*.yaml --output {schema_dir}'
-        subprocess.run(command, shell=True, check=True)
+        subprocess.run(
+            ["kcl", "import", "-m", "crd", *map(str, yaml_files), "--output", str(schema_dir)],
+            check=True
+        )
 
 if __name__ == "__main__":
     fetch_crds()

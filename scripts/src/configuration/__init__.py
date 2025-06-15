@@ -4,7 +4,12 @@ from .configuration import (
     DirEnum,
     ProjectFilters,
     FILTERS,
-    PROJECT_ROOT
+    PROJECT_ROOT,
+    HELM_VALUES,
+    CRD_SPECS,
+    CRD_ROOT,
+    SCHEMA_ROOT,
+    KCL_IMPORTS
 )
 
 assert hasattr(DirEnum, "DEFAULT"), "DirEnum must define DEFAULT"
@@ -17,4 +22,9 @@ __all__ = [
     "ProjectFilters",
     "KFile",
     "FILTERS",
+    "HELM_VALUES",
+    "CRD_SPECS",
+    "CRD_ROOT",
+    "SCHEMA_ROOT",
+    "KCL_IMPORTS"
 ]
