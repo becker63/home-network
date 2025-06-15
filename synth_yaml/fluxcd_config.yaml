@@ -1,0 +1,27 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: GitRepository
+metadata:
+  name: home-network
+  namespace: flux-system
+spec:
+  gitImplementation: go-git
+  interval: '1m'
+  ref:
+    branch: main
+  timeout: '60s'
+  url: https://github.com/becker63/home-network
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: apply-synth
+  namespace: flux-system
+spec:
+  force: false
+  interval: '1m'
+  path: './synth_yaml'
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: home-network
+  targetNamespace: default

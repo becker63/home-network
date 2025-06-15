@@ -63,8 +63,14 @@
           pyCliTools = [
             (makePythonCli {
               inherit pkgs;
-              name = "manual_kcl_find";
-              scriptPath = ./scripts/src/cli/manual_kcl_find.py;
+              name = "fetch_crds";
+              scriptPath = ./scripts/src/cli/artifacts/fetch_crds.py;
+              python = pythonEnv.virtualenv;
+            })
+            (makePythonCli {
+              inherit pkgs;
+              name = "fetch_helm_values";
+              scriptPath = ./scripts/src/cli/artifacts/fetch_helm_values.py;
               python = pythonEnv.virtualenv;
             })
           ];

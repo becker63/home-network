@@ -11,6 +11,7 @@ class DirEnum(StrEnum):
     INFRA = "infra"
     DEFAULT = "default"
     BASE = "base"
+    HELM= "helmreleases"
 
 
 class ProjectFilters(StrEnum):
@@ -22,6 +23,7 @@ class ProjectFilters(StrEnum):
     INFRA_KCL = auto()
     INFRA_NIX = auto()
     CLUSTER = auto()
+    HELM = auto()
 
 
 class KFile(BaseModel):
@@ -60,6 +62,10 @@ FILTERS: dict[ProjectFilters, Callable[[KFile], bool]] = {
     # everything inside cluster, mostly for yaml synth
     ProjectFilters.CLUSTER: lambda kf: (
         DirEnum.CLUSTER.value in kf.path.parts
+    ),
+
+    ProjectFilters.HELM: lambda kf: (
+        DirEnum.HELM.value in kf.path.parts
     ),
 
     # Catch-all for all files scanned

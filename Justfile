@@ -1,14 +1,8 @@
-# Justfile for managing KCL projects and testing
+# KCL Project Automation Justfile
 
-# ─────────────────────────────
-# Paths for CRDs and Schema Output
-# ─────────────────────────────
-KUTTL_CRD_DIR := "crds/kuttl"
-KUTTL_SCHEMA_DIR := "schemas/kuttl"
-
-# ─────────────────────────────
-# CRD Imports (infra/)
-# ─────────────────────────────
+# ────────────────
+# Import CRDs via KCL modules
+# ────────────────
 [working-directory: "kcl"]
 import-crds:
     kcl mod add external-secrets:0.1.4
@@ -17,48 +11,37 @@ import-crds:
     kcl mod add fluxcd:0.1.2
     kcl mod add cert-manager:0.3.0
     kcl mod add crossplane:1.17.3
+    kcl mod add fluxcd-source-controller:v1.3.2
+    kcl mod add crossplane-provider-gcp:0.22.2
 
-
-# ─────────────────────────────
-# Schema Generation (infra/schemas/go)
-# ─────────────────────────────
+# ────────────────
+# Generate Go-based KCL schemas
+# ────────────────
 [working-directory: "kcl/schemas/go"]
 gen-go-schema:
     go run schema-gen.go
 
-# ─────────────────────────────
-# Import KUTTL CRDs
-# ─────────────────────────────
-[working-directory: "kcl"]
-import-kuttl-crds:
-    mkdir -p {{KUTTL_CRD_DIR}} {{KUTTL_SCHEMA_DIR}}
-    curl -fsSL -o {{KUTTL_CRD_DIR}}/testassert_crd.yaml https://raw.githubusercontent.com/kudobuilder/kuttl/refs/heads/main/crds/testassert_crd.yaml
-    curl -fsSL -o {{KUTTL_CRD_DIR}}/teststep_crd.yaml https://raw.githubusercontent.com/kudobuilder/kuttl/refs/heads/main/crds/teststep_crd.yaml
-    curl -fsSL -o {{KUTTL_CRD_DIR}}/testsuite_crd.yaml https://raw.githubusercontent.com/kudobuilder/kuttl/refs/heads/main/crds/testsuite_crd.yaml
-    kcl import -m crd {{KUTTL_CRD_DIR}}/*.yaml --output {{KUTTL_SCHEMA_DIR}}
+# ────────────────
+# Full environment setup
+# ────────────────
+all:
+    just import-crds
+    just gen-go-schema
+    fetch_helm_values
+    fetch_crds
 
-# ─────────────────────────────
-# Import All CRDs (modular)
-# ─────────────────────────────
-import-all-crds: import-kuttl-crds
-
-# ─────────────────────────────
-# Full Setup: all schemas and CRDs
-# ─────────────────────────────
-all: import-crds gen-go-schema import-all-crds
-
-# ─────────────────────────────
-# Git Commands
-# ─────────────────────────────
+# ────────────────
+# Git commit shortcut
+# ────────────────
 [working-directory: "."]
 git-commit MESSAGE:
     git add .
     git commit -m "{{MESSAGE}}"
     git push
 
-# ─────────────────────────────
-# Pytest with optional -k expression
-# ─────────────────────────────
+# ────────────────
+# Run tests with optional filter
+# ────────────────
 [working-directory: "scripts"]
 [no-exit-message]
 test K_EXPRESSION="":
