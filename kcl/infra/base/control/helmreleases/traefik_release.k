@@ -1,6 +1,6 @@
-import fluxcd_helm_controller.v2.helm_toolkit_fluxcd_io_v2_helm_release as fluxcd
+import fluxcd_helm_controller.v2.helm_toolkit_fluxcd_io_v2_helm_release as fluxcd_release
 
-fluxcd.HelmRelease {
+fluxcd_release.HelmRelease {
   metadata.name = "traefik"
   metadata.namespace = "traefik"
 
@@ -19,12 +19,6 @@ fluxcd.HelmRelease {
     }
     install = {
       createNamespace = True
-    }
-    values = {
-      additionalArguments = [
-        "--entryPoints.web.address=:80",
-        "--entryPoints.websecure.address=:443"
-      ]
     }
   }
 }

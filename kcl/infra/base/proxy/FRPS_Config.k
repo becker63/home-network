@@ -1,8 +1,6 @@
 import schemas.go.frp_schema.frps as Server
 import manifests
 
-
-
 serverconfig = Server.ServerConfig {
     version: "v0.62.1"
 

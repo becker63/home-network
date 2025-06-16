@@ -39,6 +39,14 @@
     reg = "ghcr.io"
     repo = "kcl-lang/crossplane-provider-gcp"
     oci_tag = "0.22.2"
+  [dependencies.crossplane-provider-upjet-gcp]
+    name = "crossplane-provider-upjet-gcp"
+    full_name = "crossplane-provider-upjet-gcp_1.0.5"
+    version = "1.0.5"
+    sum = "nJLB3un8NJ9rare3BtDmp4Xs1PnHG2DP1ykdOxwaeYA="
+    reg = "ghcr.io"
+    repo = "kcl-lang/crossplane-provider-upjet-gcp"
+    oci_tag = "1.0.5"
   [dependencies.external-secrets]
     name = "external-secrets"
     full_name = "external-secrets_0.1.4"
