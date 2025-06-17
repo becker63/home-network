@@ -22,13 +22,14 @@ logs/
 
 kind-config.yaml
 
-# Ignore all generated schemas
-schemas/**
+# Ignore everything in schemas
+kcl/schemas/**
 
-# But keep Go source files in schemas/go/
-!schemas/go/
-!schemas/go/**/*.go
+# But re-allow Go files in schemas/go/
+!kcl/schemas/go/
+!kcl/schemas/go/**/*.go
 
+# KCL artifacts (generated)
 **/kcl.mod
 **/kcl.mod.lock
 **/main.k
