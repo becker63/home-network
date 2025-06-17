@@ -5,19 +5,6 @@ from pydantic import BaseModel, ConfigDict
 from lib.find_proj_root import find_project_root
 
 
-# --- Directory tags for contextual file classification ---
-class DirEnum(StrEnum):
-    BASE = "base"
-    CONTROL = "control"
-    PROXY = "proxy"
-    WORK = "work"
-    HELM = "helmreleases"
-    META = "meta"
-    INGRESS = "ingress"
-    INFRA = "infra"
-    DEFAULT = "default"
-
-
 # --- Project filter modes (used in tests/build steps/etc.) ---
 class ProjectFilters(StrEnum):
     BASE = auto()
@@ -35,7 +22,6 @@ class ProjectFilters(StrEnum):
 # --- KCL file abstraction ---
 class KFile(BaseModel):
     path: Path
-    dirname: DirEnum
     model_config = ConfigDict(frozen=True)
 
 
@@ -45,43 +31,35 @@ KCL_ROOT = (PROJECT_ROOT / "kcl").resolve()
 CRD_ROOT = KCL_ROOT / "crds"
 SCHEMA_ROOT = KCL_ROOT / "schemas"
 
+
 # --- Filter logic ---
 FILTERS: dict[ProjectFilters, Callable[[KFile], bool]] = {
     ProjectFilters.BASE: lambda kf: "base" in kf.path.parts,
 
-    ProjectFilters.PROXY_TEST: lambda kf: kf.dirname == DirEnum.PROXY,
+    ProjectFilters.PROXY_TEST: lambda kf: "proxy" in kf.path.parts,
 
     ProjectFilters.PROXY_E2E: lambda kf: (
-        kf.dirname == DirEnum.PROXY
-        or (kf.dirname == DirEnum.CONTROL and "frpc_daemonset" in kf.path.name)
+        "proxy" in kf.path.parts
+        or ("control" in kf.path.parts and "frpc_daemonset" in kf.path.name)
     ),
 
-    ProjectFilters.CONTROL: lambda kf: (
-        "control" in kf.path.parts
-    ),
+    ProjectFilters.CONTROL: lambda kf: kf.path.match("**/control/**/*.k"),
 
-    ProjectFilters.WORK: lambda kf: (
-        "work" in kf.path.parts
-    ),
+    ProjectFilters.WORK: lambda kf: kf.path.match("**/work/**/*.k"),
 
-    ProjectFilters.INGRESS: lambda kf: (
-        "ingress" in kf.path.parts
-    ),
+    ProjectFilters.INGRESS: lambda kf: "ingress" in kf.path.parts,
 
     ProjectFilters.META: lambda kf: (
-        "meta" in kf.path.parts
+        (PROJECT_ROOT / "kcl" / "infra" / "meta") in kf.path.parents
     ),
 
-    ProjectFilters.INFRA_KCL: lambda kf: (
-        "infra" in kf.path.parts
-    ),
+    ProjectFilters.INFRA_KCL: lambda kf: "infra" in kf.path.parts,
 
-    ProjectFilters.HELM: lambda kf: (
-        "helmreleases" in kf.path.parts
-    ),
+    ProjectFilters.HELM: lambda kf: "helmreleases" in kf.path.parts,
 
     ProjectFilters.DEFAULT: lambda kf: True,
 }
+
 
 # --- Version and import tracking ---
 CRD_SPECS = {
