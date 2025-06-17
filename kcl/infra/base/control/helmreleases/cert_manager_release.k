@@ -1,6 +1,8 @@
 import fluxcd_helm_controller.v2.helm_toolkit_fluxcd_io_v2_helm_release as fluxcd_release
+import manifests
 
-fluxcd_release.HelmRelease {
+manifests.yaml_stream([
+  fluxcd_release.HelmRelease {
   metadata.name = "cert-manager"
   metadata.namespace = "cert-manager"
 
@@ -25,3 +27,5 @@ fluxcd_release.HelmRelease {
     }
   }
 }
+])
+

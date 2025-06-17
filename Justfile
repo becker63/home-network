@@ -19,7 +19,6 @@ all:
 # ────────────────
 # Git commit shortcut
 # ────────────────
-[working-directory: "."]
 git-commit MESSAGE:
     git add .
     git commit -m "{{MESSAGE}}"
@@ -31,3 +30,19 @@ git-commit MESSAGE:
 [no-exit-message]
 test K_EXPRESSION="":
     @bash -c 'if [ "{{K_EXPRESSION}}" = "" ]; then pytest; else pytest -k "{{K_EXPRESSION}}"; fi'
+
+# ────────────────
+# Synth pipeline
+# ────────────────
+[working-directory: "scripts"]
+check-kcl:
+    pytest src/kcl_tasks/check
+
+clean-synth:
+    rm -rf synth_yaml/*
+
+[working-directory: "scripts"]
+check-synth:
+    pytest src/kcl_tasks/automation/kcl_synth_yaml.py
+
+synth: check-kcl clean-synth check-synth
