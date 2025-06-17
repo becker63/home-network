@@ -25,9 +25,11 @@ kind-config.yaml
 # Ignore everything in schemas
 kcl/schemas/**
 
-# But re-allow Go files in schemas/go/
+# Allow Go code and module files in schemas/go/
 !kcl/schemas/go/
 !kcl/schemas/go/**/*.go
+!kcl/schemas/go/go.mod
+!kcl/schemas/go/go.sum
 
 # KCL artifacts (generated)
 **/kcl.mod
