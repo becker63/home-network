@@ -1,0 +1,7 @@
+*.json
+*.k
+**/*.json
+**/*.k
+
+# We trust nix to reproduce this
+go.sum

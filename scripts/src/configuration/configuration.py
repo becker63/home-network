@@ -27,7 +27,7 @@ class KFile(BaseModel):
 
 # --- Paths ---
 PROJECT_ROOT = find_project_root()
-KCL_ROOT = (PROJECT_ROOT / "kcl").resolve()
+KCL_ROOT = (PROJECT_ROOT / "configurations").resolve()
 CRD_ROOT = KCL_ROOT / "crds"
 SCHEMA_ROOT = KCL_ROOT / "schemas"
 
