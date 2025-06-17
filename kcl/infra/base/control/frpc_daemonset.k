@@ -25,7 +25,7 @@ sets = [apps.DaemonSet {
     }
     spec: {
         updateStrategy: {
-            "$type": "RollingUpdate"
+            "type": "RollingUpdate"
         }
         selector: {
             matchLabels: {

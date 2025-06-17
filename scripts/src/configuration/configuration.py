@@ -36,14 +36,25 @@ SCHEMA_ROOT = KCL_ROOT / "schemas"
 FILTERS: dict[ProjectFilters, Callable[[KFile], bool]] = {
     ProjectFilters.BASE: lambda kf: "base" in kf.path.parts,
 
-    ProjectFilters.PROXY_TEST: lambda kf: "proxy" in kf.path.parts,
-
-    ProjectFilters.PROXY_E2E: lambda kf: (
-        "proxy" in kf.path.parts
-        or ("control" in kf.path.parts and "frpc_daemonset" in kf.path.name)
+    ProjectFilters.PROXY_TEST: lambda kf: (
+        "infra" in kf.path.parts
+        and "base" in kf.path.parts
+        and kf.path.name in {"FRPC_Config.k", "FRPS_Config.k"}
     ),
 
-    ProjectFilters.CONTROL: lambda kf: "control" in kf.path.parts,
+    ProjectFilters.PROXY_E2E: lambda kf: (
+        (
+            "infra" in kf.path.parts
+            and "base" in kf.path.parts
+            and (
+                kf.path.name in {"FRPC_Config.k", "frpc_daemonset.k", "FRPS_Config.k"}
+            )
+        )
+    ),
+
+    ProjectFilters.CONTROL: lambda kf: (
+        "control" in kf.path.parts and kf.path.suffix == ".k"
+    ),
 
     ProjectFilters.WORK: lambda kf: kf.path.match("**/work/**/*.k"),
 

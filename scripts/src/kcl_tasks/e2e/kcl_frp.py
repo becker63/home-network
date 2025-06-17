@@ -68,11 +68,11 @@ def Run_frps_container(
         docker_helper.stop_and_remove_container(container)
 
 
-@make_kcl_group_test(["ClientConfig", "ServerConfig", "DaemonSet"], ProjectFilters.PROXY_E2E)
+@make_kcl_group_test(["clientconfig = Client.ClientConfig", "serverconfig = Server.ServerConfig", "frpc-daemonset"], ProjectFilters.PROXY_E2E)
 def e2e_frp_kuttl(
     clientconfig_kf: KFile,
     serverconfig_kf: KFile,
-    daemonset_kf: KFile,
+    frpc_daemonset_kf: KFile,
     tmp_path: Path
 ) -> None:
     SERVERADDR = "localhost"
@@ -91,7 +91,7 @@ def e2e_frp_kuttl(
 
     with Override_file_tmp_multi(overrides):
         serverconfig = Exec(serverconfig_kf.path).json_result
-        daemonset = Exec(daemonset_kf.path).yaml_result
+        daemonset = Exec(frpc_daemonset_kf.path).yaml_result
 
         version_raw = json.loads(serverconfig).get("version")
         if not isinstance(version_raw, str):

@@ -38,16 +38,18 @@ def make_kcl_test(filter: ProjectFilters) -> Callable[[Callable[..., Any]], Call
 
     return wrapper
 
-def make_kcl_group_test(
-    types: list[str],
-    filter_group: ProjectFilters,
-) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
-    """
-    Decorator factory for tests that require a group of files, each defining a distinct type string.
-    """
+from typing import Callable, TypeVar
+from configuration import ProjectFilters
 
-    def wrapper(func: Callable[..., Any]) -> Callable[..., Any]:
-            setattr(func, "_kcl_group_types", types)
-            setattr(func, "_kcl_group_filter", filter_group)
-            return func
-    return wrapper
+F = TypeVar("F", bound=Callable[..., object])
+
+def make_kcl_group_test(path_substrs: list[str], group_filter: ProjectFilters) -> Callable[[F], F]:
+    """
+    Attach ordered KCL file substring match metadata to a test function.
+    Used in test collection via pytest_generate_tests.
+    """
+    def decorator(func: F) -> F:
+        setattr(func, "_kcl_group_substrs", path_substrs)
+        setattr(func, "_kcl_group_filter", group_filter)
+        return func
+    return decorator
