@@ -1,3 +1,41 @@
+slug: github-oidc-secret
+keys:
+  GITHUB_OIDC_CLIENT_ID: clientID
+  GITHUB_OIDC_CLIENT_SECRET: clientSecret
+namespace: default
+envSlug: prod
+tokenSecretName: infisical-token
+tokenSecretNamespace: default
+basePath: /github-oidc-secret
+secretsPath: /github-oidc-secret
+secret:
+  apiVersion: secrets.infisical.com/v1alpha1
+  kind: InfisicalSecret
+  metadata:
+    name: github-oidc-secret
+    namespace: default
+  spec:
+    authentication:
+      serviceToken:
+        secretsScope:
+          envSlug: prod
+          recursive: false
+          secretsPath: /github-oidc-secret
+        serviceTokenSecretReference:
+          secretName: infisical-token
+          secretNamespace: default
+    managedKubeSecretReferences:
+    - creationPolicy: Orphan
+      secretName: github-oidc-secret
+      secretNamespace: default
+      secretType: Opaque
+      template:
+        data:
+          clientID: '{{ .GITHUB_OIDC_CLIENT_ID.Value }}'
+          clientSecret: '{{ .GITHUB_OIDC_CLIENT_SECRET.Value }}'
+        includeAllSecrets: false
+    resyncInterval: 60
+---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:

@@ -34,6 +34,7 @@ target-version = "py313" # KEEP IN SYNC WITH ABOVE! /\
 include = ["src"]
 reportMissingTypeStubs = "none"
 typeCheckingMode = "strict"
+ignore = ["src/kcl_tasks/conftest.py"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
