@@ -21,6 +21,10 @@ dependencies = [
     "toml>=0.10.2",
 ]
 
+# Our tools settings
+[tool.kcltest_config]
+debug = false
+
 [tool.ruff]
 line-length = 100
 target-version = "py313" # KEEP IN SYNC WITH ABOVE! /\

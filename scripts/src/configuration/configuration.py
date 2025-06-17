@@ -43,7 +43,7 @@ FILTERS: dict[ProjectFilters, Callable[[KFile], bool]] = {
         or ("control" in kf.path.parts and "frpc_daemonset" in kf.path.name)
     ),
 
-    ProjectFilters.CONTROL: lambda kf: kf.path.match("**/control/**/*.k"),
+    ProjectFilters.CONTROL: lambda kf: "control" in kf.path.parts,
 
     ProjectFilters.WORK: lambda kf: kf.path.match("**/work/**/*.k"),
 
