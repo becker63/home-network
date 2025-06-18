@@ -83,6 +83,26 @@ CRD_SPECS = {
         "urls": [
             "https://raw.githubusercontent.com/Infisical/infisical/refs/heads/main/k8-operator/config/crd/bases/secrets.infisical.com_infisicalsecrets.yaml"
         ]
+    },
+    "crossplane_composistion": {
+        "urls": [
+            "https://raw.githubusercontent.com/crossplane/crossplane/refs/tags/v1.17.1/cluster/crds/apiextensions.crossplane.io_compositions.yaml"
+        ]
+    },
+    "crossplane_patch_and_transform": {
+        "urls": [
+            "https://raw.githubusercontent.com/crossplane-contrib/function-patch-and-transform/refs/heads/main/package/input/pt.fn.crossplane.io_resources.yaml"
+        ]
+    },
+    "crossplane_sequencer": {
+        "urls": [
+            "https://raw.githubusercontent.com/crossplane-contrib/function-sequencer/refs/heads/main/package/input/sequencer.fn.crossplane.io_inputs.yaml"
+        ]
+    },
+    "crossplane_nop": {
+        "urls": [
+            "https://raw.githubusercontent.com/crossplane-contrib/provider-nop/refs/heads/main/package/crds/nop.crossplane.io_nopresources.yaml"
+        ]
     }
 }
 

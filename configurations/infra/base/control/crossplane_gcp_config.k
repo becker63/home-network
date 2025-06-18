@@ -1,7 +1,7 @@
 import crossplane.v1.pkg_crossplane_io_v1_provider as pkg
 import k8s.apimachinery.pkg.apis.meta.v1 as meta
 import crossplane_provider_upjet_gcp.v1beta1.gcp_upbound_io_v1beta1_provider_config as gcpconfig
-import infra.meta.prefilled_infisical_secret as I
+import meta.prefilled_infisical_secret as I
 import manifests
 
 # --- GCP Provider Installation ---

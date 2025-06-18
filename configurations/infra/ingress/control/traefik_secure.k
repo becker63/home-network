@@ -1,6 +1,6 @@
 import schemas.traefik.models.v1alpha1.traefik_io_v1alpha1_ingress_route as traefik
 import schemas.traefik.models.v1alpha1.traefik_io_v1alpha1_middleware as middleware
-import infra.meta.prefilled_infisical_secret as I
+import meta.prefilled_infisical_secret as I
 import k8s.apimachinery.pkg.apis.meta.v1 as meta
 import cert_manager.v1 as cert
 import manifests
