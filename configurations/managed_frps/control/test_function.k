@@ -1,154 +1,92 @@
+import crossplane.v1 as pkg
 import schemas.crossplane_composistion.models.v1 as cross
 import schemas.crossplane_patch_and_transform.models.v1beta1.pt_fn_crossplane_io_v1beta1_resources as patch
 import schemas.crossplane_sequencer.models.v1beta1.sequencer_fn_crossplane_io_v1beta1_input as seq
 import schemas.python_crossplane_function.models.v1beta1.python_fn_crossplane_io_v1beta1_script as pyfn
-import schemas.crossplane_nop.models.v1alpha1.nop_crossplane_io_v1alpha1_nop_resource as nop
-import file
+import k8s.apimachinery.pkg.apis.meta.v1 as meta
 import manifests
+import file
 
-settings_nop = {
-    instanceName = "launch-instance"
-    imageName = "test-image"
-    bucketObjectName = "upload-image"
-    provider = "provider-nop"
-}
-
-patch_resource_nop = patch.Resources {
-    metadata.name = "patch-nop"
+mock_input = patch.Resources {
+    metadata.name = "mock-input"
     resources = [
         {
-            name = "create-bucket"
-            base = nop.NopResource {
-                metadata.name = "create-bucket"
-                spec.forProvider = {
-                    fields = {
-                        purpose = "create-bucket"
-                    }
-                    conditionAfter = [{
-                        time = "1s"
-                        conditionType = "Ready"
-                        conditionStatus = "True"
-                    }]
-                }
-                spec.providerConfigRef.name = settings_nop.provider
-            }
-        },
-        {
-            name = "grant-object-access"
-            base = nop.NopResource {
-                metadata.name = "grant-access"
-                spec.forProvider = {
-                    fields = {
-                        role = "objectViewer"
-                    }
-                    conditionAfter = [{
-                        time = "1s"
-                        conditionType = "Ready"
-                        conditionStatus = "True"
-                    }]
-                }
-                spec.providerConfigRef.name = settings_nop.provider
-            }
-        },
-        {
             name = "upload-image"
-            base = nop.NopResource {
-                metadata.name = "upload-image"
-                spec.forProvider = {
-                    fields = {
-                        type = "upload"
-                    }
-                    conditionAfter = [{
-                        time = "2s"
-                        conditionType = "Ready"
-                        conditionStatus = "True"
-                    }]
-                }
-                spec.providerConfigRef.name = settings_nop.provider
-            }
-        },
-        {
-            name = "register-image"
-            base = nop.NopResource {
-                metadata.name = "register-image"
-                spec.forProvider = {
-                    fields = {
-                        image = "test-image"
-                    }
-                    conditionAfter = [{
-                        time = "2s"
-                        conditionType = "Ready"
-                        conditionStatus = "True"
-                    }]
-                }
-                spec.providerConfigRef.name = settings_nop.provider
-            }
-        },
+            base.apiVersion = "mock.crossplane.io/v1"
+            base.kind = "UploadImage"
+        }
         {
             name = "launch-instance"
-            base = nop.NopResource {
-                metadata.name = "launch-instance"
-                spec.forProvider = {
-                    fields = {
-                        role = "vm"
-                    }
-                    conditionAfter = [{
-                        time = "3s"
-                        conditionType = "Ready"
-                        conditionStatus = "True"
-                    }]
+            base.apiVersion = "nop.crossplane.io/v1alpha1"
+            base.kind = "NopResource"
+            base.spec.forProvider.conditionAfter = [{
+                time = "3s"
+                conditionType = "Ready"
+                conditionStatus = "True"
+            }]
+            readinessChecks = [{
+                type = "MatchCondition"
+                matchCondition = {
+                    type = "Ready"
+                    status = "True"
                 }
-                spec.providerConfigRef.name = settings_nop.provider
-            }
+            }]
         }
     ]
 }
 
-sequencer_input_nop = seq.Input {
-    metadata.name = "execution-sequence"
-    rules = [
-        {
-            sequence = [
-                "create-bucket"
-                "grant-object-access"
-                "upload-image"
-                "register-image"
-                "launch-instance"
-            ]
-        }
-    ]
+mock_sequence = seq.Input {
+    metadata.name = "mock-seq"
+    rules = [{
+        sequence = ["upload-image", "launch-instance"]
+    }]
 }
 
-cleanup_function_nop = pyfn.Script {
+cleanup_fn = pyfn.Script {
+    metadata.name = "test-cleanup-script"
+    metadata.namespace = "default"
     script = file.read("del_image.py")
 }
 
-comp_nop = cross.Composition {
-    metadata.name = "nop-vps-test-pipeline"
+python_function = pkg.Function {
+    metadata.name = "python-function"
+    spec = {
+        package = "xpkg.upbound.io/upbound/function-python"
+        runtimeConfigRef.name = "default"
+    }
+}
+
+composition = cross.Composition {
+    metadata.name = "test-cleanup-pipeline"
     spec = {
         compositeTypeRef = {
-            apiVersion = "infra.fn/v1alpha1"
-            kind = "VPS"
+            apiVersion = "mock.crossplane.io/v1alpha1"
+            kind = "XNop"
         }
         mode = "Pipeline"
         pipeline = [
-            {
-                step = "patch-nop"
-                functionRef.name = "patch-and-transform"
-                input = patch_resource_nop
-            },
-            {
-                step = "sequence"
-                functionRef.name = "sequencer"
-                input = sequencer_input_nop
-            },
-            {
-                step = "cleanup"
-                functionRef.name = "python-function"
-                input = cleanup_function_nop
-            }
+            {step = "mock", functionRef.name = "patch-and-transform", input = mock_input}
+            {step = "sequence", functionRef.name = "sequencer", input = mock_sequence}
+            {step = "cleanup", functionRef.name = "python-function", input = cleanup_fn}
         ]
     }
 }
 
-manifests.yaml_stream([comp_nop])
+xr = {
+    apiVersion = "mock.crossplane.io/v1alpha1"
+    kind = "XNop"
+    metadata = {
+        name = "test-cleanup-xnop"
+        namespace = "default"
+        annotations = {
+            "crossplane.io/composition-resource-name": "test-cleanup-pipeline"
+        }
+    }
+    spec.forProvider.conditionAfter = [{
+        time = "1s"
+        conditionType = "Ready"
+        conditionStatus = "True"
+    }]
+}
+
+manifests.yaml_stream([xr, python_function, cleanup_fn, composition])

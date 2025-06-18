@@ -103,6 +103,11 @@ CRD_SPECS = {
         "urls": [
             "https://raw.githubusercontent.com/crossplane-contrib/provider-nop/refs/heads/main/package/crds/nop.crossplane.io_nopresources.yaml"
         ]
+    },
+    "python_function": {
+        "urls": [
+            "https://raw.githubusercontent.com/crossplane-contrib/function-python/refs/heads/main/package/input/python.fn.crossplane.io_scripts.yaml"
+        ]
     }
 }
 

@@ -21,18 +21,17 @@
     pyproject-build-systems.inputs.uv2nix.follows = "uv2nix";
   };
 
-  outputs =
-    inputs@{
-      self,
-      nixpkgs,
-      flake-parts,
-      uv2nix,
-      pyproject-nix,
-      pyproject-build-systems,
-      pre-commit-hooks,
-      dagger,
-      ...
-    }:
+  outputs = inputs@{
+    self,
+    nixpkgs,
+    flake-parts,
+    uv2nix,
+    pyproject-nix,
+    pyproject-build-systems,
+    pre-commit-hooks,
+    dagger,
+    ...
+  }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [
         "x86_64-linux"
@@ -40,13 +39,11 @@
         "aarch64-linux"
       ];
 
-      perSystem =
-        { pkgs, system, ... }:
+      perSystem = { pkgs, system, ... }:
         let
           lib = pkgs.lib;
           kindShellScript = import ./flake-modules/kind-init.nix { inherit pkgs; };
 
-          # Python
           uv2nixLib = uv2nix.lib;
           pythonEnv = import ./flake-modules/python.nix {
             inherit
@@ -54,8 +51,7 @@
               system
               uv2nixLib
               pyproject-nix
-              pyproject-build-systems
-              ;
+              pyproject-build-systems;
             workspaceRoot = ./scripts;
           };
 
@@ -80,6 +76,12 @@
               scriptPath = ./scripts/src/cli/artifacts/fetch_kcl_mod.py;
               python = pythonEnv.virtualenv;
             })
+            (makePythonCli {
+              inherit pkgs;
+              name = "install-crossplane-crds-dev";
+              scriptPath = ./scripts/src/cli/artifacts/install_crds_dev.py;
+              python = pythonEnv.virtualenv;
+            })
           ];
 
           gitHooks = import ./flake-modules/git-hooks.nix { inherit lib; };
@@ -94,6 +96,7 @@
             nil
             nixd
           ];
+
           shellTools = with pkgs; [
             zoxide
             fd
@@ -103,6 +106,7 @@
             git
             uv
           ];
+
           kubeTools = with pkgs; [
             talosctl
             kind
@@ -111,10 +115,15 @@
             kubernetes-helm
             kcl
             go
+            crossplane-cli
+            kyverno-chainsaw
           ];
+
           daggerTools = [ dagger.packages.${system}.dagger ];
-        in
-        {
+
+          uptestPkg = import ./flake-modules/uptest.nix { inherit pkgs; };
+
+        in {
           checks.pre-commit-check = pre-commit;
 
           devShells.default = pkgs.mkShell {
@@ -125,7 +134,8 @@
               ++ kubeTools
               ++ daggerTools
               ++ pyCliTools
-              ++ pre-commit.enabledPackages;
+              ++ pre-commit.enabledPackages
+              ++ [ uptestPkg.uptest ];
 
             env = {
               UV_PYTHON = "${pythonEnv.virtualenv}/bin/python";
@@ -138,15 +148,16 @@
               unset PYTHONPATH
               export REPO_ROOT=$(git rev-parse --show-toplevel)
               export PYTHONPATH=$PWD/scripts/src:$PYTHONPATH
+              export CHAINSAW=$(which chainsaw)
+              export KUBECTL=$(which kubectl)
 
               ${kindShellScript}/bin/kind-shell-hook
 
               echo "🐍 Python dev shell (uv2nix) ready 🐥"
 
-              # TODO: fix gomodnix
-              cd $REPO_ROOT/kcl/schemas/go
-              go mod tidy
-              cd -
+              cd $REPO_ROOT/kcl/schemas/go || true
+              go mod tidy || true
+              cd - || true
 
               if [ -n "$PS1" ] && [ -z "$ZSH_VERSION" ]; then
                 exec zsh
