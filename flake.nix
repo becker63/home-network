@@ -72,12 +72,6 @@
             })
             (makePythonCli {
               inherit pkgs;
-              name = "fetch_kcl_mod";
-              scriptPath = ./scripts/src/cli/artifacts/fetch_kcl_mod.py;
-              python = pythonEnv.virtualenv;
-            })
-            (makePythonCli {
-              inherit pkgs;
               name = "install-crossplane-crds-dev";
               scriptPath = ./scripts/src/cli/artifacts/install_crds_dev.py;
               python = pythonEnv.virtualenv;

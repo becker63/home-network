@@ -7,8 +7,7 @@ from .configuration import (
     HELM_VALUES,
     CRD_SPECS,
     CRD_ROOT,
-    SCHEMA_ROOT,
-    KCL_IMPORTS
+    SCHEMA_ROOT
 )
 
 assert hasattr(ProjectFilters, "DEFAULT"), "ProjectFilters must define DEFAULT"
@@ -22,6 +21,5 @@ __all__ = [
     "HELM_VALUES",
     "CRD_SPECS",
     "CRD_ROOT",
-    "SCHEMA_ROOT",
-    "KCL_IMPORTS"
+    "SCHEMA_ROOT"
 ]

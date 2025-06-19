@@ -17,6 +17,7 @@ class ProjectFilters(StrEnum):
     INFRA_KCL = auto()
     HELM = auto()
     DEFAULT = auto()
+    CLEANUP_TEST = auto()
 
 
 # --- KCL file abstraction ---
@@ -50,6 +51,12 @@ FILTERS: dict[ProjectFilters, Callable[[KFile], bool]] = {
                 kf.path.name in {"FRPC_Config.k", "frpc_daemonset.k", "FRPS_Config.k"}
             )
         )
+    ),
+    
+    ProjectFilters.CLEANUP_TEST: lambda kf: (
+        "managed_frps" in kf.path.parts and
+        "control" in kf.path.parts and
+        kf.path.name == "test_function.k"
     ),
 
     ProjectFilters.CONTROL: lambda kf: (
@@ -99,14 +106,23 @@ CRD_SPECS = {
             "https://raw.githubusercontent.com/crossplane-contrib/function-sequencer/refs/heads/main/package/input/sequencer.fn.crossplane.io_inputs.yaml"
         ]
     },
-    "crossplane_nop": {
+    "digitalocean": {
         "urls": [
-            "https://raw.githubusercontent.com/crossplane-contrib/provider-nop/refs/heads/main/package/crds/nop.crossplane.io_nopresources.yaml"
+            "https://raw.githubusercontent.com/crossplane-contrib/provider-upjet-digitalocean/refs/heads/main/package/crds/digitalocean.crossplane.io_providerconfigs.yaml",
+            "https://raw.githubusercontent.com/crossplane-contrib/provider-upjet-digitalocean/refs/heads/main/package/crds/droplet.digitalocean.crossplane.io_droplets.yaml",
+            "https://raw.githubusercontent.com/crossplane-contrib/provider-upjet-digitalocean/refs/heads/main/package/crds/dns.digitalocean.crossplane.io_domains.yaml",
+            "https://raw.githubusercontent.com/crossplane-contrib/provider-upjet-digitalocean/refs/heads/main/package/crds/dns.digitalocean.crossplane.io_records.yaml",
+            "https://raw.githubusercontent.com/crossplane-contrib/provider-upjet-digitalocean/refs/heads/main/package/crds/networking.digitalocean.crossplane.io_ipassignments.yaml",
+            "https://raw.githubusercontent.com/crossplane-contrib/provider-upjet-digitalocean/refs/heads/main/package/crds/networking.digitalocean.crossplane.io_ips.yaml",
+            "https://raw.githubusercontent.com/crossplane-contrib/provider-upjet-digitalocean/refs/heads/main/package/crds/project.digitalocean.crossplane.io_projects.yaml",
+            "https://raw.githubusercontent.com/crossplane-contrib/provider-upjet-digitalocean/refs/heads/main/package/crds/uptime.digitalocean.crossplane.io_alerts.yaml",
+            "https://raw.githubusercontent.com/crossplane-contrib/provider-upjet-digitalocean/refs/heads/main/package/crds/custom.digitalocean.crossplane.io_images.yaml"
         ]
     },
-    "python_function": {
+    "flux-kcl-controller" : {
         "urls": [
-            "https://raw.githubusercontent.com/crossplane-contrib/function-python/refs/heads/main/package/input/python.fn.crossplane.io_scripts.yaml"
+            "https://raw.githubusercontent.com/kcl-lang/flux-kcl-controller/refs/heads/main/config/crd/bases/gitrepositories.yaml",
+            "https://raw.githubusercontent.com/kcl-lang/flux-kcl-controller/refs/heads/main/config/crd/bases/krm.kcl.dev.fluxcd_kclruns.yaml"
         ]
     }
 }
@@ -119,11 +135,3 @@ HELM_VALUES = {
     },
 }
 
-KCL_IMPORTS = {
-    "cert-manager": "0.3.0",
-    "crossplane": "1.17.3",
-    "fluxcd-helm-controller": "v1.0.3",
-    "fluxcd-source-controller": "v1.3.2",
-    "crossplane-provider-upjet-gcp": "1.0.5",
-    "fluxcd": "0.1.2",
-}

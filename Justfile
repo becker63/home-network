@@ -11,7 +11,6 @@ gen-go-schema:
 # Full environment setup
 # ────────────────
 all:
-    fetch_kcl_mod
     just gen-go-schema
     fetch_helm_values
     fetch_crds
