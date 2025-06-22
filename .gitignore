@@ -31,13 +31,6 @@ configurations/schemas/**
 !configurations/schemas/go/go.mod
 !configurations/schemas/go/go.sum
 
-# KCL artifacts (generated)
-**/kcl.mod
-**/kcl.mod.lock
-**/main.k
-**/values.yaml
-**/values.schema.json
-**/models/
 
 # Python artifacts
 __pycache__/
