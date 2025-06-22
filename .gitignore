@@ -22,15 +22,6 @@ logs/
 
 kind-config.yaml
 
-# Ignore everything in schemas
-configurations/schemas/**
-
-# Allow Go code and module files in schemas/go/
-!configurations/schemas/go/
-!configurations/schemas/go/**/*.go
-!configurations/schemas/go/go.mod
-!configurations/schemas/go/go.sum
-
 
 # Python artifacts
 __pycache__/
