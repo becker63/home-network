@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 from configuration import FILTERS, ProjectFilters, KFile
-from lib.debug import debug_print
+from lib.test_ext.debug import debug_print
 
 TestCase: TypeAlias = Any  # pytest.param(...)
 

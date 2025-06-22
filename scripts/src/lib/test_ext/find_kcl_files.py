@@ -1,7 +1,7 @@
 from collections.abc import Callable
 from pathlib import Path
 from configuration import KCL_ROOT, KFile
-from lib.debug import debug_print
+from lib.test_ext.debug import debug_print
 
 
 def find_kcl_files(

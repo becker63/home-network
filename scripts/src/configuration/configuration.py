@@ -2,7 +2,7 @@ from enum import StrEnum, auto
 from pathlib import Path
 from typing import Callable
 from pydantic import BaseModel, ConfigDict
-from lib.find_proj_root import find_project_root
+from lib.test_ext.find_proj_root import find_project_root
 
 
 # --- Project filter modes (used in tests/build steps/etc.) ---
@@ -30,7 +30,7 @@ class KFile(BaseModel):
 PROJECT_ROOT = find_project_root()
 KCL_ROOT = (PROJECT_ROOT / "configurations").resolve()
 CRD_ROOT = KCL_ROOT / "crds"
-SCHEMA_ROOT = KCL_ROOT / "schemas"
+SCHEMA_ROOT = PROJECT_ROOT / "kcl_common" / "schemas"
 
 
 # --- Filter logic ---

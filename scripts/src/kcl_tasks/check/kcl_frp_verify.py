@@ -2,7 +2,7 @@ import subprocess
 from pathlib import Path
 
 from configuration import KFile, ProjectFilters
-from lib.test_factory import make_kcl_group_test
+from lib.test_ext.test_factory import make_kcl_group_test
 from helpers.kcl_helpers import Exec
 
 def run_frp_verify(name: str, kf: KFile, tmp_path: Path) -> None:

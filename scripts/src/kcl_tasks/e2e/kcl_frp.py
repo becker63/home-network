@@ -7,7 +7,7 @@ import json
 from configuration import KFile, ProjectFilters
 from helpers.kcl_helpers import Exec, Override_file_tmp_multi
 from helpers.helpers import get_free_port
-from lib.test_factory import make_kcl_group_test
+from lib.test_ext.test_factory import make_kcl_group_test
 from helpers.kuttl_helper import run_kuttl_test
 import helpers.docker_helper as docker_helper
 

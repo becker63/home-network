@@ -1,5 +1,5 @@
 from configuration import KFile, ProjectFilters
-from lib.test_factory import make_kcl_test
+from lib.test_ext.test_factory import make_kcl_test
 
 @make_kcl_test(ProjectFilters.BASE)
 def check_has_export(pf: ProjectFilters, kf: KFile) -> None:

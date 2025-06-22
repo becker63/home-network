@@ -2,8 +2,8 @@
 
 import pytest
 
-from lib.find_kcl_files import find_kcl_files
-from lib.filter import filter_kcl_files
+from lib.test_ext.find_kcl_files import find_kcl_files
+from lib.test_ext.filter import filter_kcl_files
 
 
 @pytest.fixture(scope="session")

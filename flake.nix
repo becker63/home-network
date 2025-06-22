@@ -73,12 +73,6 @@
               scriptPath = ./scripts/src/cli/artifacts/fetch_helm_values.py;
               python = pythonEnv.virtualenv;
             })
-            (makePythonCli {
-              inherit pkgs;
-              name = "install-dev";
-              scriptPath = ./scripts/src/cli/artifacts/install_dev.py;
-              python = pythonEnv.virtualenv;
-            })
           ];
 
           gitHooks = import ./flake-modules/git-hooks.nix { inherit lib; };
