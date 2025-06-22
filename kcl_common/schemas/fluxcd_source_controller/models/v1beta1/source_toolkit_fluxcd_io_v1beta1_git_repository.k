@@ -294,7 +294,7 @@ schema SourceToolkitFluxcdIoV1beta1GitRepositoryStatusArtifact:
     ----------
     checksum : str, default is Undefined, optional
         Checksum is the SHA256 checksum of the artifact.
-    lastUpdateTime : str, default is Undefined, optional
+    lastUpdateTime : str, default is Undefined, required
         LastUpdateTime is the timestamp corresponding to the last update of this
         artifact.
     path : str, default is Undefined, required
@@ -310,7 +310,7 @@ schema SourceToolkitFluxcdIoV1beta1GitRepositoryStatusArtifact:
 
     checksum?: str
 
-    lastUpdateTime?: str
+    lastUpdateTime: str
 
     path: str
 
@@ -322,22 +322,6 @@ schema SourceToolkitFluxcdIoV1beta1GitRepositoryStatusArtifact:
 schema SourceToolkitFluxcdIoV1beta1GitRepositoryStatusConditionsItems0:
     r"""
     Condition contains details for one aspect of the current state of this API Resource.
-    ---
-    This struct is intended for direct use as an array at the field path .status.conditions.  For example,
-
-
-    	type FooStatus struct{
-    	    // Represents the observations of a foo's current state.
-    	    // Known .status.conditions.type are: "Available", "Progressing", and "Degraded"
-    	    // +patchMergeKey=type
-    	    // +patchStrategy=merge
-    	    // +listType=map
-    	    // +listMapKey=type
-    	    Conditions []metav1.Condition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type" protobuf:"bytes,1,rep,name=conditions"`
-
-
-    	    // other fields
-    	}
 
     Attributes
     ----------
@@ -361,10 +345,6 @@ schema SourceToolkitFluxcdIoV1beta1GitRepositoryStatusConditionsItems0:
         status of the condition, one of True, False, Unknown.
     $type : str, default is Undefined, required
         type of condition in CamelCase or in foo.example.com/CamelCase.
-        ---
-        Many .condition.type values are consistent across resources like Available, but because arbitrary conditions can be
-        useful (see .node.status.conditions), the ability to deconflict is important.
-        The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
     """
 
 
@@ -399,7 +379,7 @@ schema SourceToolkitFluxcdIoV1beta1GitRepositoryStatusIncludedArtifactsItems0:
     ----------
     checksum : str, default is Undefined, optional
         Checksum is the SHA256 checksum of the artifact.
-    lastUpdateTime : str, default is Undefined, optional
+    lastUpdateTime : str, default is Undefined, required
         LastUpdateTime is the timestamp corresponding to the last update of this
         artifact.
     path : str, default is Undefined, required
@@ -415,7 +395,7 @@ schema SourceToolkitFluxcdIoV1beta1GitRepositoryStatusIncludedArtifactsItems0:
 
     checksum?: str
 
-    lastUpdateTime?: str
+    lastUpdateTime: str
 
     path: str
 

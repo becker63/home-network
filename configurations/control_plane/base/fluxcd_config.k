@@ -1,5 +1,5 @@
-import fluxcd_kustomize_controller.v1 as kustomize
-import fluxcd_source_controller.v1beta2.source_toolkit_fluxcd_io_v1beta2_git_repository as fluxcd
+import kcl_common.schemas.fluxcd_source_controller.models.v1.source_toolkit_fluxcd_io_v1_git_repository as fluxcd
+import kcl_common.schemas.fluxcd_kustomize_controller.models.v1 as kustomize
 import k8s.apimachinery.pkg.apis.meta.v1 as meta
 import manifests
 

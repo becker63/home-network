@@ -13,60 +13,64 @@ schema GitRepository:
 
     Attributes
     ----------
-    apiVersion : str, default is "source.toolkit.fluxcd.io/v1beta2", required
+    apiVersion : str, default is "source.toolkit.fluxcd.io/v1", required
         APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
     kind : str, default is "GitRepository", required
         Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
     metadata : v1.ObjectMeta, default is Undefined, optional
         metadata
-    spec : SourceToolkitFluxcdIoV1beta2GitRepositorySpec, default is Undefined, optional
+    spec : SourceToolkitFluxcdIoV1GitRepositorySpec, default is Undefined, optional
         spec
-    status : SourceToolkitFluxcdIoV1beta2GitRepositoryStatus, default is Undefined, optional
+    status : SourceToolkitFluxcdIoV1GitRepositoryStatus, default is Undefined, optional
         status
     """
 
 
-    apiVersion: "source.toolkit.fluxcd.io/v1beta2" = "source.toolkit.fluxcd.io/v1beta2"
+    apiVersion: "source.toolkit.fluxcd.io/v1" = "source.toolkit.fluxcd.io/v1"
 
     kind: "GitRepository" = "GitRepository"
 
     metadata?: v1.ObjectMeta
 
-    spec?: SourceToolkitFluxcdIoV1beta2GitRepositorySpec
+    spec?: SourceToolkitFluxcdIoV1GitRepositorySpec
 
-    status?: SourceToolkitFluxcdIoV1beta2GitRepositoryStatus
+    status?: SourceToolkitFluxcdIoV1GitRepositoryStatus
 
 
-schema SourceToolkitFluxcdIoV1beta2GitRepositorySpec:
+schema SourceToolkitFluxcdIoV1GitRepositorySpec:
     r"""
     GitRepositorySpec specifies the required configuration to produce an
     Artifact for a Git repository.
 
     Attributes
     ----------
-    accessFrom : SourceToolkitFluxcdIoV1beta2GitRepositorySpecAccessFrom, default is Undefined, optional
-        access from
-    gitImplementation : str, default is "go-git", optional
-        GitImplementation specifies which Git client library implementation to
-        use. Defaults to 'go-git', valid values are ('go-git', 'libgit2').
-        Deprecated: gitImplementation is deprecated now that 'go-git' is the
-        only supported implementation.
     ignore : str, default is Undefined, optional
         Ignore overrides the set of excluded patterns in the .sourceignore format
         (which is the same as .gitignore). If not provided, a default will be used,
         consult the documentation for your version to find out what those are.
-    include : [SourceToolkitFluxcdIoV1beta2GitRepositorySpecIncludeItems0], default is Undefined, optional
+    include : [SourceToolkitFluxcdIoV1GitRepositorySpecIncludeItems0], default is Undefined, optional
         Include specifies a list of GitRepository resources which Artifacts
         should be included in the Artifact produced for this GitRepository.
     interval : str, default is Undefined, required
-        Interval at which to check the GitRepository for updates.
+        Interval at which the GitRepository URL is checked for updates.
+        This interval is approximate and may be subject to jitter to ensure
+        efficient use of resources.
+    provider : str, default is Undefined, optional
+        Provider used for authentication, can be 'azure', 'github', 'generic'.
+        When not specified, defaults to 'generic'.
+    proxySecretRef : SourceToolkitFluxcdIoV1GitRepositorySpecProxySecretRef, default is Undefined, optional
+        proxy secret ref
     recurseSubmodules : bool, default is Undefined, optional
         RecurseSubmodules enables the initialization of all submodules within
         the GitRepository as cloned from the URL, using their default settings.
-    ref : SourceToolkitFluxcdIoV1beta2GitRepositorySpecRef, default is Undefined, optional
+    ref : SourceToolkitFluxcdIoV1GitRepositorySpecRef, default is Undefined, optional
         ref
-    secretRef : SourceToolkitFluxcdIoV1beta2GitRepositorySpecSecretRef, default is Undefined, optional
+    secretRef : SourceToolkitFluxcdIoV1GitRepositorySpecSecretRef, default is Undefined, optional
         secret ref
+    sparseCheckout : [str], default is Undefined, optional
+        SparseCheckout specifies a list of directories to checkout when cloning
+        the repository. If specified, only these directories are included in the
+        Artifact produced for this GitRepository.
     suspend : bool, default is Undefined, optional
         Suspend tells the controller to suspend the reconciliation of this
         GitRepository.
@@ -74,26 +78,28 @@ schema SourceToolkitFluxcdIoV1beta2GitRepositorySpec:
         Timeout for Git operations like cloning, defaults to 60s.
     url : str, default is Undefined, required
         URL specifies the Git repository URL, it can be an HTTP/S or SSH address.
-    verify : SourceToolkitFluxcdIoV1beta2GitRepositorySpecVerify, default is Undefined, optional
+    verify : SourceToolkitFluxcdIoV1GitRepositorySpecVerify, default is Undefined, optional
         verify
     """
 
 
-    accessFrom?: SourceToolkitFluxcdIoV1beta2GitRepositorySpecAccessFrom
-
-    gitImplementation?: "go-git" | "libgit2" = "go-git"
-
     ignore?: str
 
-    include?: [SourceToolkitFluxcdIoV1beta2GitRepositorySpecIncludeItems0]
+    include?: [SourceToolkitFluxcdIoV1GitRepositorySpecIncludeItems0]
 
     interval: str
 
+    provider?: "generic" | "azure" | "github"
+
+    proxySecretRef?: SourceToolkitFluxcdIoV1GitRepositorySpecProxySecretRef
+
     recurseSubmodules?: bool
 
-    ref?: SourceToolkitFluxcdIoV1beta2GitRepositorySpecRef
+    ref?: SourceToolkitFluxcdIoV1GitRepositorySpecRef
 
-    secretRef?: SourceToolkitFluxcdIoV1beta2GitRepositorySpecSecretRef
+    secretRef?: SourceToolkitFluxcdIoV1GitRepositorySpecSecretRef
+
+    sparseCheckout?: [str]
 
     suspend?: bool
 
@@ -101,7 +107,7 @@ schema SourceToolkitFluxcdIoV1beta2GitRepositorySpec:
 
     url: str
 
-    verify?: SourceToolkitFluxcdIoV1beta2GitRepositorySpecVerify
+    verify?: SourceToolkitFluxcdIoV1GitRepositorySpecVerify
 
 
     check:
@@ -110,41 +116,7 @@ schema SourceToolkitFluxcdIoV1beta2GitRepositorySpec:
         _regex_match(str(url), r"^(http|https|ssh)://.*$")
 
 
-schema SourceToolkitFluxcdIoV1beta2GitRepositorySpecAccessFrom:
-    r"""
-    AccessFrom specifies an Access Control List for allowing cross-namespace
-    references to this object.
-    NOTE: Not implemented, provisional as of https://github.com/fluxcd/flux2/pull/2092
-
-    Attributes
-    ----------
-    namespaceSelectors : [SourceToolkitFluxcdIoV1beta2GitRepositorySpecAccessFromNamespaceSelectorsItems0], default is Undefined, required
-        NamespaceSelectors is the list of namespace selectors to which this ACL applies.
-        Items in this list are evaluated using a logical OR operation.
-    """
-
-
-    namespaceSelectors: [SourceToolkitFluxcdIoV1beta2GitRepositorySpecAccessFromNamespaceSelectorsItems0]
-
-
-schema SourceToolkitFluxcdIoV1beta2GitRepositorySpecAccessFromNamespaceSelectorsItems0:
-    r"""
-    NamespaceSelector selects the namespaces to which this ACL applies.
-    An empty map of MatchLabels matches all namespaces in a cluster.
-
-    Attributes
-    ----------
-    matchLabels : {str:str}, default is Undefined, optional
-        MatchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
-        map is equivalent to an element of matchExpressions, whose key field is "key", the
-        operator is "In", and the values array contains only "value". The requirements are ANDed.
-    """
-
-
-    matchLabels?: {str:str}
-
-
-schema SourceToolkitFluxcdIoV1beta2GitRepositorySpecIncludeItems0:
+schema SourceToolkitFluxcdIoV1GitRepositorySpecIncludeItems0:
     r"""
     GitRepositoryInclude specifies a local reference to a GitRepository which
     Artifact (sub-)contents must be included, and where they should be placed.
@@ -154,7 +126,7 @@ schema SourceToolkitFluxcdIoV1beta2GitRepositorySpecIncludeItems0:
     fromPath : str, default is Undefined, optional
         FromPath specifies the path to copy contents from, defaults to the root
         of the Artifact.
-    repository : SourceToolkitFluxcdIoV1beta2GitRepositorySpecIncludeItems0Repository, default is Undefined, required
+    repository : SourceToolkitFluxcdIoV1GitRepositorySpecIncludeItems0Repository, default is Undefined, required
         repository
     toPath : str, default is Undefined, optional
         ToPath specifies the path to copy contents to, defaults to the name of
@@ -164,12 +136,12 @@ schema SourceToolkitFluxcdIoV1beta2GitRepositorySpecIncludeItems0:
 
     fromPath?: str
 
-    repository: SourceToolkitFluxcdIoV1beta2GitRepositorySpecIncludeItems0Repository
+    repository: SourceToolkitFluxcdIoV1GitRepositorySpecIncludeItems0Repository
 
     toPath?: str
 
 
-schema SourceToolkitFluxcdIoV1beta2GitRepositorySpecIncludeItems0Repository:
+schema SourceToolkitFluxcdIoV1GitRepositorySpecIncludeItems0Repository:
     r"""
     GitRepositoryRef specifies the GitRepository which Artifact contents
     must be included.
@@ -184,7 +156,22 @@ schema SourceToolkitFluxcdIoV1beta2GitRepositorySpecIncludeItems0Repository:
     name: str
 
 
-schema SourceToolkitFluxcdIoV1beta2GitRepositorySpecRef:
+schema SourceToolkitFluxcdIoV1GitRepositorySpecProxySecretRef:
+    r"""
+    ProxySecretRef specifies the Secret containing the proxy configuration
+    to use while communicating with the Git server.
+
+    Attributes
+    ----------
+    name : str, default is Undefined, required
+        Name of the referent.
+    """
+
+
+    name: str
+
+
+schema SourceToolkitFluxcdIoV1GitRepositorySpecRef:
     r"""
     Reference specifies the Git reference to resolve and monitor for
     changes, defaults to the 'master' branch.
@@ -196,12 +183,10 @@ schema SourceToolkitFluxcdIoV1beta2GitRepositorySpecRef:
     commit : str, default is Undefined, optional
         Commit SHA to check out, takes precedence over all reference fields.
 
-
         This can be combined with Branch to shallow clone the branch, in which
         the commit is expected to exist.
     name : str, default is Undefined, optional
         Name of the reference to check out; takes precedence over Branch, Tag and SemVer.
-
 
         It must be a valid Git reference: https://git-scm.com/docs/git-check-ref-format#_description
         Examples: "refs/heads/main", "refs/tags/v0.1.0", "refs/pull/420/head", "refs/merge-requests/1/head"
@@ -223,7 +208,7 @@ schema SourceToolkitFluxcdIoV1beta2GitRepositorySpecRef:
     tag?: str
 
 
-schema SourceToolkitFluxcdIoV1beta2GitRepositorySpecSecretRef:
+schema SourceToolkitFluxcdIoV1GitRepositorySpecSecretRef:
     r"""
     SecretRef specifies the Secret containing authentication credentials for
     the GitRepository.
@@ -242,26 +227,30 @@ schema SourceToolkitFluxcdIoV1beta2GitRepositorySpecSecretRef:
     name: str
 
 
-schema SourceToolkitFluxcdIoV1beta2GitRepositorySpecVerify:
+schema SourceToolkitFluxcdIoV1GitRepositorySpecVerify:
     r"""
     Verification specifies the configuration to verify the Git commit
     signature(s).
 
     Attributes
     ----------
-    mode : str, default is Undefined, required
-        Mode specifies what Git object should be verified, currently ('head').
-    secretRef : SourceToolkitFluxcdIoV1beta2GitRepositorySpecVerifySecretRef, default is Undefined, required
+    mode : str, default is "HEAD", optional
+        Mode specifies which Git object(s) should be verified.
+
+        The variants "head" and "HEAD" both imply the same thing, i.e. verify
+        the commit that the HEAD of the Git repository points to. The variant
+        "head" solely exists to ensure backwards compatibility.
+    secretRef : SourceToolkitFluxcdIoV1GitRepositorySpecVerifySecretRef, default is Undefined, required
         secret ref
     """
 
 
-    mode: "head"
+    mode?: "head" | "HEAD" | "Tag" | "TagAndHEAD" = "HEAD"
 
-    secretRef: SourceToolkitFluxcdIoV1beta2GitRepositorySpecVerifySecretRef
+    secretRef: SourceToolkitFluxcdIoV1GitRepositorySpecVerifySecretRef
 
 
-schema SourceToolkitFluxcdIoV1beta2GitRepositorySpecVerifySecretRef:
+schema SourceToolkitFluxcdIoV1GitRepositorySpecVerifySecretRef:
     r"""
     SecretRef specifies the Secret containing the public keys of trusted Git
     authors.
@@ -276,31 +265,17 @@ schema SourceToolkitFluxcdIoV1beta2GitRepositorySpecVerifySecretRef:
     name: str
 
 
-schema SourceToolkitFluxcdIoV1beta2GitRepositoryStatus:
+schema SourceToolkitFluxcdIoV1GitRepositoryStatus:
     r"""
     GitRepositoryStatus records the observed state of a Git repository.
 
     Attributes
     ----------
-    artifact : SourceToolkitFluxcdIoV1beta2GitRepositoryStatusArtifact, default is Undefined, optional
+    artifact : SourceToolkitFluxcdIoV1GitRepositoryStatusArtifact, default is Undefined, optional
         artifact
-    conditions : [SourceToolkitFluxcdIoV1beta2GitRepositoryStatusConditionsItems0], default is Undefined, optional
+    conditions : [SourceToolkitFluxcdIoV1GitRepositoryStatusConditionsItems0], default is Undefined, optional
         Conditions holds the conditions for the GitRepository.
-    contentConfigChecksum : str, default is Undefined, optional
-        ContentConfigChecksum is a checksum of all the configurations related to
-        the content of the source artifact:
-         - .spec.ignore
-         - .spec.recurseSubmodules
-         - .spec.included and the checksum of the included artifacts
-        observed in .status.observedGeneration version of the object. This can
-        be used to determine if the content of the included repository has
-        changed.
-        It has the format of `<algo>:<checksum>`, for example: `sha256:<checksum>`.
-
-
-        Deprecated: Replaced with explicit fields for observed artifact content
-        config in the status.
-    includedArtifacts : [SourceToolkitFluxcdIoV1beta2GitRepositoryStatusIncludedArtifactsItems0], default is Undefined, optional
+    includedArtifacts : [SourceToolkitFluxcdIoV1GitRepositoryStatusIncludedArtifactsItems0], default is Undefined, optional
         IncludedArtifacts contains a list of the last successfully included
         Artifacts as instructed by GitRepositorySpec.Include.
     lastHandledReconcileAt : str, default is Undefined, optional
@@ -313,26 +288,26 @@ schema SourceToolkitFluxcdIoV1beta2GitRepositoryStatus:
     observedIgnore : str, default is Undefined, optional
         ObservedIgnore is the observed exclusion patterns used for constructing
         the source artifact.
-    observedInclude : [SourceToolkitFluxcdIoV1beta2GitRepositoryStatusObservedIncludeItems0], default is Undefined, optional
+    observedInclude : [SourceToolkitFluxcdIoV1GitRepositoryStatusObservedIncludeItems0], default is Undefined, optional
         ObservedInclude is the observed list of GitRepository resources used to
-        to produce the current Artifact.
+        produce the current Artifact.
     observedRecurseSubmodules : bool, default is Undefined, optional
         ObservedRecurseSubmodules is the observed resource submodules
         configuration used to produce the current Artifact.
-    url : str, default is Undefined, optional
-        URL is the dynamic fetch link for the latest Artifact.
-        It is provided on a "best effort" basis, and using the precise
-        GitRepositoryStatus.Artifact data is recommended.
+    observedSparseCheckout : [str], default is Undefined, optional
+        ObservedSparseCheckout is the observed list of directories used to
+        produce the current Artifact.
+    sourceVerificationMode : str, default is Undefined, optional
+        SourceVerificationMode is the last used verification mode indicating
+        which Git object(s) have been verified.
     """
 
 
-    artifact?: SourceToolkitFluxcdIoV1beta2GitRepositoryStatusArtifact
+    artifact?: SourceToolkitFluxcdIoV1GitRepositoryStatusArtifact
 
-    conditions?: [SourceToolkitFluxcdIoV1beta2GitRepositoryStatusConditionsItems0]
+    conditions?: [SourceToolkitFluxcdIoV1GitRepositoryStatusConditionsItems0]
 
-    contentConfigChecksum?: str
-
-    includedArtifacts?: [SourceToolkitFluxcdIoV1beta2GitRepositoryStatusIncludedArtifactsItems0]
+    includedArtifacts?: [SourceToolkitFluxcdIoV1GitRepositoryStatusIncludedArtifactsItems0]
 
     lastHandledReconcileAt?: str
 
@@ -340,14 +315,16 @@ schema SourceToolkitFluxcdIoV1beta2GitRepositoryStatus:
 
     observedIgnore?: str
 
-    observedInclude?: [SourceToolkitFluxcdIoV1beta2GitRepositoryStatusObservedIncludeItems0]
+    observedInclude?: [SourceToolkitFluxcdIoV1GitRepositoryStatusObservedIncludeItems0]
 
     observedRecurseSubmodules?: bool
 
-    url?: str
+    observedSparseCheckout?: [str]
+
+    sourceVerificationMode?: str
 
 
-schema SourceToolkitFluxcdIoV1beta2GitRepositoryStatusArtifact:
+schema SourceToolkitFluxcdIoV1GitRepositoryStatusArtifact:
     r"""
     Artifact represents the last successful GitRepository reconciliation.
 
@@ -395,25 +372,9 @@ schema SourceToolkitFluxcdIoV1beta2GitRepositoryStatusArtifact:
         _regex_match(str(digest), r"^[a-z0-9]+(?:[.+_-][a-z0-9]+)*:[a-zA-Z0-9=_-]+$") if digest
 
 
-schema SourceToolkitFluxcdIoV1beta2GitRepositoryStatusConditionsItems0:
+schema SourceToolkitFluxcdIoV1GitRepositoryStatusConditionsItems0:
     r"""
     Condition contains details for one aspect of the current state of this API Resource.
-    ---
-    This struct is intended for direct use as an array at the field path .status.conditions.  For example,
-
-
-    	type FooStatus struct{
-    	    // Represents the observations of a foo's current state.
-    	    // Known .status.conditions.type are: "Available", "Progressing", and "Degraded"
-    	    // +patchMergeKey=type
-    	    // +patchStrategy=merge
-    	    // +listType=map
-    	    // +listMapKey=type
-    	    Conditions []metav1.Condition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type" protobuf:"bytes,1,rep,name=conditions"`
-
-
-    	    // other fields
-    	}
 
     Attributes
     ----------
@@ -437,10 +398,6 @@ schema SourceToolkitFluxcdIoV1beta2GitRepositoryStatusConditionsItems0:
         status of the condition, one of True, False, Unknown.
     $type : str, default is Undefined, required
         type of condition in CamelCase or in foo.example.com/CamelCase.
-        ---
-        Many .condition.type values are consistent across resources like Available, but because arbitrary conditions can be
-        useful (see .node.status.conditions), the ability to deconflict is important.
-        The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
     """
 
 
@@ -467,7 +424,7 @@ schema SourceToolkitFluxcdIoV1beta2GitRepositoryStatusConditionsItems0:
         _regex_match(str($type), r"^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$")
 
 
-schema SourceToolkitFluxcdIoV1beta2GitRepositoryStatusIncludedArtifactsItems0:
+schema SourceToolkitFluxcdIoV1GitRepositoryStatusIncludedArtifactsItems0:
     r"""
     Artifact represents the output of a Source reconciliation.
 
@@ -515,7 +472,7 @@ schema SourceToolkitFluxcdIoV1beta2GitRepositoryStatusIncludedArtifactsItems0:
         _regex_match(str(digest), r"^[a-z0-9]+(?:[.+_-][a-z0-9]+)*:[a-zA-Z0-9=_-]+$") if digest
 
 
-schema SourceToolkitFluxcdIoV1beta2GitRepositoryStatusObservedIncludeItems0:
+schema SourceToolkitFluxcdIoV1GitRepositoryStatusObservedIncludeItems0:
     r"""
     GitRepositoryInclude specifies a local reference to a GitRepository which
     Artifact (sub-)contents must be included, and where they should be placed.
@@ -525,7 +482,7 @@ schema SourceToolkitFluxcdIoV1beta2GitRepositoryStatusObservedIncludeItems0:
     fromPath : str, default is Undefined, optional
         FromPath specifies the path to copy contents from, defaults to the root
         of the Artifact.
-    repository : SourceToolkitFluxcdIoV1beta2GitRepositoryStatusObservedIncludeItems0Repository, default is Undefined, required
+    repository : SourceToolkitFluxcdIoV1GitRepositoryStatusObservedIncludeItems0Repository, default is Undefined, required
         repository
     toPath : str, default is Undefined, optional
         ToPath specifies the path to copy contents to, defaults to the name of
@@ -535,12 +492,12 @@ schema SourceToolkitFluxcdIoV1beta2GitRepositoryStatusObservedIncludeItems0:
 
     fromPath?: str
 
-    repository: SourceToolkitFluxcdIoV1beta2GitRepositoryStatusObservedIncludeItems0Repository
+    repository: SourceToolkitFluxcdIoV1GitRepositoryStatusObservedIncludeItems0Repository
 
     toPath?: str
 
 
-schema SourceToolkitFluxcdIoV1beta2GitRepositoryStatusObservedIncludeItems0Repository:
+schema SourceToolkitFluxcdIoV1GitRepositoryStatusObservedIncludeItems0Repository:
     r"""
     GitRepositoryRef specifies the GitRepository which Artifact contents
     must be included.

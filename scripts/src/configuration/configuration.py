@@ -119,20 +119,30 @@ CRD_SPECS = {
             "https://raw.githubusercontent.com/crossplane-contrib/provider-upjet-digitalocean/refs/heads/main/package/crds/custom.digitalocean.crossplane.io_images.yaml"
         ]
     },
-    "flux_kcl_controller" : {
-        "urls": [
-            "https://raw.githubusercontent.com/kcl-lang/flux-kcl-controller/refs/heads/main/config/crd/bases/gitrepositories.yaml",
-            "https://raw.githubusercontent.com/kcl-lang/flux-kcl-controller/refs/heads/main/config/crd/bases/krm.kcl.dev.fluxcd_kclruns.yaml"
-        ]
-    },
-    "crossplane_nop": {
-        "urls": [
-            "https://raw.githubusercontent.com/crossplane-contrib/provider-nop/refs/heads/main/package/crds/nop.crossplane.io_nopresources.yaml"
-        ]
-    },
     "crossplane_kcl_function": {
         "urls": [
             "https://raw.githubusercontent.com/crossplane-contrib/function-kcl/refs/heads/main/package/input/template.fn.crossplane.io_kclinputs.yaml"
+        ]
+    },
+    "fluxcd_kustomize_controller": {
+        "urls": [
+            "https://raw.githubusercontent.com/fluxcd/kustomize-controller/refs/heads/main/config/crd/bases/kustomize.toolkit.fluxcd.io_kustomizations.yaml"
+        ]
+    },
+    "fluxcd_source_controller": {
+        "urls": [
+            "https://raw.githubusercontent.com/fluxcd/source-controller/refs/heads/main/config/crd/bases/source.toolkit.fluxcd.io_gitrepositories.yaml",
+            "https://raw.githubusercontent.com/fluxcd/source-controller/refs/heads/main/config/crd/bases/source.toolkit.fluxcd.io_helmcharts.yaml"
+        ]
+    },
+    "cert_manager": {
+        "urls": [
+            "https://raw.githubusercontent.com/cert-manager/cert-manager/refs/heads/master/deploy/crds/crd-certificaterequests.yaml",
+            "https://raw.githubusercontent.com/cert-manager/cert-manager/refs/heads/master/deploy/crds/crd-certificates.yaml",
+            "https://raw.githubusercontent.com/cert-manager/cert-manager/refs/heads/master/deploy/crds/crd-challenges.yaml",
+            "https://raw.githubusercontent.com/cert-manager/cert-manager/refs/heads/master/deploy/crds/crd-clusterissuers.yaml",
+            "https://raw.githubusercontent.com/cert-manager/cert-manager/refs/heads/master/deploy/crds/crd-issuers.yaml",
+            "https://raw.githubusercontent.com/cert-manager/cert-manager/refs/heads/master/deploy/crds/crd-orders.yaml"
         ]
     }
 }

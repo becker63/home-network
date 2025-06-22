@@ -859,7 +859,7 @@ schema PtFnCrossplaneIoV1beta1ResourcesResourcesItems0:
         A Name uniquely identifies this entry within its resources array.
     patches : [PtFnCrossplaneIoV1beta1ResourcesResourcesItems0PatchesItems0], default is Undefined, optional
         Patches to and from the composed resource.
-    readinessChecks : [PtFnCrossplaneIoV1beta1ResourcesResourcesItems0ReadinessChecksItems0], default is [{"matchCondition": {"status": "True", "type": "Ready"}, "type": "MatchCondition"}], optional
+    readinessChecks : [PtFnCrossplaneIoV1beta1ResourcesResourcesItems0ReadinessChecksItems0], default is [{"type": "MatchCondition", "matchCondition": {"status": "True", "type": "Ready"}}], optional
         ReadinessChecks allows users to define custom readiness checks. All
         checks have to return true in order for resource to be considered ready.
         The default readiness check is to have the "Ready" condition to be
