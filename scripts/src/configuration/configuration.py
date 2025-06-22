@@ -52,7 +52,7 @@ FILTERS: dict[ProjectFilters, Callable[[KFile], bool]] = {
             )
         )
     ),
-    
+
     ProjectFilters.CLEANUP_TEST: lambda kf: (
         "managed_frps" in kf.path.parts and
         "control" in kf.path.parts and
@@ -119,10 +119,20 @@ CRD_SPECS = {
             "https://raw.githubusercontent.com/crossplane-contrib/provider-upjet-digitalocean/refs/heads/main/package/crds/custom.digitalocean.crossplane.io_images.yaml"
         ]
     },
-    "flux-kcl-controller" : {
+    "flux_kcl_controller" : {
         "urls": [
             "https://raw.githubusercontent.com/kcl-lang/flux-kcl-controller/refs/heads/main/config/crd/bases/gitrepositories.yaml",
             "https://raw.githubusercontent.com/kcl-lang/flux-kcl-controller/refs/heads/main/config/crd/bases/krm.kcl.dev.fluxcd_kclruns.yaml"
+        ]
+    },
+    "crossplane_nop": {
+        "urls": [
+            "https://raw.githubusercontent.com/crossplane-contrib/provider-nop/refs/heads/main/package/crds/nop.crossplane.io_nopresources.yaml"
+        ]
+    },
+    "crossplane_kcl_function": {
+        "urls": [
+            "https://raw.githubusercontent.com/crossplane-contrib/function-kcl/refs/heads/main/package/input/template.fn.crossplane.io_kclinputs.yaml"
         ]
     }
 }
@@ -134,4 +144,3 @@ HELM_VALUES = {
         ]
     },
 }
-

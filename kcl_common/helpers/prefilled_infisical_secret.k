@@ -1,5 +1,4 @@
 import regex
-import template
 import schemas.infisical_operator.models.v1alpha1.secrets_infisical_com_v1alpha1_infisical_secret as infisical
 import k8s.apimachinery.pkg.apis.meta.v1 as meta
 

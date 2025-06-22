@@ -1,6 +1,6 @@
 import k8s.api.apps.v1 as apps
 import k8s.api.core.v1 as core
-import infra.base.control.FRPC_Config as frpc
+import .FRPC_Config as frpc
 import json
 import manifests
 

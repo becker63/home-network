@@ -1,0 +1,230 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "4"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"deployment.kubernetes.io/revision":"3","meta.helm.sh/release-name":"crossplane","meta.helm.sh/release-namespace":"crossplane-system"},"creationTimestamp":"2025-05-20T01:05:57Z","generation":3,"labels":{"app":"crossplane","app.kubernetes.io/component":"cloud-infrastructure-controller","app.kubernetes.io/instance":"crossplane","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"crossplane","app.kubernetes.io/part-of":"crossplane","app.kubernetes.io/version":"1.20.0","helm.sh/chart":"crossplane-1.20.0","release":"crossplane"},"name":"crossplane","namespace":"crossplane-system","resourceVersion":"2634901","uid":"e702d837-edcb-468f-b57b-dfcdb8b8c1a1"},"spec":{"progressDeadlineSeconds":600,"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"crossplane","release":"crossplane"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":"25%"},"type":"RollingUpdate"},"template":{"metadata":{"creationTimestamp":null,"labels":{"app":"crossplane","app.kubernetes.io/component":"cloud-infrastructure-controller","app.kubernetes.io/instance":"crossplane","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"crossplane","app.kubernetes.io/part-of":"crossplane","app.kubernetes.io/version":"1.20.0","helm.sh/chart":"crossplane-1.20.0","release":"crossplane"}},"spec":{"containers":[{"args":["core","start","--debug"],"env":[{"name":"GOMAXPROCS","valueFrom":{"resourceFieldRef":{"containerName":"crossplane","divisor":"1","resource":"limits.cpu"}}},{"name":"GOMEMLIMIT","valueFrom":{"resourceFieldRef":{"containerName":"crossplane","divisor":"1","resource":"limits.memory"}}},{"name":"POD_NAMESPACE","valueFrom":{"fieldRef":{"apiVersion":"v1","fieldPath":"metadata.namespace"}}},{"name":"POD_SERVICE_ACCOUNT","valueFrom":{"fieldRef":{"apiVersion":"v1","fieldPath":"spec.serviceAccountName"}}},{"name":"LEADER_ELECTION","value":"true"},{"name":"TLS_SERVER_SECRET_NAME","value":"crossplane-tls-server"},{"name":"TLS_SERVER_CERTS_DIR","value":"/tls/server"},{"name":"TLS_CLIENT_SECRET_NAME","value":"crossplane-tls-client"},{"name":"TLS_CLIENT_CERTS_DIR","value":"/tls/client"}],"image":"xpkg.crossplane.io/crossplane/crossplane:v1.20.0","imagePullPolicy":"IfNotPresent","name":"crossplane","ports":[{"containerPort":8081,"name":"readyz","protocol":"TCP"},{"containerPort":9443,"name":"webhooks","protocol":"TCP"}],"resources":{"limits":{"cpu":"500m","memory":"1Gi"},"requests":{"cpu":"100m","memory":"256Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":65532,"runAsUser":65532},"startupProbe":{"failureThreshold":30,"periodSeconds":2,"successThreshold":1,"tcpSocket":{"port":"readyz"},"timeoutSeconds":1},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/cache/xpkg","name":"package-cache"},{"mountPath":"/cache/xfn","name":"function-cache"},{"mountPath":"/tls/server","name":"tls-server-certs"},{"mountPath":"/tls/client","name":"tls-client-certs"}]}],"dnsPolicy":"ClusterFirst","initContainers":[{"args":["core","init"],"env":[{"name":"GOMAXPROCS","valueFrom":{"resourceFieldRef":{"containerName":"crossplane-init","divisor":"1","resource":"limits.cpu"}}},{"name":"GOMEMLIMIT","valueFrom":{"resourceFieldRef":{"containerName":"crossplane-init","divisor":"1","resource":"limits.memory"}}},{"name":"POD_NAMESPACE","valueFrom":{"fieldRef":{"apiVersion":"v1","fieldPath":"metadata.namespace"}}},{"name":"POD_SERVICE_ACCOUNT","valueFrom":{"fieldRef":{"apiVersion":"v1","fieldPath":"spec.serviceAccountName"}}},{"name":"WEBHOOK_SERVICE_NAME","value":"crossplane-webhooks"},{"name":"WEBHOOK_SERVICE_NAMESPACE","valueFrom":{"fieldRef":{"apiVersion":"v1","fieldPath":"metadata.namespace"}}},{"name":"WEBHOOK_SERVICE_PORT","value":"9443"},{"name":"TLS_CA_SECRET_NAME","value":"crossplane-root-ca"},{"name":"TLS_SERVER_SECRET_NAME","value":"crossplane-tls-server"},{"name":"TLS_CLIENT_SECRET_NAME","value":"crossplane-tls-client"}],"image":"xpkg.crossplane.io/crossplane/crossplane:v1.20.0","imagePullPolicy":"IfNotPresent","name":"crossplane-init","resources":{"limits":{"cpu":"500m","memory":"1Gi"},"requests":{"cpu":"100m","memory":"256Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":65532,"runAsUser":65532},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File"}],"restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"serviceAccount":"crossplane","serviceAccountName":"crossplane","terminationGracePeriodSeconds":30,"volumes":[{"emptyDir":{"sizeLimit":"20Mi"},"name":"package-cache"},{"emptyDir":{"sizeLimit":"512Mi"},"name":"function-cache"},{"name":"tls-server-certs","secret":{"defaultMode":420,"secretName":"crossplane-tls-server"}},{"name":"tls-client-certs","secret":{"defaultMode":420,"secretName":"crossplane-tls-client"}}]}}},"status":{"availableReplicas":1,"conditions":[{"lastTransitionTime":"2025-06-13T17:25:33Z","lastUpdateTime":"2025-06-13T17:25:33Z","message":"Deployment has minimum availability.","reason":"MinimumReplicasAvailable","status":"True","type":"Available"},{"lastTransitionTime":"2025-05-20T01:05:57Z","lastUpdateTime":"2025-06-18T01:57:41Z","message":"ReplicaSet \"crossplane-84b46d687f\" has successfully progressed.","reason":"NewReplicaSetAvailable","status":"True","type":"Progressing"}],"observedGeneration":3,"readyReplicas":1,"replicas":1,"updatedReplicas":1}}
+    meta.helm.sh/release-name: crossplane
+    meta.helm.sh/release-namespace: crossplane-system
+  creationTimestamp: "2025-05-20T01:05:57Z"
+  generation: 4
+  labels:
+    app: crossplane
+    app.kubernetes.io/component: cloud-infrastructure-controller
+    app.kubernetes.io/instance: crossplane
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: crossplane
+    app.kubernetes.io/part-of: crossplane
+    app.kubernetes.io/version: 1.20.0
+    helm.sh/chart: crossplane-1.20.0
+    release: crossplane
+  name: crossplane
+  namespace: crossplane-system
+  resourceVersion: "2906133"
+  uid: e702d837-edcb-468f-b57b-dfcdb8b8c1a1
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: crossplane
+      release: crossplane
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: crossplane
+        app.kubernetes.io/component: cloud-infrastructure-controller
+        app.kubernetes.io/instance: crossplane
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: crossplane
+        app.kubernetes.io/part-of: crossplane
+        app.kubernetes.io/version: 1.20.0
+        helm.sh/chart: crossplane-1.20.0
+        release: crossplane
+    spec:
+      containers:
+      - args:
+        - core
+        - start
+        - --debug
+        env:
+        - name: GOMAXPROCS
+          valueFrom:
+            resourceFieldRef:
+              containerName: crossplane
+              divisor: "1"
+              resource: limits.cpu
+        - name: GOMEMLIMIT
+          valueFrom:
+            resourceFieldRef:
+              containerName: crossplane
+              divisor: "1"
+              resource: limits.memory
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: POD_SERVICE_ACCOUNT
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.serviceAccountName
+        - name: LEADER_ELECTION
+          value: "true"
+        - name: TLS_SERVER_SECRET_NAME
+          value: crossplane-tls-server
+        - name: TLS_SERVER_CERTS_DIR
+          value: /tls/server
+        - name: TLS_CLIENT_SECRET_NAME
+          value: crossplane-tls-client
+        - name: TLS_CLIENT_CERTS_DIR
+          value: /tls/client
+        image: xpkg.crossplane.io/crossplane/crossplane:v1.20.0
+        imagePullPolicy: IfNotPresent
+        name: crossplane
+        ports:
+        - containerPort: 8081
+          name: readyz
+          protocol: TCP
+        - containerPort: 9443
+          name: webhooks
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 65532
+          runAsUser: 65532
+        startupProbe:
+          failureThreshold: 30
+          periodSeconds: 2
+          successThreshold: 1
+          tcpSocket:
+            port: readyz
+          timeoutSeconds: 1
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /cache/xpkg
+          name: package-cache
+        - mountPath: /cache/xfn
+          name: function-cache
+        - mountPath: /tls/server
+          name: tls-server-certs
+        - mountPath: /tls/client
+          name: tls-client-certs
+      dnsPolicy: ClusterFirst
+      initContainers:
+      - args:
+        - core
+        - init
+        env:
+        - name: GOMAXPROCS
+          valueFrom:
+            resourceFieldRef:
+              containerName: crossplane-init
+              divisor: "1"
+              resource: limits.cpu
+        - name: GOMEMLIMIT
+          valueFrom:
+            resourceFieldRef:
+              containerName: crossplane-init
+              divisor: "1"
+              resource: limits.memory
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: POD_SERVICE_ACCOUNT
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.serviceAccountName
+        - name: WEBHOOK_SERVICE_NAME
+          value: crossplane-webhooks
+        - name: WEBHOOK_SERVICE_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: WEBHOOK_SERVICE_PORT
+          value: "9443"
+        - name: TLS_CA_SECRET_NAME
+          value: crossplane-root-ca
+        - name: TLS_SERVER_SECRET_NAME
+          value: crossplane-tls-server
+        - name: TLS_CLIENT_SECRET_NAME
+          value: crossplane-tls-client
+        image: xpkg.crossplane.io/crossplane/crossplane:v1.20.0
+        imagePullPolicy: IfNotPresent
+        name: crossplane-init
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 65532
+          runAsUser: 65532
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: crossplane
+      serviceAccountName: crossplane
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir:
+          sizeLimit: 20Mi
+        name: package-cache
+      - emptyDir:
+          sizeLimit: 512Mi
+        name: function-cache
+      - name: tls-server-certs
+        secret:
+          defaultMode: 420
+          secretName: crossplane-tls-server
+      - name: tls-client-certs
+        secret:
+          defaultMode: 420
+          secretName: crossplane-tls-client
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2025-06-13T17:25:33Z"
+    lastUpdateTime: "2025-06-13T17:25:33Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2025-05-20T01:05:57Z"
+    lastUpdateTime: "2025-06-20T03:41:48Z"
+    message: ReplicaSet "crossplane-7d59d45f6" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 4
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1

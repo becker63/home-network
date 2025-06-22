@@ -1,14 +1,14 @@
 import manifests
 import schemas.digitalocean.models.v1beta1.digitalocean_crossplane_io_v1beta1_provider_config as do_provider
 import k8s.apimachinery.pkg.apis.meta.v1 as meta
-import control_plane.prefilled_infisical_secret as I
+import helpers.prefilled_infisical_secret as I
 
 do_api_token = I.InfisicalSecret {
     slug = "digitalocean-provider-token"
     keys = {
         "DIGITALOCEAN_ACCESS_TOKEN": "token"
     }
-}.secret
+}
 
 do_provider_config = do_provider.ProviderConfig {
     metadata = meta.ObjectMeta {

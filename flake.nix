@@ -21,17 +21,18 @@
     pyproject-build-systems.inputs.uv2nix.follows = "uv2nix";
   };
 
-  outputs = inputs@{
-    self,
-    nixpkgs,
-    flake-parts,
-    uv2nix,
-    pyproject-nix,
-    pyproject-build-systems,
-    pre-commit-hooks,
-    dagger,
-    ...
-  }:
+  outputs =
+    inputs@{
+      self,
+      nixpkgs,
+      flake-parts,
+      uv2nix,
+      pyproject-nix,
+      pyproject-build-systems,
+      pre-commit-hooks,
+      dagger,
+      ...
+    }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [
         "x86_64-linux"
@@ -39,7 +40,8 @@
         "aarch64-linux"
       ];
 
-      perSystem = { pkgs, system, ... }:
+      perSystem =
+        { pkgs, system, ... }:
         let
           lib = pkgs.lib;
           kindShellScript = import ./flake-modules/kind-init.nix { inherit pkgs; };
@@ -51,7 +53,8 @@
               system
               uv2nixLib
               pyproject-nix
-              pyproject-build-systems;
+              pyproject-build-systems
+              ;
             workspaceRoot = ./scripts;
           };
 
@@ -72,8 +75,8 @@
             })
             (makePythonCli {
               inherit pkgs;
-              name = "install-crossplane-crds-dev";
-              scriptPath = ./scripts/src/cli/artifacts/install_crds_dev.py;
+              name = "install-dev";
+              scriptPath = ./scripts/src/cli/artifacts/install_dev.py;
               python = pythonEnv.virtualenv;
             })
           ];
@@ -117,7 +120,8 @@
 
           uptestPkg = import ./flake-modules/uptest.nix { inherit pkgs; };
 
-        in {
+        in
+        {
           checks.pre-commit-check = pre-commit;
 
           devShells.default = pkgs.mkShell {

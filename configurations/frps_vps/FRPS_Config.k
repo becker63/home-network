@@ -25,7 +25,5 @@ serverconfig = Server.ServerConfig {
 }
 
 manifests.yaml_stream(
-    emiter.emit_if_set({
-        objs = [serverconfig]
-    })
+    emiter.not_k8s([serverconfig])
 )
