@@ -3,7 +3,7 @@
 # ────────────────
 # Generate Go-based KCL schemas
 # ────────────────
-[working-directory: "configurations/schemas/go"]
+[working-directory: "kcl_common/schemas/go"]
 gen-go-schema:
     go run schema-gen.go
 
