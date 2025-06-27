@@ -135,6 +135,11 @@ CRD_SPECS = {
             "https://raw.githubusercontent.com/fluxcd/source-controller/refs/heads/main/config/crd/bases/source.toolkit.fluxcd.io_helmcharts.yaml"
         ]
     },
+    "fluxcd_helm_controller": {
+        "urls": [
+            "https://raw.githubusercontent.com/fluxcd/helm-controller/refs/heads/main/config/crd/bases/helm.toolkit.fluxcd.io_helmreleases.yaml"
+        ]
+    },
     "cert_manager": {
         "urls": [
             "https://raw.githubusercontent.com/cert-manager/cert-manager/refs/heads/master/deploy/crds/crd-certificaterequests.yaml",
