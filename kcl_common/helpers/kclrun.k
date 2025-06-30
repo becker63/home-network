@@ -21,3 +21,5 @@ get = lambda x: any, y: str, d: any -> any {
     y = ".".join(p[1::])
     x[c] if len(p) == 1 and c in x else d if c not in x else get(x[c], y, d)
 }
+
+is_defined = lambda v { v != Undefined }

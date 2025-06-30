@@ -1,7 +1,7 @@
 import manifests
-import schemas.digitalocean.models.v1beta1.digitalocean_crossplane_io_v1beta1_provider_config as do_provider
+import kcl_common.schemas.digitalocean.models.v1beta1.digitalocean_crossplane_io_v1beta1_provider_config as do_provider
 import k8s.apimachinery.pkg.apis.meta.v1 as meta
-import helpers.prefilled_infisical_secret as I
+import kcl_common.helpers.prefilled_infisical_secret as I
 
 do_api_token = I.InfisicalSecret {
     slug = "digitalocean-provider-token"

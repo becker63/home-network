@@ -149,6 +149,11 @@ CRD_SPECS = {
             "https://raw.githubusercontent.com/cert-manager/cert-manager/refs/heads/master/deploy/crds/crd-issuers.yaml",
             "https://raw.githubusercontent.com/cert-manager/cert-manager/refs/heads/master/deploy/crds/crd-orders.yaml"
         ]
+    },
+    "crossplane": {
+        "urls": [
+            "https://raw.githubusercontent.com/crossplane/crossplane/refs/heads/main/cluster/crds/apiextensions.crossplane.io_compositeresourcedefinitions.yaml"
+        ]
     }
 }
 
