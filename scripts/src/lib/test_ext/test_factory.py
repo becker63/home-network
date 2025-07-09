@@ -1,5 +1,4 @@
-from typing import Any
-from typing import TypeVar, Callable
+from typing import TypeVar, Callable, ParamSpec
 from configuration import KFile
 
 
@@ -11,10 +10,14 @@ def make_kcl_test(filter_fn: Callable[[KFile], bool]) -> Callable[[F], F]:
         return test_func
     return decorator
 
+P = ParamSpec("P")
 
-def make_kcl_group_test(path_substrs: list[str], group_filter: Callable[[Any], bool]) -> Callable[[F], F]:
+def make_kcl_group_test(
+    filenames: list[str],
+    filter_fn: Callable[[KFile], bool],
+) -> Callable[[F], F]:
     def decorator(func: F) -> F:
-        setattr(func, "_kcl_group_substrs", path_substrs)
-        setattr(func, "_kcl_group_filter", group_filter)
+        setattr(func, "_kcl_group_filenames", filenames)
+        setattr(func, "_kcl_group_filter", filter_fn)
         return func
     return decorator

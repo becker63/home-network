@@ -4,7 +4,7 @@ from contextlib import contextmanager
 import textwrap
 import json
 
-from configuration import KFile, ProjectFilters
+from configuration import KFile
 from helpers.kcl_helpers import Exec, Override_file_tmp_multi
 from helpers.helpers import get_free_port
 from lib.test_ext.test_factory import make_kcl_group_test
@@ -68,7 +68,9 @@ def Run_frps_container(
         docker_helper.stop_and_remove_container(container)
 
 
-@make_kcl_group_test(["clientconfig = Client.ClientConfig", "serverconfig = Server.ServerConfig", "frpc-daemonset"], ProjectFilters.PROXY_E2E)
+@make_kcl_group_test(["FRPC_Config.k", "frpc_daemonset.k", "FRPS_Config.k"],  lambda kf: (
+    kf.path.name in {"FRPC_Config.k", "frpc_daemonset.k", "FRPS_Config.k"}
+))
 def e2e_frp_kuttl(
     clientconfig_kf: KFile,
     serverconfig_kf: KFile,
