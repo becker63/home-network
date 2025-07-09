@@ -4,10 +4,12 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.13" # KEEP IN SYNC WITH BELOW! \/
 dependencies = [
+    "cloudcoil[kubernetes]>=0.5.8",
     "colored>=2.3.0",
     "crossplane-function-sdk-python>=0.7.0",
     "dagger-io>=0.18.10",
     "docker>=7.1.0",
+    "filelock>=3.18.0",
     "genson>=1.3.0",
     "grpcio>=1.71.0",
     "kcl-lib>=0.11.2",

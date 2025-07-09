@@ -1,0 +1,9 @@
+clean up our test code. For things that depend deeply on specific files just use abs paths. Modify code to support filenames instead of abs strings for make_kcl_group_test(), thats silly, we can reasonibly assume our filenames will be globally unique (or unique based on the broad filter).
+
+Also change up our code to put the filter in the actual test, not in the weird map we have in configuration.py we never have code thats repeated often enough for us to use this, and if we do its fine for the sake of explicitness
+
+Explore cloudcoils cluster management capabilities, might be useful
+
+implement cloudcoil codegen, the docs suggest that we insert crds into our pyproject.yaml. That might be something we can dynamically modify with a script.
+
+prob move to vite with remix for the blog. It was good for learning and we do like mdx but The vendor lock in and poor ssr support is bad.

@@ -105,6 +105,37 @@ wheels = [
 ]
 
 [[package]]
+name = "cloudcoil"
+version = "0.5.8"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "httpx" },
+    { name = "pydantic" },
+    { name = "pyyaml" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/9e/b1/befccb3d96db6caf6449cf44fe1ffe7339b1bbc63d89ff78951ec7f2c16c/cloudcoil-0.5.8.tar.gz", hash = "sha256:5b289231e3ef9cf28b9fcffdd4c85254fc21ad254c59bc885c2418515599a74d", size = 365848, upload-time = "2025-05-31T21:37:34.511Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/56/1c/c6483482bfe3f1d114f63b1b5fae80e8c1e14b26c021a2f3b81d6efd3de2/cloudcoil-0.5.8-py3-none-any.whl", hash = "sha256:079972bf0966cd202505b72d2bf6566892affd0e6b1faed04197d59d1b81d4ca", size = 71742, upload-time = "2025-05-31T21:37:32.826Z" },
+]
+
+[package.optional-dependencies]
+kubernetes = [
+    { name = "cloudcoil-models-kubernetes" },
+]
+
+[[package]]
+name = "cloudcoil-models-kubernetes"
+version = "1.32.1.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "cloudcoil" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/86/5d/3b49375453c610b010f8c969503a5f7b1a3bca5b073551fd51b195522292/cloudcoil_models_kubernetes-1.32.1.3.tar.gz", hash = "sha256:a0ba052d756878bf50637553e9670e2ea102ba82a25f3b1da818d4d9426f051b", size = 364158, upload-time = "2025-02-10T04:25:01.948Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/44/7c/db13900309d57285e1724279e3dc00b89b9b2ba378ae0fd6a84b9120b896/cloudcoil_models_kubernetes-1.32.1.3-py3-none-any.whl", hash = "sha256:58353d789b12dce2620d67b1d70b62e2dc272a3a1a5d464f32de8c940db8ae6f", size = 349524, upload-time = "2025-02-10T04:25:00.351Z" },
+]
+
+[[package]]
 name = "colorama"
 version = "0.4.6"
 source = { registry = "https://pypi.org/simple" }
@@ -188,6 +219,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/bb/ff/b4c0dc78fbe20c3e59c0c7334de0c27eb4001a2b2017999af398bf730817/execnet-2.1.1.tar.gz", hash = "sha256:5189b52c6121c24feae288166ab41b32549c7e2348652736540b9e6e7d4e72e3", size = 166524, upload-time = "2024-04-08T09:04:19.245Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/43/09/2aea36ff60d16dd8879bdb2f5b3ee0ba8d08cbbdcdfe870e695ce3784385/execnet-2.1.1-py3-none-any.whl", hash = "sha256:26dee51f1b80cebd6d0ca8e74dd8745419761d3bef34163928cbebbdc4749fdc", size = 40612, upload-time = "2024-04-08T09:04:17.414Z" },
+]
+
+[[package]]
+name = "filelock"
+version = "3.18.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/0a/10/c23352565a6544bdc5353e0b15fc1c563352101f30e24bf500207a54df9a/filelock-3.18.0.tar.gz", hash = "sha256:adbc88eabb99d2fec8c9c1b229b171f18afa655400173ddc653d5d01501fb9f2", size = 18075, upload-time = "2025-03-14T07:11:40.47Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4d/36/2a115987e2d8c300a974597416d9de88f2444426de9571f4b59b2cca3acc/filelock-3.18.0-py3-none-any.whl", hash = "sha256:c401f4f8377c4464e6db25fff06205fd89bdd83b65eb0488ed1b160f780e21de", size = 16215, upload-time = "2025-03-14T07:11:39.145Z" },
 ]
 
 [[package]]
@@ -889,10 +929,12 @@ name = "scripts"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "cloudcoil", extra = ["kubernetes"] },
     { name = "colored" },
     { name = "crossplane-function-sdk-python" },
     { name = "dagger-io" },
     { name = "docker" },
+    { name = "filelock" },
     { name = "genson" },
     { name = "grpcio" },
     { name = "kcl-lib" },
@@ -911,10 +953,12 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "cloudcoil", extras = ["kubernetes"], specifier = ">=0.5.8" },
     { name = "colored", specifier = ">=2.3.0" },
     { name = "crossplane-function-sdk-python", specifier = ">=0.7.0" },
     { name = "dagger-io", specifier = ">=0.18.10" },
     { name = "docker", specifier = ">=7.1.0" },
+    { name = "filelock", specifier = ">=3.18.0" },
     { name = "genson", specifier = ">=1.3.0" },
     { name = "grpcio", specifier = ">=1.71.0" },
     { name = "kcl-lib", specifier = ">=0.11.2" },
