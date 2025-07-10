@@ -36,7 +36,7 @@ __pycache__/
 scripts/src/cli/artifacts/*.json
 scripts/src/cli/artifacts/*.yaml
 scripts/src/cli/artifacts/__pycache__/
-#scripts/src/ccgen/
+scripts/src/ccgen/
 
 # Nix handles this
 .pre-commit-config.yaml
