@@ -27,7 +27,6 @@ logging.basicConfig(
 )
 logging.getLogger().handlers[0].setFormatter(ColoredFormatter("%(levelname)s - %(name)s - %(message)s"))
 
-# Create logger
 logger = logging.getLogger(__name__)
 
 def generate_spec(spec: RemoteSchema) -> str:
@@ -47,8 +46,7 @@ def generate_spec(spec: RemoteSchema) -> str:
         logger.error(error_msg)
         return f"ERROR: {spec.name} - {str(e)}"
 
-def main() -> None:
-    """Main function to orchestrate parallel code generation."""
+def main():
     with ProcessPoolExecutor(max_workers=os.cpu_count()) as executor:
         specs_to_process = CRD_SPECS
 
