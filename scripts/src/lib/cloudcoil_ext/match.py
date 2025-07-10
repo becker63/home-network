@@ -1,94 +1,142 @@
-from typing import Any, Type, TypeVar, Dict, Tuple, List, cast
+from typing import Type, TypeVar, List, Union, Mapping, Any, Sequence, cast
 import yaml
 
+from cloudcoil.resources import Resource, Unstructured
+from cloudcoil import apimachinery
 from cloudcoil.models.kubernetes.apps.v1 import Deployment
 from cloudcoil.models.kubernetes.core.v1 import Service
 
-import cloudcoil.models.kubernetes.apps.v1 as apps_v1
-import cloudcoil.models.kubernetes.core.v1 as core_v1
+T = TypeVar("T", bound=Resource)
 
-# Typing alias for any Cloudcoil model
-CloudcoilModel = Any
+def parse_kcl_yaml(yaml_text: str) -> List[Resource]:
+    objs: List[Resource] = []
 
-MODEL_REGISTRY: Dict[Tuple[str, str], Type[CloudcoilModel]] = {
-    ("apps/v1", "Deployment"): apps_v1.Deployment,
-    ("v1", "Service"): core_v1.Service,
-}
-
-
-def parse_kcl_yaml(yaml_text: str) -> List[CloudcoilModel]:
-    objs: List[CloudcoilModel] = []
     for raw_doc in yaml.safe_load_all(yaml_text):
         if not isinstance(raw_doc, dict):
             continue
 
-        # Cast to concrete typed dict
-        doc = cast(Dict[str, Any], raw_doc)
-
-        api_version = doc.get("api_version") or doc.get("apiVersion")
-        kind = doc.get("kind")
-
-        if not isinstance(api_version, str) or not isinstance(kind, str):
-            continue
-
-        model_cls = MODEL_REGISTRY.get((api_version, kind))
-        if model_cls is not None:
-            obj = model_cls(**doc)  # type: ignore (if needed)
+        try:
+            obj = Unstructured.model_validate(raw_doc)
             objs.append(obj)
+        except Exception:
+            continue
 
     return objs
 
+def is_partial_match(struct: Mapping[str, Any], partial: Mapping[str, Any]) -> bool:
+    """
+    Checks whether `partial` is a subset of `struct`.
+    - Exact match for primitive values and lists.
+    - Recursively matches nested dictionaries.
+    """
+    for key, partial_value in partial.items():
+        if key not in struct:
+            return False
 
-T = TypeVar("T")
+        struct_value = struct[key]
 
-def find_first_of_type(resources: List[Any], typ: Type[T]) -> T:
+        if isinstance(partial_value, dict):
+            if not isinstance(struct_value, dict):
+                return False
+            # Explicitly cast for Pyright
+            if not is_partial_match(
+                cast(Mapping[str, Any], struct_value),
+                cast(Mapping[str, Any], partial_value)
+            ):
+                return False
+
+        elif isinstance(partial_value, list):
+            if not isinstance(struct_value, list):
+                return False
+            if struct_value != partial_value:
+                return False
+
+        else:
+            if struct_value != partial_value:
+                return False
+
+    return True
+
+def find_first_of_type(
+    resources: Sequence[Resource],
+    match: Union[Type[T], T],
+    match_partial: bool = True,
+) -> T:
+    is_partial = not isinstance(match, type)
+    typ: Type[T] = match if isinstance(match, type) else type(match)
+
     for res in resources:
-        if isinstance(res, typ):
-            return res
-    raise ValueError(f"Type {typ} not found in resources")
+        try:
+            res_data = res.model_dump(exclude_none=True, exclude_unset=True)
+            typed_res = typ.model_validate(res_data)
+        except Exception:
+            continue
 
-# --- usage example below ---
-yaml_input = """
-api_version: apps/v1
-kind: Deployment
-metadata:
-  name: nginx
-spec:
-  replicas: 2
-  selector:
-    match_labels:
-      app: nginx
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:latest
-        ports:
-        - container_port: 80
----
-api_version: v1
-kind: Service
-metadata:
-  name: nginx-svc
-spec:
-  selector:
-    app: nginx
-  ports:
-  - port: 80
-    target_port: 80
-"""
+        if is_partial and match_partial:
+            res_dict = typed_res.model_dump(exclude_none=True, exclude_unset=True)
+            partial_dict = match.model_dump(exclude_none=True, exclude_unset=True)  # type: ignore
+            if not is_partial_match(res_dict, partial_dict):
+                continue
 
-resources = parse_kcl_yaml(yaml_input)
+        return typed_res
 
-# TODO: instead of just picking with isinstance the first type that matches from an array, create a match function that will allow me to fill in the second argument (the type) with some of the values I expect from the kcl, so that if Im for example given two deployments in the yaml I can select the one I need. For now this is fine.
-deployment: Deployment = find_first_of_type(resources, Deployment)
-service: Service = find_first_of_type(resources, Service)
+    raise ValueError(f"Type {typ} with matching spec not found in resources")
 
 
-out = yaml.dump(
-    deployment.model_dump(exclude_none=True, exclude_unset=True)
-)
-print(out)
+# --- usage ---
+if __name__ == "__main__":
+    import textwrap
+    yaml_input = textwrap.dedent("""
+        api_version: apps/v1
+        kind: Deployment
+        metadata:
+          name: nginx
+        spec:
+          replicas: 2
+          selector:
+            match_labels:
+              app: nginx
+          template:
+            metadata:
+              labels:
+                app: nginx
+            spec:
+              containers:
+              - name: nginx
+                image: nginx:latest
+                ports:
+                - container_port: 80
+        ---
+        api_version: v1
+        kind: Service
+        metadata:
+          name: nginx-svc
+        spec:
+          selector:
+            app: nginx
+          ports:
+          - port: 80
+            target_port: 80
+        ---
+        api_version: v1
+        kind: Service
+        metadata:
+          name: other-svc
+        spec:
+          selector:
+            app: other-app
+          ports:
+          - port: 8080
+            target_port: 8080
+    """)
+
+    resources = parse_kcl_yaml(yaml_input)
+
+    deployment: Deployment = find_first_of_type(resources, Deployment)
+
+    service: Service = find_first_of_type(resources, Service(
+        metadata=apimachinery.ObjectMeta(name="other-svc")
+    ))
+
+    # print("Service metadata:", service.metadata)
+    print(yaml.dump(service.model_dump(exclude_none=True, exclude_unset=True)))

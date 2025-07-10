@@ -1,0 +1,88 @@
+[
+  {
+    "name": "traefik",
+    "urls": [
+      "https://raw.githubusercontent.com/traefik/traefik/refs/heads/v3.4/docs/content/reference/dynamic-configuration/kubernetes-crd-definition-v1.yml"
+    ]
+  },
+  {
+    "name": "infisical_operator",
+    "urls": [
+      "https://raw.githubusercontent.com/Infisical/infisical/refs/heads/main/k8-operator/config/crd/bases/secrets.infisical.com_infisicalsecrets.yaml"
+    ]
+  },
+  {
+    "name": "crossplane_composistion",
+    "urls": [
+      "https://raw.githubusercontent.com/crossplane/crossplane/refs/tags/v1.17.1/cluster/crds/apiextensions.crossplane.io_compositions.yaml"
+    ]
+  },
+  {
+    "name": "crossplane_patch_and_transform",
+    "urls": [
+      "https://raw.githubusercontent.com/crossplane-contrib/function-patch-and-transform/refs/heads/main/package/input/pt.fn.crossplane.io_resources.yaml"
+    ]
+  },
+  {
+    "name": "crossplane_sequencer",
+    "urls": [
+      "https://raw.githubusercontent.com/crossplane-contrib/function-sequencer/refs/heads/main/package/input/sequencer.fn.crossplane.io_inputs.yaml"
+    ]
+  },
+  {
+    "name": "digitalocean",
+    "urls": [
+      "https://raw.githubusercontent.com/crossplane-contrib/provider-upjet-digitalocean/refs/heads/main/package/crds/digitalocean.crossplane.io_providerconfigs.yaml",
+      "https://raw.githubusercontent.com/crossplane-contrib/provider-upjet-digitalocean/refs/heads/main/package/crds/droplet.digitalocean.crossplane.io_droplets.yaml",
+      "https://raw.githubusercontent.com/crossplane-contrib/provider-upjet-digitalocean/refs/heads/main/package/crds/dns.digitalocean.crossplane.io_domains.yaml",
+      "https://raw.githubusercontent.com/crossplane-contrib/provider-upjet-digitalocean/refs/heads/main/package/crds/dns.digitalocean.crossplane.io_records.yaml",
+      "https://raw.githubusercontent.com/crossplane-contrib/provider-upjet-digitalocean/refs/heads/main/package/crds/networking.digitalocean.crossplane.io_ipassignments.yaml",
+      "https://raw.githubusercontent.com/crossplane-contrib/provider-upjet-digitalocean/refs/heads/main/package/crds/networking.digitalocean.crossplane.io_ips.yaml",
+      "https://raw.githubusercontent.com/crossplane-contrib/provider-upjet-digitalocean/refs/heads/main/package/crds/project.digitalocean.crossplane.io_projects.yaml",
+      "https://raw.githubusercontent.com/crossplane-contrib/provider-upjet-digitalocean/refs/heads/main/package/crds/uptime.digitalocean.crossplane.io_alerts.yaml",
+      "https://raw.githubusercontent.com/crossplane-contrib/provider-upjet-digitalocean/refs/heads/main/package/crds/custom.digitalocean.crossplane.io_images.yaml"
+    ]
+  },
+  {
+    "name": "crossplane_kcl_function",
+    "urls": [
+      "https://raw.githubusercontent.com/crossplane-contrib/function-kcl/refs/heads/main/package/input/template.fn.crossplane.io_kclinputs.yaml"
+    ]
+  },
+  {
+    "name": "fluxcd_kustomize_controller",
+    "urls": [
+      "https://raw.githubusercontent.com/fluxcd/kustomize-controller/refs/heads/main/config/crd/bases/kustomize.toolkit.fluxcd.io_kustomizations.yaml"
+    ]
+  },
+  {
+    "name": "fluxcd_source_controller",
+    "urls": [
+      "https://raw.githubusercontent.com/fluxcd/source-controller/refs/heads/main/config/crd/bases/source.toolkit.fluxcd.io_gitrepositories.yaml",
+      "https://raw.githubusercontent.com/fluxcd/source-controller/refs/heads/main/config/crd/bases/source.toolkit.fluxcd.io_helmcharts.yaml"
+    ]
+  },
+  {
+    "name": "fluxcd_helm_controller",
+    "urls": [
+      "https://raw.githubusercontent.com/fluxcd/helm-controller/refs/heads/main/config/crd/bases/helm.toolkit.fluxcd.io_helmreleases.yaml"
+    ]
+  },
+  {
+    "name": "cert_manager",
+    "urls": [
+      "https://raw.githubusercontent.com/cert-manager/cert-manager/refs/heads/master/deploy/crds/crd-certificaterequests.yaml",
+      "https://raw.githubusercontent.com/cert-manager/cert-manager/refs/heads/master/deploy/crds/crd-certificates.yaml",
+      "https://raw.githubusercontent.com/cert-manager/cert-manager/refs/heads/master/deploy/crds/crd-challenges.yaml",
+      "https://raw.githubusercontent.com/cert-manager/cert-manager/refs/heads/master/deploy/crds/crd-clusterissuers.yaml",
+      "https://raw.githubusercontent.com/cert-manager/cert-manager/refs/heads/master/deploy/crds/crd-issuers.yaml",
+      "https://raw.githubusercontent.com/cert-manager/cert-manager/refs/heads/master/deploy/crds/crd-orders.yaml"
+    ]
+  },
+  {
+    "name": "crossplane",
+    "urls": [
+      "https://raw.githubusercontent.com/crossplane/crossplane/refs/heads/main/cluster/crds/apiextensions.crossplane.io_compositeresourcedefinitions.yaml"
+    ]
+  }
+]

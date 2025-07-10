@@ -17,23 +17,23 @@ def fetch_crds() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
-        for name, spec in CRD_SPECS.items():
-            print(f"\n📦 Fetching {name} CRDs...")
-            schema_dir = SCHEMA_ROOT / name
+        for schema in CRD_SPECS:
+            print(f"\n📦 Fetching {schema.name} CRDs...")
+            schema_dir = SCHEMA_ROOT / schema.name
             schema_dir.mkdir(parents=True, exist_ok=True)
 
-            crd_dir = tmp_path / name
+            crd_dir = tmp_path / schema.name
             crd_dir.mkdir(parents=True)
 
-            for url in spec.get("urls", []):
+            for url in schema.urls:
                 filename = url.split("/")[-1]
                 download(url, crd_dir / filename)
 
             yaml_files = list(crd_dir.glob("*.yaml")) + list(crd_dir.glob("*.yml"))
             if not yaml_files:
-                raise FileNotFoundError(f"❌ No YAML files found for {name}")
+                raise FileNotFoundError(f"❌ No YAML files found for {schema.name}")
 
-            print(f"📥 Importing {name} CRDs to {schema_dir}")
+            print(f"📥 Importing {schema.name} CRDs to {schema_dir}")
             subprocess.run(
                 ["kcl", "import", "-m", "crd", *map(str, yaml_files), "--output", str(schema_dir)],
                 check=True,

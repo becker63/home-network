@@ -7,7 +7,7 @@ import json
 from configuration import KFile
 from helpers.kcl_helpers import Exec, Override_file_tmp_multi
 from helpers.helpers import get_free_port
-from lib.test_ext.test_factory import make_kcl_group_test
+from lib.test_ext.test_factory import make_kcl_named_test
 from helpers.kuttl_helper import run_kuttl_test
 import helpers.docker_helper as docker_helper
 
@@ -68,7 +68,7 @@ def Run_frps_container(
         docker_helper.stop_and_remove_container(container)
 
 
-@make_kcl_group_test(["FRPC_Config.k", "frpc_daemonset.k", "FRPS_Config.k"],  lambda kf: (
+@make_kcl_named_test(["FRPC_Config.k", "frpc_daemonset.k", "FRPS_Config.k"],  lambda kf: (
     kf.path.name in {"FRPC_Config.k", "frpc_daemonset.k", "FRPS_Config.k"}
 ))
 def e2e_frp_kuttl(

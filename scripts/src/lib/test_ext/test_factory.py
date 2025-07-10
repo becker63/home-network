@@ -12,7 +12,7 @@ def make_kcl_test(filter_fn: Callable[[KFile], bool]) -> Callable[[F], F]:
 
 P = ParamSpec("P")
 
-def make_kcl_group_test(
+def make_kcl_named_test(
     filenames: list[str],
     filter_fn: Callable[[KFile], bool],
 ) -> Callable[[F], F]:

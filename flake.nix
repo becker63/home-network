@@ -67,12 +67,6 @@
               scriptPath = ./scripts/src/cli/artifacts/fetch_crds.py;
               python = pythonEnv.virtualenv;
             })
-            (makePythonCli {
-              inherit pkgs;
-              name = "fetch_helm_values";
-              scriptPath = ./scripts/src/cli/artifacts/fetch_helm_values.py;
-              python = pythonEnv.virtualenv;
-            })
           ];
 
           gitHooks = import ./flake-modules/git-hooks.nix { inherit lib; };

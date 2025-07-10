@@ -1,25 +1,25 @@
 from .configuration import (
-    KFile,
     KCL_ROOT,
-    ProjectFilters,
-    FILTERS,
     PROJECT_ROOT,
-    HELM_VALUES,
-    CRD_SPECS,
     CRD_ROOT,
-    SCHEMA_ROOT
+    SCHEMA_ROOT,
 )
 
-assert hasattr(ProjectFilters, "DEFAULT"), "ProjectFilters must define DEFAULT"
+from .models import (
+    KFile,
+    RemoteSchema
+)
+
+from .load_config import (
+    CRD_SPECS
+)
 
 __all__ = [
     "PROJECT_ROOT",
     "KCL_ROOT",
-    "ProjectFilters",
     "KFile",
-    "FILTERS",
-    "HELM_VALUES",
     "CRD_SPECS",
     "CRD_ROOT",
-    "SCHEMA_ROOT"
+    "SCHEMA_ROOT",
+    "RemoteSchema"
 ]
