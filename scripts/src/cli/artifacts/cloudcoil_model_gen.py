@@ -1,9 +1,10 @@
 from __future__ import annotations
 import logging
 import sys
+import re
 from concurrent.futures import Future, ProcessPoolExecutor, as_completed
 from typing import Dict
-from cloudcoil.codegen.generator import ModelConfig, generate
+from cloudcoil.codegen.generator import ModelConfig, generate, Transformation
 from configuration import CRD_SPECS, RemoteSchema, PROJECT_ROOT
 from helpers.helpers import remove_path
 
@@ -35,6 +36,20 @@ def generate_spec(spec: RemoteSchema) -> str:
         config: ModelConfig = ModelConfig(
             namespace=namespace,
             input_=spec.urls,
+            transformations=[
+                # Remove io. prefix from all matches
+                Transformation(
+                    match_=re.compile(r"^io\.(.+)$"),
+                    replace=r"\g<1>",
+                    namespace=namespace,
+                ),
+                # Handle k8s apimachinery specifically
+                Transformation(
+                    match_=re.compile(r"^k8s\.apimachinery\.(.+)$"),
+                    replace=r"apimachinery.\g<1>",
+                    namespace="k8s",
+                ),
+            ],
             log_level="DEBUG"
         )
         logger.info(f"Starting generation for {spec.name}")
