@@ -160,8 +160,23 @@ wheels = [
 ]
 
 [package.optional-dependencies]
+fluxcd = [
+    { name = "cloudcoil-models-fluxcd" },
+]
 kubernetes = [
     { name = "cloudcoil-models-kubernetes" },
+]
+
+[[package]]
+name = "cloudcoil-models-fluxcd"
+version = "2.5.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "cloudcoil" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/9b/23/24f6ee20b7c2dc55cbe2d30db96a870f36e44a386248e159ecd6517aad3e/cloudcoil_models_fluxcd-2.5.1.0.tar.gz", hash = "sha256:cce69cb870f70d8641fd5a7a5a8ff21206f30260a3d86a5a8200fa2d2da63ae5", size = 230437, upload-time = "2025-02-26T08:36:38.524Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4a/06/c4c84c9652a0bb77b63a59b213e4fd5b5d07778e87bb5d1e154f01aab7f4/cloudcoil_models_fluxcd-2.5.1.0-py3-none-any.whl", hash = "sha256:85d173cba9b8990af2aa1ef0ef554357bfc7b8041468adc88098eda35d4a2056", size = 186351, upload-time = "2025-02-26T08:36:37.041Z" },
 ]
 
 [[package]]
@@ -1100,7 +1115,7 @@ name = "scripts"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
-    { name = "cloudcoil", extra = ["kubernetes"] },
+    { name = "cloudcoil", extra = ["fluxcd", "kubernetes"] },
     { name = "colored" },
     { name = "crossplane-function-sdk-python" },
     { name = "dagger-io" },
@@ -1126,7 +1141,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "cloudcoil", extras = ["kubernetes"], specifier = ">=0.5.8" },
+    { name = "cloudcoil", extras = ["fluxcd", "kubernetes"], specifier = ">=0.5.8" },
     { name = "colored", specifier = ">=2.3.0" },
     { name = "crossplane-function-sdk-python", specifier = ">=0.7.0" },
     { name = "dagger-io", specifier = ">=0.18.10" },

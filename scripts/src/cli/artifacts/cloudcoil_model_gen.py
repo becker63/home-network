@@ -1,12 +1,13 @@
 from __future__ import annotations
 import logging
 import sys
-import re
 from concurrent.futures import Future, ProcessPoolExecutor, as_completed
 from typing import Dict
-from cloudcoil.codegen.generator import ModelConfig, generate, Transformation
+from cloudcoil.codegen.generator import ModelConfig, generate
 from configuration import CRD_SPECS, RemoteSchema, PROJECT_ROOT
 from helpers.helpers import remove_path
+from importlib.resources import files
+from pathlib import Path
 
 # Colored logging formatter
 import os
@@ -36,21 +37,9 @@ def generate_spec(spec: RemoteSchema) -> str:
         config: ModelConfig = ModelConfig(
             namespace=namespace,
             input_=spec.urls,
-            transformations=[
-                # Remove io. prefix from all matches
-                Transformation(
-                    match_=re.compile(r"^io\.(.+)$"),
-                    replace=r"\g<1>",
-                    namespace=namespace,
-                ),
-                # Handle k8s apimachinery specifically
-                Transformation(
-                    match_=re.compile(r"^k8s\.apimachinery\.(.+)$"),
-                    replace=r"apimachinery.\g<1>",
-                    namespace="k8s",
-                ),
-            ],
-            log_level="DEBUG"
+            mode="resource",
+            log_level="DEBUG",
+            additional_datamodel_codegen_args=["--extra-fields", "allow"]
         )
         logger.info(f"Starting generation for {spec.name}")
         generate(config)
@@ -87,4 +76,17 @@ def main():
 
 if __name__ == "__main__":
     remove_path(PROJECT_ROOT / "scripts" / "src" / "ccgen")
+
+    (ccgen_root := PROJECT_ROOT / "scripts" / "src" / "ccgen").mkdir(parents=True, exist_ok=True)
+
+    # dont ask wtf files is I have no idea
+    tmpl_dir = Path(str(files("cloudcoil.codegen"))) / "templates" / "pydantic_v2"
+    tmpl_dir.mkdir(parents=True, exist_ok=True)
+
+    # Allow all extra fields my hacking around cloudcoils cookiecutter config
+    (tmpl_dir / "ConfigDict.jinja2").write_text(
+        '{% if extra_fields %}\nmodel_config = ConfigDict(extra="{{ extra_fields }}")\n{% endif %}\n'
+    )
+
+    (ccgen_root / "__init__.py").touch()
     main()

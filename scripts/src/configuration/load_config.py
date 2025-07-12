@@ -12,7 +12,8 @@ CRD_SPEC_PATH = PROJECT_ROOT / "crds.json"
 def load_crd_specs(path: Path = CRD_SPEC_PATH) -> List[RemoteSchema]:
     with path.open("r", encoding="utf-8") as f:
         raw_data = json.load(f)
-    return [RemoteSchema.model_validate(item) for item in raw_data]
+    loaded = [RemoteSchema.model_validate(item) for item in raw_data]
+    return loaded
 
 
 # --- Loaded CRD specs ---

@@ -1,4 +1,4 @@
-import fluxcd_helm_controller.v2.helm_toolkit_fluxcd_io_v2_helm_release as fluxcd_release
+import kcl_common.schemas.fluxcd_helm_controller.models.v2.helm_toolkit_fluxcd_io_v2_helm_release as fluxcd_release
 import manifests
 
 manifests.yaml_stream([

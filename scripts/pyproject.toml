@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.13" # KEEP IN SYNC WITH BELOW! \/
 dependencies = [
-    "cloudcoil[kubernetes]>=0.5.8",
+    "cloudcoil[fluxcd,kubernetes]>=0.5.8",
     "colored>=2.3.0",
     "crossplane-function-sdk-python>=0.7.0",
     "dagger-io>=0.18.10",
@@ -65,3 +65,6 @@ filterwarnings = [
 # B   = bugbear (common bugs & design issues)
 # SIM = flake8-simplify (unnecessary conditionals, redundant logic)
 extend-select = ["F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+plugins = ["pydantic.mypy", "cloudcoil.mypy"]
