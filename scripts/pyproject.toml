@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.13" # KEEP IN SYNC WITH BELOW! \/
 dependencies = [
-    "cloudcoil[fluxcd,kubernetes]>=0.5.8",
+    "cloudcoil[fluxcd,kubernetes,test]>=0.5.8",
     "colored>=2.3.0",
     "crossplane-function-sdk-python>=0.7.0",
     "dagger-io>=0.18.10",
@@ -44,17 +44,20 @@ typeCheckingMode = "strict"
 ignore = ["src/kcl_tasks/conftest.py"]
 
 [tool.pytest.ini_options]
+markers = [
+    "configure_test_cluster: mark tests that require configuring a test k3d cluster via Cloudcoil",
+]
 minversion = "6.0"
 # Once we have enough tests, we can also add "-n auto" to run all of them in parallel
 # For now single threaded will almost always be faster
 python_functions = ["auto_*", "check_*", "e2e_*", "py_"]
-addopts = "-ra -s -v"
+addopts = "-ra -s -v  -p no:unraisableexception"
 testpaths = ["src/kcl_tasks"]
 python_files = ["kcl_*", "py_*"]
 filterwarnings = [
-    "error",
     "ignore::UserWarning:google.protobuf.runtime_version",
     'ignore:function ham\(\) is deprecated:DeprecationWarning',
+    "ignore:Implicitly cleaning up.*TemporaryDirectory:ResourceWarning",
 ]
 
 [tool.ruff.lint]

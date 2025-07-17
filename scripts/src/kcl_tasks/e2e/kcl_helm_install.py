@@ -1,46 +1,67 @@
-from pathlib import Path
+#from pathlib import Path
 from configuration import KFile
 from lib.test_ext.test_factory import make_kcl_named_test
 import json
 from helpers.kcl_helpers import Exec
 from ccgen.fluxcd_helm_controller.io.fluxcd.toolkit.helm.v2 import HelmRelease
-from typing import Generator, Type, TypeVar, Any
-from pydantic import BaseModel, ValidationError
-from cloudcoil.apimachinery import ObjectMeta
-from typing import cast
+from cloudcoil.resources import Unstructured
+from cloudcoil.models.kubernetes.core.v1 import Namespace
+from cloudcoil.errors import ResourceNotFound
+import subprocess
+import pytest
+import yaml
 
-T = TypeVar("T", bound=BaseModel)
 
-def safe_validate(model: Type[T], obj: dict[Any,Any]) -> Generator[T, None, None]:
-    try:
-        yield model.model_validate(obj)
-    except ValidationError as e:
-        print(f"⚠️ Invalid {model.__name__}: {e}")
-
+@pytest.mark.configure_test_cluster(
+    cluster_name="shared-cluster",
+    remove=False  # Keep cluster after tests
+)
 @make_kcl_named_test(["crossplane_release.k"],  lambda kf: "helm_releases" in kf.path.parts )
 def e2e_frp_kuttl(
-    crossplane_release: KFile,
-    tmp_path: Path
+    crossplane_release: KFile
 ) -> None:
-    kcl = Exec(crossplane_release.path).json_result
-    dict = json.loads(kcl)
+    subprocess.run(["flux", "run"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
+    kcl = Exec(crossplane_release.path)
+
+    dict = json.loads(kcl.json_result)
     release = HelmRelease.model_validate(dict)
 
-    # some bs we gotta do bc they did not codegen correctly
-    metadata = cast(ObjectMeta, release.metadata)
-    print("cast:", metadata)
-    print("def:", release.metadata)
+    assert release.metadata != None
+    metadata = release.metadata
 
-    newdict = release.model_dump(by_alias=True, exclude_unset=False, exclude_none=True)
-    print("new: \n", newdict)
-    print("old: \n", dict)
+    if metadata.namespace is None:
+        raise ValueError("HelmRelease.metadata.namespace and name is required")
+    if metadata.name is None:
+        raise ValueError("HelmRelease.metadata.name is required")
 
-    print("name: ", metadata.name)
 
-    #for _, resource in release.watch(field_selector=f"metadata.name={metadata.name}"):
-    #    for typed_resource in safe_validate(HelmRelease, resource.model_dump(by_alias=True)):
-    #        # Now typed_resource is guaranteed and Pyright is happy
-    #        if typed_resource.status and typed_resource.status.conditions:
-    #            for condition in typed_resource.status.conditions:
-    #                print(condition)
+    try:
+        Namespace.get(name=metadata.namespace)
+        print(f"Namespace '{metadata.namespace}' already exists.")
+    except ResourceNotFound:
+        ns = Namespace.builder() \
+            .metadata(lambda m: m.name(metadata.namespace)) \
+            .build() \
+            .create()
+
+        for event, _ in ns.watch():
+            if event == "ADDED":
+                print("namespace added")
+                break
+
+
+    try:
+        HelmRelease.get(name=metadata.name, namespace=metadata.namespace)
+        print(f"HelmRelease '{metadata.name}' already exists.")
+    except ResourceNotFound:
+        release = release.create()
+
+        for event, _ in release.watch(namespace=metadata.namespace):
+            if event == "BOOKMARK":
+                    print("Skipping BOOKMARK event")
+                    continue
+
+            if event == "ADDED":
+                print(f"HelmRelease '{metadata.name}' successfully created.")
+                break

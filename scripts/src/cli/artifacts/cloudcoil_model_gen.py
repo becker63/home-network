@@ -1,9 +1,10 @@
 from __future__ import annotations
+import re
 import logging
 import sys
 from concurrent.futures import Future, ProcessPoolExecutor, as_completed
 from typing import Dict
-from cloudcoil.codegen.generator import ModelConfig, generate
+from cloudcoil.codegen.generator import ModelConfig, generate, Transformation
 from configuration import CRD_SPECS, RemoteSchema, PROJECT_ROOT
 from helpers.helpers import remove_path
 from importlib.resources import files
@@ -39,7 +40,14 @@ def generate_spec(spec: RemoteSchema) -> str:
             input_=spec.urls,
             mode="resource",
             log_level="DEBUG",
-            additional_datamodel_codegen_args=["--extra-fields", "allow"]
+            additional_datamodel_codegen_args=["--extra-fields", "allow"],
+            transformations=[
+                Transformation(
+                    match_=re.compile(r"^io\.k8s\.apimachinery\.pkg\.apis\.meta\.v1\.ObjectMeta$"),
+                    replace="apimachinery.ObjectMeta",
+                    namespace="cloudcoil",
+                )
+            ]
         )
         logger.info(f"Starting generation for {spec.name}")
         generate(config)
