@@ -10,7 +10,6 @@ from helpers.helpers import remove_path
 from importlib.resources import files
 from pathlib import Path
 
-# Colored logging formatter
 import os
 
 class ColoredFormatter(logging.Formatter):
@@ -22,7 +21,6 @@ class ColoredFormatter(logging.Formatter):
         formatted_msg = super().format(record)
         return f"\033[{color_code}m{formatted_msg}\033[0m"
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(levelname)s - %(name)s - %(message)s",
@@ -91,7 +89,8 @@ if __name__ == "__main__":
     tmpl_dir = Path(str(files("cloudcoil.codegen"))) / "templates" / "pydantic_v2"
     tmpl_dir.mkdir(parents=True, exist_ok=True)
 
-    # Allow all extra fields my hacking around cloudcoils cookiecutter config
+    # Allow all extra fields by hacking around cloudcoils cookiecutter config
+    # I dont remmeber why we needed this lol
     (tmpl_dir / "ConfigDict.jinja2").write_text(
         '{% if extra_fields %}\nmodel_config = ConfigDict(extra="{{ extra_fields }}")\n{% endif %}\n'
     )
